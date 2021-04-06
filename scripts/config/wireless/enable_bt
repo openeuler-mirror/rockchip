@@ -1,0 +1,18 @@
+#!/bin/bash
+#/usr/bin/enable_bt
+
+ret=`ps -ef |grep hciattach |grep -v "grep" |wc -l`
+if [ ${ret} = 1 ]; then
+        killall hciattach
+        sleep 1
+fi
+
+{
+rfkill block bluetooth
+rfkill unblock bluetooth
+sleep 1
+/usr/bin/hciattach -s 115200 -n /dev/ttyS0 bcm43xx 1500000
+sleep 3
+rfkill unblock bluetooth
+hciconfig hci0 up
+} &
