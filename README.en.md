@@ -2,7 +2,7 @@
 
 English | [简体中文](./README.md)
 
-This repository provides build scripts and related documents for the openEuler image of RK3399 Firefly
+This repository provides build scripts and related documents for the openEuler image of Firefly-RK3399 Socs
 
 <!-- TOC -->
 
