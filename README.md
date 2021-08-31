@@ -1,30 +1,37 @@
-# rockchip
+# Rockchip
 
 [English](./README.en.md) | 简体中文
 
-本仓库提供适用于 Firefly-RK3399 开发板的 openEuler 镜像的构建脚本和相关文档
+本仓库提供适用于基于 RK3399 开发板的 openEuler 镜像的构建脚本和相关文档。
 
 <!-- TOC -->
 
-- [rockchip](#rockchip)
+- [Rockchip](#Rockchip)
   - [文件说明](#文件说明)
   - [最新镜像](#最新镜像)
-  - [使用镜像](#使用镜像)
   - [镜像构建](#镜像构建)
-    - [rootfs 镜像构建](#rootfs-镜像构建)
-      - [运行环境](#运行环境)
-      - [运行脚本](#运行脚本)
+    - [准备环境](#准备环境)
+    - [一次构建](#一次构建)
+    - [顺序构建](#顺序构建)
+  - [刷写镜像](#刷写镜像)
+    - [刷写到 SD 卡](安装系统到-SD-卡)
+    - [刷写到 EMMC](#安装系统到-EMMC)
 
 <!-- /TOC -->
-
 
 ## 文件说明
 
 - [documents](./documents/): 使用文档
-  - [编译内核镜像](documents/编译内核镜像.md)
-  - [制作 rootfs 镜像](documents/rootfs制作.md)
-- [scripts](./scripts): 构建 openEuler RK3399镜像的脚本
-  - [构建 rootfs 镜像](scripts/build_rootfs.sh)
+    - [openEuler镜像的构建](documents/openEuler镜像的构建.md): 
+    - [刷写EMMC镜像](documents/刷写EMMC镜像.md)
+    - [顺序构建](documents/顺序构建.md)
+    - [基于firefly-sdk编译Firefly-RK3399的内核镜像](documents/基于firefly-sdk编译Firefly-RK3399的内核镜像.md)
+- [scripts](./scripts/): 构建 openEuler RK3399镜像的脚本
+    - [一次构建脚本](scripts/build.sh)
+    - [boot 镜像构建脚本](scripts/build_boot.sh)
+    - [rootfs 镜像构建脚本](scripts/build_rootfs.sh)
+    - [u-boot 编译脚本](scripts/build_u-boot.sh)
+    - [可启动镜像生成脚本](scripts/gen_image.sh)
 
 ## 最新镜像
 
@@ -37,6 +44,7 @@
 <th class="cellrowborder" valign="top" width="10%"><p><strong>大小</strong></p></th>
 <th class="cellrowborder" valign="top" width="10%"><p><strong>内核版本</strong></p></th>
 <th class="cellrowborder" valign="top" width="10%"><p><strong>构建文件系统的源仓库</strong></p></th>
+<th class="cellrowborder" valign="top" width="10%"><p><strong>镜像类型</strong></p></th>
 </tr></thead>
 <tbody><tr>
 <td class="cellrowborder" valign="top" width="10%"><a href="https://isrc.iscas.ac.cn/eulixos/repo/others/openeuler-rk3399/FIREFLY-RK3399-BUILDROOT-GPT-20210401-2212.tar.gz">openEuler-rk3399 20210401-2212 </a></td>
@@ -45,61 +53,119 @@
 <td class="cellrowborder" valign="top" width="10%"><p>346 MiB</p></td>
 <td class="cellrowborder" valign="top" width="10%"><p>4.19.90-ge221bb1</p></td>
 <td class="cellrowborder" valign="top" width="10%"><a href="https://gitee.com/src-openeuler/openEuler-repos/blob/openEuler-20.03-LTS/generic.repo">openEuler 20.03 LTS 源仓库</a></td>
+<td class="cellrowborder" valign="top" width="10%"><p>EMMC 刷写镜像</p></td>
 </tr>
 </tbody></table>
-
-## 使用镜像
-
-- [刷写镜像](documents/刷写镜像.md)
-
 
 
 ## 镜像构建
 
-### rootfs 镜像构建
+### 准备环境
+- 操作系统：openEuler 20.03-LTS、 openEuler 21.03、 CentOS 8
+- 架构：AArch64 ，如树莓派、 RK3399 开发板
 
-#### 运行环境
+### 自行构建镜像
 
-- 操作系统：openEuler  
-- 架构：AArch64，如树莓派
+详细过程参见 [openEuler 镜像的构建](documents/openEuler镜像的构建.md)。
 
-#### 运行脚本
 
-   `sudo bash build_rootfs.sh  -r REPO_INFO  -p PACKAGE`
+### 一次构建
 
-**说明: 由于 build_rootfs.sh 提供默认参数，可以直接以 root 用户执行 ./build_rootfs.sh**
-  
-   脚本运行完，buil_rootfs.sh 所在目录生成 rootfs.img 即为 RK3399 rootfs 镜像。 
+`sudo bash build.sh -n NAME -k KERNEL_URL -b KERNEL_BRANCH -c BOARD_CONFIG -r REPO_INFO -d DTB_NAME`
 
-   各个参数意义：
-      
-1. -r, --repo REPO_INFO
+**说明: 基于 build.sh 提供的默认参数，执行 sudo bash build.sh 可构建 Firefly-RK3399 的 openEuler-20.03-LTS 镜像。**
+
+该脚本会在 output 文件夹下生成以下文件：
+
+- 压缩后的 EMMC 刷写文件：openEuler-VERSION-BOARD-RELEASE.tar.gz。
+- 压缩后的 SD 卡启动镜像：openEuler-VERSION-BOARD-ARCH-RELEASE.img.xz。
+
+>EMMC 刷写文件和 openEuler SD 卡启动文件有什么区别？
+
+>1. EMMC 刷写文件：适用于例如 Firefly-RK3399 这一类自带 EMMC 储存介质的开发板，需要使用 Rockchip 专用工具进行刷入。
+>2. SD 卡启动文件：适用于带 SD 卡槽的开发板，刷写过程在使用镜像中介绍。
+>3. 带 EMMC 的开发板也可以使用 SD 卡启动镜像，具体启动选择的储存介质各不相同，如果 EMMC 启动优先级大于 SD 卡，则优先启动 EMMC 内的系统，在这种情况下若想使用 SD 卡内的系统需要先清空 EMMC。
+
+各个参数意义：
+
+1. -n, --name IMAGE_NAME
+
+    构建的镜像名称。
+
+2. -k, --kernel KERNEL_URL
+
+   内核源码仓库的项目地址，默认为 `https://gitee.com/openeuler/rockchip-kernel.git`。可根据需要设置为 `git@gitee.com:openeuler/rockchip-kernel.git` 或 `git@gitee.com:openeuler/kernel.git`。
+
+3. -b, --branch KERNEL_BRANCH
+
+    内核源码的对应分支，默认为 openEuler-20.03-LTS。根据 -k 参数有以下选择：
+
+    - -k https://gitee.com/openeuler/rockchip-kernel.git
+        - openEuler-20.03-LTS
+    - -k https://gitee.com/openeuler/kernel.git
+        - openEuler-21.03
+        - openEuler-21.09
+
+4. -c, --config BOARD_CONFIG
    
-    开发源 repo 文件的 URL 或者路径。
+    开发板对应的 defconfig 的文件名称，对应 [u-boot/configs](https://github.com/u-boot/u-boot/tree/master/configs) 下 `BOARD_CONFIG` 文件，默认为 `firefly-rk3399_defconfig`。
 
+5. -r, --repo REPO_INFO
+   
+    开发源 repo 文件的 URL 或者路径，也可以是开发源中资源库的 baseurl 列表。注意，如果该参数为资源库的 baseurl 列表，该参数需要使用双引号，各个 baseurl 之间以空格隔开。
     下面分别举例：
-    - 开发源 repo 文件的 URL：`https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-20.03-LTS/generic.repo`
+
+    - 开发源 repo 文件的 URL，如 https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-20.03-LTS-SP2/generic.repo。
     - 开发源的 repo 文件路径：
-        - `./openEuler-20.03-LTS.repo`：生成 openEuler 20.03 LTS 版本的镜像，该文件内容参考 <https://gitee.com/src-openeuler/openEuler-repos/blob/openEuler-20.03-LTS/generic.repo>。
-    
+        
+        `./openEuler-20.03-LTS.repo`：生成 openEuler 20.03 LTS 版本的镜像，该文件内容参考 <https://gitee.com/src-openeuler/openEuler-repos/blob/openEuler-20.03-LTS/generic.repo>。
+
+    - 资源库的 baseurl 列表，如 "http://repo.openeuler.org/openEuler-20.03-LTS-SP2/OS/aarch64/ http://repo.openeuler.org/openEuler-20.03-LTS/EPOL/aarch64/"。
+
+6. -d, --device-tree DTB_NAME
+
+     内核设备树中的设备名称，和开发板名称有一点区别，对应 [kernel/arch/arm64/boot/dts/rockchip](https://gitee.com/openeuler/kernel/tree/master/arch/arm64/boot/dts/rockchip) 下的 `DTB_NAME.dts` 文件，默认为 `rk3399_firefly`。
 
 
-2. -p, --package PACKAGE
+适用的 RK3399 开发板:
 
-     制作 rootfs 所需的 openEuler 发布包的 URL。
+已经测试的开发板如下，其他类型 RK3399 开发板适用情况待测试。
 
-    举例说明：
-    - openEuler-20.03-LTS 的发布包： `http://repo.openeuler.org/openEuler-20.03-LTS/everything/aarch64/Packages/openEuler-release-20.03LTS-33.oe1.aarch64.rpm`
+1. Firefly-RK3399
 
+    已测试的版本如下：
 
+    - openEuler-20.03-LTS, 构建命令如下:
 
-
-
-
-
+        `sudo bash build.sh  -n openEuler-20.03-LTS-Firefly-RK3399-aarch64-alpha1  -k "https://gitee.com/openeuler/rockchip-kernel.git"  -b openEuler-20.03-LTS  -c firefly-rk3399_defconfig  -r "https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-20.03-LTS/generic.repo"  -d rk3399-firefly`
 
 
+    - openEuler-21.03, 构建命令如下：
+
+        `sudo bash build.sh  -n openEuler-21.03-Firefly-RK3399-aarch64-alpha1  -k "https://gitee.com/openeuler/kernel.git"  -b openEuler-21.03  -c firefly-rk3399_defconfig  -r "https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-21.03/generic.repo"  -d rk3399-firefly`
 
 
+2. RockPi-4A
+  
+    已测试的版本如下：
+
+    - openEuler-21.03, 构建命令如下：
+
+        `sudo bash build.sh  -n openEuler-21.03-RockPi-4A-aarch64-alpha1  -k "https://gitee.com/openeuler/kernel.git"  -b openEuler-21.03  -c rock-pi-4-rk3399_defconfig  -r "https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-21.03/generic.repo"  -d rk3399-rock-pi-4a`
 
 
+### 顺序构建
+
+依次执行脚本构建出 SD 卡启动镜像和打包后的 EMMC 刷写文件，过程参考[顺序构建](documents/顺序构建.md)。
+
+## 刷写镜像
+
+### 刷写到 SD 卡
+
+将 SD 卡启动镜像刷写入 SD 卡，请参考[树莓派镜像烧录](https://gitee.com/openeuler/raspberrypi/blob/master/documents/%E5%88%B7%E5%86%99%E9%95%9C%E5%83%8F.md)。
+
+>注意：由于 Firefly-RK3399 有与其他 RK3399 开发板不同的启动顺序，在 Firefly-RK3399 上使用 SD 卡启动镜像之前需要清除 EMMC 上的系统，上电后需要按下电源键来启动。
+
+### 刷写到 EMMC
+
+将 EMMC 刷写文件刷写入 EMMC，详见[刷写EMMC镜像](documents/刷写EMMC镜像.md)。

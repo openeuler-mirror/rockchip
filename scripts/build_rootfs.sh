@@ -8,7 +8,6 @@ The target file rootfs.img will be generated in the directory where the build_ro
 
 Options: 
   -r, --repo REPO_INFO       Required! The URL/path of target repo file or list of repo's baseurls which should be a space separated list.
-  -p, --package PACKAGE      Required! The URL of target package .
   -h, --help                 Show command help.
 "
 
@@ -25,15 +24,12 @@ used_param() {
     echo ""
     echo "REPO_INFO : $repo_file"
     echo ""    
-    echo "PACKAGE   : $openeuler_package"
-    echo ""
 }
 
 default_param() {
     repo_file="https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-20.03-LTS/generic.repo"
     img_name="rootfs.img"
-    workdir=$(pwd)
-    openeuler_package="http://repo.openeuler.org/openEuler-20.03-LTS/everything/aarch64/Packages/openEuler-release-20.03LTS-33.oe1.aarch64.rpm"
+    workdir=$(pwd)/build_dir
 }
 
 parseargs()
@@ -51,11 +47,7 @@ parseargs()
         elif [ "x$1" == "x-r" -o "x$1" == "x--repo" ]; then
             repo_file=`echo $2`
             shift
-            shift
-        elif [ "x$1" == "x-p" -o "x$1" == "x--package" ]; then
-            openeuler_package=`echo $2`
-            shift
-            shift            
+            shift          
         else
             echo `date` - ERROR, UNKNOWN params "$@"
             return 2
@@ -73,27 +65,94 @@ build_rootfs() {
     cd $workdir
     if [ -d rootfs ];then rm -rf rootfs; fi
     mkdir rootfs
-    mkdir -p rootfs/var/lib/rpm
-    rpm --root  /rootfs/ --initdb  
-    rpm -ivh --nodeps --root $workdir/rootfs/ $openeuler_package
-    mkdir $workdir/rootfs/etc/yum.repos.d 
 
-    if [ "x${repo_file:0:4}" == "xhttp" ]; then
+    if [ ! -d ${tmp_dir} ]; then
+        mkdir -p ${tmp_dir}
+    else
+        rm -rf ${tmp_dir}/*
+    fi
+
+    mkdir -p rootfs/var/lib/rpm
+    rpm --root  rootfs/ --initdb
+
+    if [ "x$repo_file" == "x" ] ; then
+        echo `date` - ERROR, \"-r REPO_INFO or --repo REPO_INFO\" missing.
+        help 2
+    elif [ "x${repo_file:0:4}" == "xhttp" ]; then
         if [ "x${repo_file:0-5}" == "x.repo" ]; then
-            curl -o $workdir/rootfs/etc/yum.repos.d/openEuler-20.03-LTS.repo $repo_file
+            repo_url=${repo_file}
+            wget ${repo_file} -P ${tmp_dir}/
+            repo_file_name=${repo_file##*/}
+            repo_file=${tmp_dir}/${repo_file_name}
+        else
+            repo_file_name=tmp.repo
+            repo_file_tmp=${tmp_dir}/${repo_file_name}
+            index=1
+            for baseurl in ${repo_file// / }
+            do
+                echo [repo${index}] >> ${repo_file_tmp}
+                echo name=repo${index} to build rk3399 image >> ${repo_file_tmp}
+                echo baseurl=${baseurl} >> ${repo_file_tmp}
+                echo enabled=1 >> ${repo_file_tmp}
+                echo gpgcheck=0 >> ${repo_file_tmp}
+                echo >> ${repo_file_tmp}
+                index=$(($index+1))
+            done
+            repo_file=${repo_file_tmp}
         fi
     else
         if [ ! -f $repo_file ]; then
             echo `date` - ERROR, repo file $repo_file can not be found.
             exit 2
         else
-            cat  $repo_file > "$workdir/rootfs/etc/yum.repos.d/openEuler-20.03-LTS.repo"
+            cp $repo_file ${tmp_dir}/
+            repo_file_name=${repo_file##*/}
+            repo_file=${tmp_dir}/${repo_file_name}
         fi
-    fi    
+    fi
+
+    repo_info_names=`cat ${repo_file} | grep "^\["`
+    repo_baseurls=`cat ${repo_file} | grep "^baseurl="`
+    index=1
+    for repo_name in ${repo_info_names}
+    do
+        repo_name_list[$index]=${repo_name:1:-1}
+        index=$((index+1))
+    done
+    index=1
+    for baseurl in ${repo_baseurls}
+    do
+        repo_info="${repo_info} --repofrompath ${repo_name_list[$index]}-tmp,${baseurl:8}"
+        index=$((index+1))
+    done
+    
+    os_release_name=openEuler-release
+    dnf ${repo_info} --disablerepo="*" --downloaddir=${workdir}/ download ${os_release_name}
+    if [ $? != 0 ]; then
+        echo "Fail to download ${os_release_name}!"
+        exit 2
+    fi
+    os_release_name=`ls -r ${workdir}/${os_release_name}*.rpm 2>/dev/null| head -n 1`
+    if [ -z "${os_release_name}" ]; then
+        echo "${os_release_name} can not be found!"
+        exit 2
+    fi
+
+    rpm -ivh --nodeps --root $workdir/rootfs/ ${os_release_name}
+
+    mkdir -p ${workdir}/rootfs/etc/rpm
+    chmod a+rX ${workdir}/rootfs/etc/rpm
+    echo "%_install_langs en_US" > ${workdir}/rootfs/etc/rpm/macros.image-language-conf
+    mkdir -p ${workdir}/rootfs/etc/yum.repos.d
+    cp ${tmp_dir}/generic.repo ${workdir}/rootfs/etc/yum.repos.d/generic.repo
     dnf --installroot=$workdir/rootfs/ install dnf --nogpgcheck -y 
     dnf --installroot=$workdir/rootfs/ makecache
-    dnf --installroot=$workdir/rootfs/ install -y alsa-utils wpa_supplicant vim net-tools iproute iputils NetworkManager openssh-server passwd hostname ntp bluez pulseaudio-module-bluetooth
+    dnf --installroot=$workdir/rootfs/ install -y alsa-utils wpa_supplicant vim net-tools iproute iputils NetworkManager openssh-server passwd hostname ntp bluez pulseaudio-module-bluetooth linux-firmware parted gdisk
     cp -L /etc/resolv.conf ${workdir}/rootfs/etc/resolv.conf
+    
+    if [ -d rootfs/lib/modules ];then rm -rf rootfs/lib/modules; fi
+    cp -rfp kernel/kernel-bin/lib/modules rootfs/lib 
+    
     echo "   nameserver 8.8.8.8
    nameserver 114.114.114.114"  > "$workdir/rootfs/etc/resolv.conf"
    if [ ! -d ${workdir}/rootfs/etc/sysconfig/network-scripts ]; then mkdir "${workdir}/rootfs/etc/sysconfig/network-scripts"; fi
@@ -118,31 +177,34 @@ build_rootfs() {
     mount -t proc /proc $workdir/rootfs/proc
     mount -t sysfs /sys $workdir/rootfs/sys
 
-    cat << EOF | chroot /root/tmp/rootfs  /bin/bash
+    cp $workdir/../bin/expand-rootfs.sh ${workdir}/rootfs/etc/rc.d/init.d/expand-rootfs.sh
+    chmod +x ${workdir}/rootfs/etc/rc.d/init.d/expand-rootfs.sh
+
+    cat << EOF | chroot ${workdir}/rootfs  /bin/bash
     echo 'openeuler' | passwd --stdin root
     echo openEuler > /etc/hostname
     ln -s /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
+    chkconfig --add expand-rootfs.sh
+    chkconfig expand-rootfs.sh on
 EOF
 
     umount -l ${workdir}/rootfs/dev
     umount -l ${workdir}/rootfs/proc
-    umount -l ${workdir}/rootfs/sys 
+    umount -l ${workdir}/rootfs/sys
 
-    mkdir  $workdir/rootfs/system
-    cp -r $workdir/config/wireless/system/*    ${workdir}/rootfs/system/
-    cp   $workdir/config/wireless/rcS.sh    ${workdir}/rootfs/etc/profile.d/
-    cp   $workdir/config/wireless/enable_bt    ${workdir}/rootfs/usr/bin/
-    chmod +x  $workdir/rootfs/usr/bin/enable_bt  ${workdir}/rootfs/etc/profile.d/rcS.sh  
+    os_name=${repo_url#*raw/}
+    if [ "x${os_name:0:12}" == "xopenEuler-20" ]; then
+        mkdir  ${workdir}/rootfs/system
+        cp -r ${workdir}/../bin/wireless/system/*    ${workdir}/rootfs/system/
+        cp   ${workdir}/../bin/wireless/rcS.sh    ${workdir}/rootfs/etc/profile.d/
+        cp   ${workdir}/../bin/wireless/enable_bt    ${workdir}/rootfs/usr/bin/
+        chmod +x  ${workdir}/rootfs/usr/bin/enable_bt  ${workdir}/rootfs/etc/profile.d/rcS.sh
+    fi
 
-    echo "Writint image ..."
-    dd if=/dev/zero of=rootfs.img bs=1M count=3000
-    mkfs.ext4 rootfs.img
-    mkdir rootfsimg
-    mount rootfs.img rootfsimg/
-    cp -rfp rootfs/* rootfsimg/    
-    umount rootfsimg/
-    e2fsck -p -f rootfs.img  
-    resize2fs -M rootfs.img   
+    sed -i 's/#NTP=/NTP=0.cn.pool.ntp.org/g' ${workdir}/rootfs/etc/systemd/timesyncd.conf
+    sed -i 's/#FallbackNTP=/FallbackNTP=1.asia.pool.ntp.org 2.asia.pool.ntp.org/g' ${workdir}/rootfs/etc/systemd/timesyncd.conf
+
+    cp ${workdir}/../bin/brcmfmac4356-sdio.firefly,firefly-rk3399.txt ${workdir}/rootfs/lib/firmware/brcm
 
 }
 root_need
@@ -150,4 +212,8 @@ default_param
 parseargs "$@" || help $?
 used_param
 
+if [ ! -d $workdir ]; then
+    mkdir $workdir
+fi
+tmp_dir=${workdir}/tmp
 build_rootfs
