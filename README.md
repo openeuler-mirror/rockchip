@@ -2,7 +2,7 @@
 
 [English](./README.en.md) | 简体中文
 
-本仓库提供适用于基于 RK3399 开发板的 openEuler 镜像的构建脚本和相关文档。
+本仓库提供适用于 RK3399 开发板的 openEuler 镜像的构建脚本和相关文档。
 
 <!-- TOC -->
 
