@@ -40,7 +40,7 @@
 # 准备编译环境
 
 1.  系统要求。
-    - 操作系统：openEuler-20.03-LTS
+    - 操作系统：openEuler
     - 架构：AArch64
 
 2.  安装依赖包
@@ -91,7 +91,7 @@
     ```
 
 
-# 基于 openeuler 内核编译内核镜像
+# 基于 openEuler 内核编译内核镜像
 
 ## 编译内核代码
    
@@ -136,7 +136,7 @@
     cp $workplace/firefly-rk3399.dtb boot
     ```
 
-3.  制作 boot 镜像。
+3.  制作 boot 镜像
     
     1.  创建空镜像
 
@@ -148,11 +148,19 @@
 
     3.  创建临时目录
 
-        `mkdir tmp && sudo mount boot.img tmp/`
+        `mkdir tmp`
 
-    3.  填充镜像内容
+    4.  将 boot.img 挂载到临时目录
+
+        `sudo mount boot.img tmp/`
+
+    5.  填充镜像内容
         
-        `cp -r boot/* tmp/ && umount tmp`
+        `cp -r boot/* tmp/`
+
+    6.  取消挂载 boot.img
+        
+        `umount tmp`
 
 # 制作 rootfs 镜像
 
@@ -238,11 +246,11 @@ dnf --installroot=/root/rootfs/ install -y alsa-utils wpa_supplicant vim net-too
 
     2.  拷贝文件 :
         ```
-        mkdir  ${workdir}/rootfs/system
-        cp -r ${workdir}/../bin/wireless/system/*    $workplace/rootfs/system/
-        cp   ${workdir}/../bin/wireless/rcS.sh    $workplace/rootfs/etc/profile.d/
-        cp   ${workdir}/../bin/wireless/enable_bt    $workplace/rootfs/usr/bin/
-        chmod +x  ${workdir}/rootfs/usr/bin/enable_bt  $workplace/rootfs/etc/profile.d/rcS.sh
+        mkdir  $workplace/rootfs/system
+        cp -r $workplace/../bin/wireless/system/*    $workplace/rootfs/system/
+        cp   $workplace/../bin/wireless/rcS.sh    $workplace/rootfs/etc/profile.d/
+        cp   $workplace/../bin/wireless/enable_bt    $workplace/rootfs/usr/bin/
+        chmod +x  $workplace/rootfs/usr/bin/enable_bt  $workplace/rootfs/etc/profile.d/rcS.sh
         ```
 
 4.  设置 NTP 服务器
@@ -254,7 +262,7 @@ dnf --installroot=/root/rootfs/ install -y alsa-utils wpa_supplicant vim net-too
 
 5.  添加第一次开机扩容脚本
 
-    在 `${workspace}/rootfs/etc/rc.d/init.d/expand-rootfs.sh` 写入以下内容：
+    在 `$workplace/rootfs/etc/rc.d/init.d/expand-rootfs.sh` 写入以下内容：
         
         echo "#!/bin/bash
         # chkconfig: - 99 10
@@ -280,7 +288,7 @@ dnf --installroot=/root/rootfs/ install -y alsa-utils wpa_supplicant vim net-too
 
     设置可执行权限：
 
-        `chmod +x ${workspace}/rootfs/etc/rc.d/init.d/expand-rootfs.sh`
+        `chmod +x $workplace/rootfs/etc/rc.d/init.d/expand-rootfs.sh`
 
 
 ## rootfs 设置
@@ -439,13 +447,13 @@ add map loop0p5 ...
 
 ## 创建要挂载的根目录和 boot 分区路径
 
-`mkdir ${workspace}/rootp ${workspace}/bootp`
+`mkdir $workplace/rootp $workplace/bootp`
 
 ## 挂载根目录和 boot 分区
 
-`mount -t vfat -o uid=root,gid=root,umask=0000 /dev/mapper/loop0p4 ${workspace}/bootp/`
+`mount -t vfat -o uid=root,gid=root,umask=0000 /dev/mapper/loop0p4 $workplace/bootp/`
 
-`mount -t ext4 /dev/mapper/loop0p5 ${workspace}/rootp/`
+`mount -t ext4 /dev/mapper/loop0p5 $workplace/rootp/`
 
 ## 获取生成的 img 镜像的 blkid
 
@@ -458,7 +466,7 @@ add map loop0p5 ...
 
 ## 修改 fstab
 
-`vim ${workspace}/rootfs/etc/fstab`
+`vim $workplace/rootfs/etc/fstab`
 
 内容：
 ```
@@ -468,11 +476,11 @@ UUID=2785-C7C3  /boot vfat    defaults,noatime 0 0
 
 ## rootfs 拷贝到镜像
 
-`rsync -avHAXq ${workspace}/rootfs/* ${workspace}/rootp`
+`rsync -avHAXq ${workspace}/rootfs/* $workplace/rootp`
 
 ## boot 引导拷贝到镜像
 
-`cp -r ${workspace}/boot/* ${workspace}/bootp`
+`cp -r ${workspace}/boot/* $workplace/bootp`
 
 ## 卸载镜像
 
@@ -482,9 +490,9 @@ UUID=2785-C7C3  /boot vfat    defaults,noatime 0 0
 
 ### 卸载
 
-`umount ${workspace}/root`
+`umount $workplace/root`
 
-`umount ${workspace}/boot`
+`umount $workplace/boot`
 
 ### 卸载镜像文件虚拟的块设备
 

@@ -11,14 +11,14 @@
 
 # 描述
 
-本文档介绍基于 firefly sdk 编译出适用于 Firefly RK3399 的内核镜像。
+本文档介绍基于 firefly sdk 交叉编译出适用于 Firefly RK3399 的内核镜像。
 
 # 基于 openeuler 内核制作 RK3399-firefly 内核镜像
 
 ## 准备编译环境
 
 1.  系统要求。
-    - 操作系统：ubuntu16.04
+    - 操作系统：Ubuntu 16.04
     - 架构：x86_64
 
 2.  安装依赖包。
@@ -85,21 +85,8 @@
         
 2.  生成 boot.img。
                 
-    在 rk3399_linux_release_v2.5.1_20210301/kernel 目录下执行 
+    在 rk3399_linux_release_v2.5.1_20210301/kernel 目录下执行
 
     `make rk3399-firefly.img`
 
-    该命令执行完成后在 rk3399_linux_release_v2.5.1_20210301/rockdev 目录下生成 boot.img 
-        
-
-
-
-
-
-
-
-
-
-
-                
-
+    该命令执行完成后在 rk3399_linux_release_v2.5.1_20210301/rockdev 目录下生成 boot.img。
