@@ -7,8 +7,6 @@ The target compressed bootable images will be generated in the output directory 
 
 Options: 
   -n, --name IMAGE_NAME         The RK3399 image name to be built.
-  -b, --branch KERNEL_BRANCH    The branch name of kernel source's repository, which defaults to openEuler-20.03-LTS.
-  -d, --device-tree DTB_NAME    Required! The device tree name of target board.
   -h, --help                    Show command help.
 "
 
@@ -19,8 +17,12 @@ help()
 }
 
 default_param() {
-    workdir=$(pwd)/build_dir
+    workdir=$(pwd)/builddir
+    output_dir=$(pwd)/output
     name=openEuler-Firefly-RK3399-aarch64-alpha1
+    rootfs_dir=${workdir}/rootfs
+    boot_mnt=${workdir}/boot_tmp
+    root_mnt=${workdir}/root_tmp
 }
 
 parseargs()
@@ -38,18 +40,13 @@ parseargs()
         elif [ "x$1" == "x-n" -o "x$1" == "x--name" ]; then
             name=`echo $2`
             shift
-            shift         
+            shift
         else
             echo `date` - ERROR, UNKNOWN params "$@"
             return 2
         fi
     done
 }
-
-workdir=$(pwd)/build_dir
-rootfs_dir=${workdir}/rootfs
-boot_mnt=${workdir}/boot_tmp
-root_mnt=${workdir}/root_tmp
 
 LOSETUP_D_IMG(){
     set +e
@@ -77,6 +74,20 @@ LOSETUP_D_IMG(){
     set -e
 }
 
+UMOUNT_ALL(){
+    set +e
+    if grep -q "${rootfs_dir}/dev " /proc/mounts ; then
+        umount -l ${rootfs_dir}/dev
+    fi
+    if grep -q "${rootfs_dir}/proc " /proc/mounts ; then
+        umount -l ${rootfs_dir}/proc
+    fi
+    if grep -q "${rootfs_dir}/sys " /proc/mounts ; then
+        umount -l ${rootfs_dir}/sys
+    fi
+    set -e
+}
+
 make_img(){
     cd $workdir
     device=""
@@ -86,7 +97,6 @@ make_img(){
     losetup -D
     img_file=${workdir}/${name}.img
     dd if=/dev/zero of=${img_file} bs=1MiB count=$size status=progress && sync
-    
     cat << EOF | parted ${img_file} mklabel gpt mkpart primary 64s 16383s
     Ignore
 EOF
@@ -97,9 +107,7 @@ EOF
     parted ${img_file} mkpart primary ext4 262144s 100%
 
     device=`losetup -f --show -P ${img_file}`
-
     trap 'LOSETUP_D_IMG' EXIT
-
     kpartx -va ${device}
     loopX=${device##*\/}
     partprobe ${device}
@@ -160,7 +168,7 @@ EOF
     losetup -D
 }
 
-output(){
+outputd(){
     cd $workdir
     xz ${name}.img
     sha256sum ${name}.img.xz >> ${name}.img.xz.sha256sum
@@ -169,11 +177,13 @@ output(){
 
     cd ..
     mkdir output
-    mv build_dir/${name}.tar.gz* output
-    mv build_dir/${name}.img.xz* output
+    mv $workdir/${name}.tar.gz* $output_dir
+    mv $workdir/${name}.img.xz* $output_dir
 }
 
 default_param
 parseargs "$@" || help $?
+trap 'UMOUNT_ALL' EXIT
+UMOUNT_ALL
 make_img
-output
+outputd

@@ -14,14 +14,14 @@
     - [一次构建](#一次构建)
     - [顺序构建](#顺序构建)
   - [刷写镜像](#刷写镜像)
-    - [刷写到 SD 卡](安装系统到-SD-卡)
-    - [刷写到 EMMC](#安装系统到-EMMC)
+    - [刷写到 SD 卡](#刷写到-SD-卡)
+    - [刷写到 EMMC](#刷写到-EMMC)
 
 <!-- /TOC -->
 
 ## 文件说明
 
-- [documents](./documents/): 使用文档
+- [documents](./documents/)使用文档
     - [openEuler镜像的构建](documents/openEuler镜像的构建.md)
     - [刷写EMMC镜像](documents/刷写EMMC镜像.md)
     - [顺序构建](documents/顺序构建.md)
@@ -61,7 +61,7 @@
 ## 镜像构建
 
 ### 准备环境
-- 操作系统：openEuler 20.03-LTS、 openEuler 21.03、 CentOS 8
+- 操作系统：openEuler 20.03-LTS、 openEuler 21.03、 Fedora 34
 - 架构：AArch64 ，如树莓派、 RK3399 开发板
 
 详细过程参见 [openEuler 镜像的构建](documents/openEuler镜像的构建.md)。
@@ -73,15 +73,15 @@
 
 **说明: 基于 build.sh 提供的默认参数，执行 sudo bash build.sh 可构建 Firefly-RK3399 的 openEuler-20.03-LTS 镜像。**
 
-该脚本会在 output 文件夹下生成以下文件：
+该脚本的工作目录为 builddir 文件夹，最终会在 output 文件夹下得到以下文件：
 
 - 压缩后的 EMMC 刷写文件：openEuler-VERSION-BOARD-RELEASE.tar.gz。
 - 压缩后的 SD 卡启动镜像：openEuler-VERSION-BOARD-ARCH-RELEASE.img.xz。
 
 >打包后的 EMMC 刷写文件和压缩后的 openEuler SD 卡启动文件有什么区别？
 
->1. EMMC 刷写文件：适用于例如 Firefly-RK3399 这一类自带 EMMC 储存介质的开发板，需要使用 Rockchip 专用工具进行刷入。
->2. SD 卡启动文件：适用于带 SD 卡槽的开发板，刷写过程在使用镜像中介绍。
+>1. 打包后的 EMMC 刷写文件：适用于例如 Firefly-RK3399 这一类自带 EMMC 储存介质的开发板，需要使用 Rockchip 专用工具进行刷入。
+>2. 压缩后的 SD 卡启动文件：适用于带 SD 卡槽的开发板，刷写过程在 [刷写镜像](#刷写到-SD-卡) 中介绍。
 >3. 带 EMMC 的开发板也可以使用 SD 卡启动镜像，具体启动选择的储存介质各不相同，如果 EMMC 启动优先级大于 SD 卡，则优先启动 EMMC 内的系统，在这种情况下若想使用 SD 卡内的系统需要先清空 EMMC。
 
 各个参数意义：

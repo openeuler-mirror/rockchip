@@ -17,19 +17,12 @@ help()
     exit $1
 }
 
-used_param() {
-    echo ""
-    echo "Default args"
-    echo "DIR       : $workdir"
-    echo ""
-    echo "REPO_INFO : $repo_file"
-    echo ""    
-}
-
 default_param() {
     repo_file="https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-20.03-LTS/generic.repo"
     img_name="rootfs.img"
-    workdir=$(pwd)/build_dir
+    tmp_dir=${workdir}/tmp
+    workdir=$(pwd)/builddir
+    nonfree_bin_dir=${workdir}/../bin
 }
 
 parseargs()
@@ -47,7 +40,7 @@ parseargs()
         elif [ "x$1" == "x-r" -o "x$1" == "x--repo" ]; then
             repo_file=`echo $2`
             shift
-            shift          
+            shift
         else
             echo `date` - ERROR, UNKNOWN params "$@"
             return 2
@@ -177,7 +170,7 @@ build_rootfs() {
     mount -t proc /proc $workdir/rootfs/proc
     mount -t sysfs /sys $workdir/rootfs/sys
 
-    cp $workdir/../bin/expand-rootfs.sh ${workdir}/rootfs/etc/rc.d/init.d/expand-rootfs.sh
+    cp $nonfree_bin_dir/../bin/expand-rootfs.sh ${workdir}/rootfs/etc/rc.d/init.d/expand-rootfs.sh
     chmod +x ${workdir}/rootfs/etc/rc.d/init.d/expand-rootfs.sh
 
     cat << EOF | chroot ${workdir}/rootfs  /bin/bash
@@ -195,25 +188,23 @@ EOF
     os_name=${repo_url#*raw/}
     if [ "x${os_name:0:12}" == "xopenEuler-20" ]; then
         mkdir  ${workdir}/rootfs/system
-        cp -r ${workdir}/../bin/wireless/system/*    ${workdir}/rootfs/system/
-        cp   ${workdir}/../bin/wireless/rcS.sh    ${workdir}/rootfs/etc/profile.d/
-        cp   ${workdir}/../bin/wireless/enable_bt    ${workdir}/rootfs/usr/bin/
+        cp -r $nonfree_bin_dir/wireless/system/*    ${workdir}/rootfs/system/
+        cp   $nonfree_bin_dir/wireless/rcS.sh    ${workdir}/rootfs/etc/profile.d/
+        cp   $nonfree_bin_dir/wireless/enable_bt    ${workdir}/rootfs/usr/bin/
         chmod +x  ${workdir}/rootfs/usr/bin/enable_bt  ${workdir}/rootfs/etc/profile.d/rcS.sh
     fi
 
     sed -i 's/#NTP=/NTP=0.cn.pool.ntp.org/g' ${workdir}/rootfs/etc/systemd/timesyncd.conf
     sed -i 's/#FallbackNTP=/FallbackNTP=1.asia.pool.ntp.org 2.asia.pool.ntp.org/g' ${workdir}/rootfs/etc/systemd/timesyncd.conf
 
-    cp ${workdir}/../bin/brcmfmac4356-sdio.firefly,firefly-rk3399.txt ${workdir}/rootfs/lib/firmware/brcm
+    cp $nonfree_bin_dir/brcmfmac4356-sdio.firefly,firefly-rk3399.txt ${workdir}/rootfs/lib/firmware/brcm
 
 }
 root_need
 default_param
 parseargs "$@" || help $?
-used_param
 
 if [ ! -d $workdir ]; then
     mkdir $workdir
 fi
-tmp_dir=${workdir}/tmp
 build_rootfs

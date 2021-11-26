@@ -6,7 +6,7 @@ Build rk3399 u-boot image.
 The target file idbloader.img u-boot.itb will be generated in the directory where the build_u-boot.sh script is located
 
 Options: 
-  -c, --config BOARD_CONFIG     Required! The name of target board which should be a space separated list.
+  -c, --config BOARD_CONFIG     Required! The name of target board which should be a space separated list, which defaults to firely-rk3399_defconfig.
   -h, --help                    Show command help.
 "
 
@@ -16,18 +16,9 @@ help()
     exit $1
 }
 
-used_param() {
-    echo ""
-    echo "Default args"
-    echo "DIR         : $workdir"
-    echo ""
-    echo "BOARD_CONFIG: $config"
-    echo ""    
-}
-
 default_param() {
     config="firely-rk3399_defconfig"
-    workdir=$(pwd)/build_dir
+    workdir=$(pwd)/builddir
 }
 
 parseargs()
@@ -45,7 +36,7 @@ parseargs()
         elif [ "x$1" == "x-c" -o "x$1" == "x--config" ]; then
             config=`echo $2`
             shift
-            shift         
+            shift
         else
             echo `date` - ERROR, UNKNOWN params "$@"
             return 2
@@ -90,7 +81,6 @@ build_u-boot() {
 u_boot_ver="v2020.10"
 default_param
 parseargs "$@" || help $?
-used_param
 
 if [ ! -d $workdir ]; then
     mkdir $workdir

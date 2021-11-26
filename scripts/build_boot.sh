@@ -8,7 +8,7 @@ The target file boot.img will be generated in the directory where the build_boot
 Options: 
   -b, --branch KERNEL_BRANCH            The branch name of kernel source's repository, which defaults to openEuler-20.03-LTS.
   -k, --kernel KERNEL_URL               Required! The URL of kernel source's repository.
-  -d, --device-tree DTB_NAME            Required! The device tree name of target board.
+  -d, --device-tree DTB_NAME            Required! The device tree name of target board, which defaults to rk3399-firefly.
   -h, --help                            Show command help.
 "
 
@@ -18,21 +18,8 @@ help()
     exit $1
 }
 
-used_param() {
-    echo ""
-    echo "Default args"
-    echo "DIR         : $workdir"
-    echo ""  
-    echo "DTB_NAME    : $dtb_name"
-    echo ""
-    echo "BRANCH      : $branch"
-    echo ""
-    echo "KERNEL_URL  : $kernel_url"
-    echo ""
-}
-
 default_param() {
-    workdir=$(pwd)/build_dir
+    workdir=$(pwd)/builddir
     branch=openEuler-20.03-LTS
     dtb_name=rk3399-firefly
     kernel_url="https://gitee.com/openeuler/rockchip-kernel.git"
@@ -57,11 +44,11 @@ parseargs()
         elif [ "x$1" == "x-d" -o "x$1" == "x--device-tree" ]; then
             dtb_name=`echo $2`
             shift
-            shift            
+            shift
         elif [ "x$1" == "x-k" -o "x$1" == "x--kernel" ]; then
             kernel_url=`echo $2`
             shift
-            shift            
+            shift
         else
             echo `date` - ERROR, UNKNOWN params "$@"
             return 2
@@ -115,7 +102,6 @@ mk_bootdir() {
 
 default_param
 parseargs "$@" || help $?
-used_param
 
 if [ ! -d $workdir ]; then
     mkdir $workdir
