@@ -175,6 +175,7 @@ outputd(){
     sha256sum ${name}.tar.gz >> ${name}.tar.gz.sha256sum
 }
 
+set -e
 default_param
 parseargs "$@" || help $?
 trap 'UMOUNT_ALL' EXIT

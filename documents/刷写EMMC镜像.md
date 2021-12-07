@@ -1,10 +1,12 @@
-<!-- TOC -->
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+
+<!-- code_chunk_output -->
 
 - [描述](#描述)
-- [使用 Windows 刷写](#使用-Windows-刷写)
-- [使用 Linux 刷写](#使用-Linux-刷写)
+- [使用 Windows 刷写](#使用-windows-刷写)
+- [使用 Linux 刷写](#使用-linux-刷写)
 
-<!-- /TOC -->
+<!-- /code_chunk_output -->
 
 # 描述
 
@@ -75,13 +77,13 @@
 
 4.  刷写镜像等文件到 EMMC，如下：
 
-```
-cd build
-rkdeveloptool db rk3399_loader.bin
-rkdeveloptool gpt parameter.gpt
-rkdeveloptool wl 0x40 idbloader.img
-rkdeveloptool wl 0x4000 u-boot.itb
-rkdeveloptool wl 0x8000 boot.img
-rkdeveloptool wl 0x40000 rootfs.img
-rkdeveloptool rd
-```
+    ```
+    cd build
+    rkdeveloptool db rk3399_loader.bin
+    rkdeveloptool gpt parameter.gpt
+    rkdeveloptool wl 0x40 idbloader.img
+    rkdeveloptool wl 0x4000 u-boot.itb
+    rkdeveloptool wl 0x8000 boot.img
+    rkdeveloptool wl 0x40000 rootfs.img
+    rkdeveloptool rd
+    ```

@@ -200,6 +200,7 @@ EOF
     cp $nonfree_bin_dir/brcmfmac4356-sdio.firefly,firefly-rk3399.txt ${workdir}/rootfs/lib/firmware/brcm
 
 }
+set -e
 root_need
 default_param
 parseargs "$@" || help $?

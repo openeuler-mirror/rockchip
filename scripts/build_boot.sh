@@ -113,5 +113,6 @@ else
     build_kernel
 fi
 
+set -e
 install_kernel
 mk_bootdir

@@ -4,9 +4,10 @@
 
 本仓库提供适用于 RK3399 开发板的 openEuler 镜像的构建脚本和相关文档。
 
-<!-- TOC -->
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
 
-- [Rockchip](#Rockchip)
+- [Rockchip](#rockchip)
   - [文件说明](#文件说明)
   - [最新镜像](#最新镜像)
   - [镜像构建](#镜像构建)
@@ -14,14 +15,14 @@
     - [一次构建](#一次构建)
     - [顺序构建](#顺序构建)
   - [刷写镜像](#刷写镜像)
-    - [刷写到 SD 卡](#刷写到-SD-卡)
-    - [刷写到 EMMC](#刷写到-EMMC)
+    - [刷写到 SD 卡](#刷写到-sd-卡)
+    - [刷写到 EMMC](#刷写到-emmc)
 
-<!-- /TOC -->
+<!-- /code_chunk_output -->
 
 ## 文件说明
 
-- [documents](./documents/)使用文档
+- [documents](./documents/): 使用文档
     - [openEuler镜像的构建](documents/openEuler镜像的构建.md)
     - [刷写EMMC镜像](documents/刷写EMMC镜像.md)
     - [顺序构建](documents/顺序构建.md)
@@ -71,16 +72,16 @@
 
 **说明: 基于 build.sh 提供的默认参数，执行 sudo bash build.sh 可构建 Firefly-RK3399 的 openEuler-20.03-LTS 镜像。**
 
-该脚本的工作目录为 builddir 文件夹，最终会在 build 文件夹下得到以下文件：
+脚本执行完成后，会在脚本所在目录的 build 文件夹下生成以下文件：
 
 - 压缩后的 EMMC 刷写文件：openEuler-VERSION-BOARD-RELEASE.tar.gz。
 - 压缩后的 SD 卡启动镜像：openEuler-VERSION-BOARD-ARCH-RELEASE.img.xz。
 
 >打包后的 EMMC 刷写文件和压缩后的 openEuler SD 卡启动文件有什么区别？
 
->1. 打包后的 EMMC 刷写文件：适用于例如 Firefly-RK3399 这一类自带 EMMC 储存介质的开发板，需要使用 Rockchip 专用工具进行刷入。
->2. 压缩后的 SD 卡启动文件：适用于带 SD 卡槽的开发板，刷写过程在 [刷写镜像](#刷写到-SD-卡) 中介绍。
->3. 带 EMMC 的开发板也可以使用 SD 卡启动镜像，具体启动选择的储存介质各不相同，如果 EMMC 启动优先级大于 SD 卡，则优先启动 EMMC 内的系统，在这种情况下若想使用 SD 卡内的系统需要先清空 EMMC。
+>1. 打包后的 EMMC 刷写文件：适用于例如 Firefly-RK3399 这一类自带 EMMC 储存介质的开发板，需要将解压缩后的文件使用 Rockchip 专用工具进行刷入。
+>2. 压缩后的 SD 卡启动文件：适用于带 SD 卡槽的开发板，后面会在 [刷写镜像](#刷写到-SD-卡) 中介绍具体刷写过程。
+>3. 带 EMMC 的开发板也可以使用 SD 卡启动镜像，启动选择的储存介质各不相同，如果 EMMC 启动优先级大于 SD 卡，则优先启动 EMMC 内的系统，在这种情况下若想使用 SD 卡内的系统需要先清空 EMMC。
 
 各个参数意义：
 
@@ -103,17 +104,17 @@
         - openEuler-21.09
 
 4. -c, --config BOARD_CONFIG
-   
+
     开发板对应的 defconfig 的文件名称，对应 [u-boot/configs](https://github.com/u-boot/u-boot/tree/master/configs) 下 `BOARD_CONFIG` 文件，默认为 `firefly-rk3399_defconfig`。
 
 5. -r, --repo REPO_INFO
-   
+
     开发源 repo 文件的 URL 或者路径，也可以是开发源中资源库的 baseurl 列表。注意，如果该参数为资源库的 baseurl 列表，该参数需要使用双引号，各个 baseurl 之间以空格隔开。
     下面分别举例：
 
     - 开发源 repo 文件的 URL，如 `https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-20.03-LTS-SP2/generic.repo`。
     - 开发源的 repo 文件路径：
-        
+
         `./openEuler-20.03-LTS.repo`：生成 openEuler 20.03 LTS 版本的镜像，该文件内容参考 <https://gitee.com/src-openeuler/openEuler-repos/blob/openEuler-20.03-LTS/generic.repo>。
 
     - 资源库的 baseurl 列表，如 `http://repo.openeuler.org/openEuler-20.03-LTS-SP2/OS/aarch64/ http://repo.openeuler.org/openEuler-20.03-LTS/EPOL/aarch64/`。
@@ -121,6 +122,10 @@
 6. -d, --device-tree DTB_NAME
 
     内核设备树中的设备名称，和开发板名称有一点区别，对应 [kernel/arch/arm64/boot/dts/rockchip](https://gitee.com/openeuler/kernel/tree/master/arch/arm64/boot/dts/rockchip) 下的 `DTB_NAME.dts` 文件，默认为 `rk3399_firefly`。
+
+7.  -h, --help
+
+    显示帮助信息。
 
 适用的 RK3399 开发板:
 
@@ -139,7 +144,7 @@
         `sudo bash build.sh -n openEuler-21.03-Firefly-RK3399-aarch64-alpha1 -k https://gitee.com/openeuler/kernel.git -b openEuler-21.03 -c firefly-rk3399_defconfig -r https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-21.03/generic.repo -d rk3399-firefly`
 
 2. RockPi-4A
-  
+
     已测试的版本如下：
 
     - openEuler-21.03, 构建命令如下：

@@ -1,15 +1,15 @@
-<!-- TOC -->
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+
+<!-- code_chunk_output -->
 
 - [描述](#描述)
 - [准备编译环境](#准备编译环境)
 - [基于主线 u-boot 编译启动文件](#基于主线-u-boot-编译启动文件)
-  - [克隆代码](#克隆代码)
-  - [获取 ARM-Trusted-Firmware](#获取-ARM-Trusted-Firmware)
   - [编译 u-boot](#编译-u-boot)
-- [基于 openeuler 内核编译内核镜像](#基于-openeuler-内核编译内核镜像)
+- [基于 openEuler 内核编译内核镜像](#基于-openeuler-内核编译内核镜像)
   - [编译内核代码](#编译内核代码)
-- [构建 boot 镜像](#构建-boot-分区)
-- [制作 rootfs 镜像](#制作-rootfs-镜像)
+- [构建 boot 镜像](#构建-boot-镜像)
+- [构建 rootfs 镜像](#构建-rootfs-镜像)
   - [创建 RPM 数据库](#创建-rpm-数据库)
   - [下载安装 openEuler 发布包](#下载安装-openeuler-发布包)
   - [添加 yum 源](#添加-yum-源)
@@ -17,10 +17,15 @@
   - [安装必要软件](#安装必要软件)
   - [添加配置文件](#添加配置文件)
   - [rootfs 设置](#rootfs-设置)
-- [制作 openEuler 镜像](#制作-openEuler-镜像)
+- [制作 openEuler 镜像](#制作-openeuler-镜像)
   - [创建镜像](#创建镜像)
+    - [创建空镜像](#创建空镜像)
+    - [镜像分区](#镜像分区)
+      - [创建分区表](#创建分区表)
+      - [镜像分区](#镜像分区-1)
+      - [设置 boot 分区为可启动](#设置-boot-分区为可启动)
   - [使用 losetup 将磁盘镜像文件虚拟成块设备](#使用-losetup-将磁盘镜像文件虚拟成块设备)
-  - [使用 kpartx 创建分区表 /dev/loop0 的设备映射](#使用-kpartx-创建分区表-/dev/loop0-的设备映射)
+  - [使用 kpartx 创建分区表 /dev/loop0 的设备映射](#使用-kpartx-创建分区表-devloop0-的设备映射)
   - [写入 u-boot](#写入-u-boot)
   - [格式化分区](#格式化分区)
   - [创建要挂载的根目录和 boot 分区路径](#创建要挂载的根目录和-boot-分区路径)
@@ -30,8 +35,11 @@
   - [rootfs 拷贝到镜像](#rootfs-拷贝到镜像)
   - [boot 引导拷贝到镜像](#boot-引导拷贝到镜像)
   - [卸载镜像](#卸载镜像)
+    - [同步到盘](#同步到盘)
+    - [卸载](#卸载)
+    - [卸载镜像文件虚拟的块设备](#卸载镜像文件虚拟的块设备)
 
-<!-- /TOC -->
+<!-- /code_chunk_output -->
 
 # 描述
 
@@ -52,7 +60,7 @@
 
 3.  创建工作目录
     ```
-    WORKDIR=$(pwd)/build_dir
+    WORKDIR=$(pwd)/build
     mkdir $WORKDIR
     cd $WORKDIR
     ```
@@ -124,12 +132,13 @@
            
 # 构建 boot 镜像
    
-1.  设置内核启动项
+1.  创建 boot 工作目录
 
     ```
     cd $WORKDIR
     mkdir -p boot/extlinux
     ```
+2.  设置内核启动项
 
     将以下内容写进 boot/extlinux/extlinux.conf
 
@@ -138,14 +147,14 @@
         fdt /firefly-rk3399.dtb
         append  earlyprintk console=ttyS2,1500000 rw root=/dev/mmcblk1p5 rootfstype=ext4 init=/sbin/init rootwait"
 
-2.  内核映像文件和设备树文件放入 boot 目录
+3.  内核映像文件和设备树文件放入 boot 目录
 
     ```
     cp $WORKDIR/kernel8.img boot
     cp $WORKDIR/firefly-rk3399.dtb boot
     ```
 
-3.  制作 boot 镜像
+4.  构建 boot 镜像
     
     1.  创建空镜像
 
@@ -431,7 +440,7 @@ dnf --installroot=$WORKDIR/rootfs/ install -y alsa-utils wpa_supplicant vim net-
 23.  输入 32768，输入第二个分区的起始扇区号。
 24.  输入 262143，输入第二个分区的末尾扇区号。
 25.  输入 p，查看当前分区情况，可以看到当前有四个分区。
-26.  输入 n，创建 rootfs 分区。
+26.  输入 n，创建 root 分区。
 27.  输入 p 或直接按 Enter，创建 Primary 类型的分区。
 28.  输入 5 或直接按 Enter，创建序号为 5 的分区。
 29.  输入 262144，输入第三个分区的起始扇区号。
@@ -484,7 +493,7 @@ add map loop0p5 ...
 
     `mkfs.vfat -n boot /dev/mapper/loop0p4`
 
-3.  格式化根目录分区
+3.  格式化 root 分区
 
     `mkfs.ext4 /dev/mapper/loop0p5`
 

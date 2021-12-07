@@ -77,7 +77,7 @@ build_u-boot() {
     cp ../bin/parameter.gpt .
 }
 
-
+set -e
 u_boot_ver="v2020.10"
 default_param
 parseargs "$@" || help $?
