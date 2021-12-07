@@ -38,7 +38,7 @@ default_param() {
     branch=openEuler-20.03-LTS
     repo_file="https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-20.03-LTS/generic.repo"
     kernel_url="https://gitee.com/openeuler/rockchip-kernel.git"
-    workdir=$(pwd)/builddir
+    workdir=$(pwd)/build
     name=${branch}-${dtb_name}-aarch64-alpha1
 }
 

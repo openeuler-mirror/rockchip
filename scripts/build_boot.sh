@@ -19,7 +19,7 @@ help()
 }
 
 default_param() {
-    workdir=$(pwd)/builddir
+    workdir=$(pwd)/build
     branch=openEuler-20.03-LTS
     dtb_name=rk3399-firefly
     kernel_url="https://gitee.com/openeuler/rockchip-kernel.git"

@@ -21,7 +21,7 @@ default_param() {
     repo_file="https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-20.03-LTS/generic.repo"
     img_name="rootfs.img"
     tmp_dir=${workdir}/tmp
-    workdir=$(pwd)/builddir
+    workdir=$(pwd)/build
     nonfree_bin_dir=${workdir}/../bin
 }
 

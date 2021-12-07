@@ -52,9 +52,9 @@
 
 3.  创建工作目录
     ```
-    workplace=$(pwd)/build_dir
-    mkdir $workplace
-    cd $workplace
+    WORKDIR=$(pwd)/build_dir
+    mkdir $WORKDIR
+    cd $WORKDIR
     ```
 
 # 基于主线 u-boot 编译启动文件
@@ -63,7 +63,10 @@
 
 1. 下载源码
 
-    `git clone --branch v2020.10 https://github.com/u-boot/u-boot.git`
+    ```
+    cd $WORKDIR
+    git clone --branch v2020.10 https://github.com/u-boot/u-boot.git
+    ```
 
 2. 获取 ARM-Trusted-Firmware
 
@@ -85,9 +88,9 @@
     将生成的 idbloader.img 和 u-boot.itb 文件复制到工作目录。
 
     ```
-    cp idbloader.img $workplace
-    cp idbloader.img $workplace
-    cd $workplace
+    cp idbloader.img $WORKDIR
+    cp idbloader.img $WORKDIR
+    cd $WORKDIR
     ```
 
 
@@ -95,9 +98,12 @@
 
 ## 编译内核代码
    
-1.  克隆代码
+1.  下载源码
 
-    `git clone --branch openEuler-20.03-LTS https://gitee.com/openeuler/rockchip-kernel.git`
+    ```
+    cd $WORKDIR
+    git clone --branch openEuler-20.03-LTS https://gitee.com/openeuler/rockchip-kernel.git
+    ```
 
 2.  编译内核，生成内核映像文件 Image 和设备树文件
     ```
@@ -112,15 +118,18 @@
     将编译生成的内核映像文件 Image 和设备树文件复制到工作目录。
 
     ```
-    cp test/arch/arm64/boot/Image $workplace/kernel8.img
-    cp test/arch/arm64/boot/dts/rockchip/firefly-rk3399.dtb $workplace
+    cp test/arch/arm64/boot/Image $WORKDIR/kernel8.img
+    cp test/arch/arm64/boot/dts/rockchip/firefly-rk3399.dtb $WORKDIR
     ```
            
 # 构建 boot 镜像
    
 1.  设置内核启动项
 
-    `mkdir -p boot/extlinux`
+    ```
+    cd $WORKDIR
+    mkdir -p boot/extlinux
+    ```
 
     将以下内容写进 boot/extlinux/extlinux.conf
 
@@ -132,8 +141,8 @@
 2.  内核映像文件和设备树文件放入 boot 目录
 
     ```
-    cp $workplace/kernel8.img boot
-    cp $workplace/firefly-rk3399.dtb boot
+    cp $WORKDIR/kernel8.img boot
+    cp $WORKDIR/firefly-rk3399.dtb boot
     ```
 
 3.  制作 boot 镜像
@@ -162,18 +171,21 @@
         
         `umount tmp`
 
-# 制作 rootfs 镜像
+# 构建 rootfs 镜像
 
 ## 创建 RPM 数据库
+
 ```    
+cd $WORKDIR
 mkdir rootfs
 mkdir -p rootfs/var/lib/rpm
-rpm --root  /rootfs/ --initdb
+rpm --root  $WORKDIR/rootfs/ --initdb
 ```
 
 ## 下载安装 openEuler 发布包
+
 ```
-rpm -ivh --nodeps --root /root/rootfs/ http://repo.openeuler.org/openEuler-20.03-LTS/everything/aarch64/Packages/openEuler-release-20.03LTS-33.oe1.aarch64.rpm
+rpm -ivh --nodeps --root $WORKDIR/rootfs/ http://repo.openeuler.org/openEuler-20.03-LTS/everything/aarch64/Packages/openEuler-release-20.03LTS-33.oe1.aarch64.rpm
 ```
 
 执行此操作会在/root/rootfs下生成3个文件夹，如下：
@@ -184,31 +196,29 @@ rpm -ivh --nodeps --root /root/rootfs/ http://repo.openeuler.org/openEuler-20.03
 ## 添加 yum 源
 
 ```
-mkdir /root/rootfs/etc/yum.repos.d`
-curl -o /root/rootfs/etc/yum.repos.d/openEuler-20.03-LTS.repo https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-20.03-LTS/generic.repo
+mkdir $WORKDIR/rootfs/etc/yum.repos.d`
+curl -o $WORKDIR/rootfs/etc/yum.repos.d/openEuler-20.03-LTS.repo https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-20.03-LTS/generic.repo
 ```
 
 ![addrepo](images/addrepo.png)
 
 ## 安装 dnf
 
-`dnf --installroot=/root/rootfs/ install dnf --nogpgcheck -y`  （多执行几次）
-
+`dnf --installroot=$WORKDIR/rootfs/ install dnf --nogpgcheck -y`
 
 ## 安装必要软件
 
 ```
-dnf --installroot=/root/rootfs/ makecache
-dnf --installroot=/root/rootfs/ install -y alsa-utils wpa_supplicant vim net-tools iproute iputils NetworkManager openssh-server passwd hostname ntp bluez pulseaudio-module-bluetooth
+dnf --installroot=$WORKDIR/rootfs/ makecache
+dnf --installroot=$WORKDIR/rootfs/ install -y alsa-utils wpa_supplicant vim net-tools iproute iputils NetworkManager openssh-server passwd hostname ntp bluez pulseaudio-module-bluetooth
 ```
-
 
 ## 添加配置文件
 
 1.  设置 DNS
     ```
     cp -L /etc/resolv.conf ${WORKDIR}/rootfs/etc/resolv.conf
-    vim $workplace/rootfs/etc/resolv.conf
+    vim $WORKDIR/rootfs/etc/resolv.conf
     ```
     添加内容：
     ```
@@ -218,8 +228,8 @@ dnf --installroot=/root/rootfs/ install -y alsa-utils wpa_supplicant vim net-too
 2. 设置 IP 自动获取
 
     ```
-    mkdir $workplace/rootfs/etc/sysconfig/network-scripts
-    vim $workplace/rootfs/etc/sysconfig/network-scripts/ifup-eth0
+    mkdir $WORKDIR/rootfs/etc/sysconfig/network-scripts
+    vim $WORKDIR/rootfs/etc/sysconfig/network-scripts/ifup-eth0
     ```
     内容：
     ```
@@ -242,27 +252,27 @@ dnf --installroot=/root/rootfs/ install -y alsa-utils wpa_supplicant vim net-too
     ```
 3.  拷贝 wifi 配置文件，蓝牙启动文件
 
-    1.  下载 [无线配置目录](../scripts/bin/config/wireless) 到  WORKDIR
+    1.  下载 [无线配置目录](../scripts/bin/wireless) 到 $WORKDIR
 
     2.  拷贝文件 :
         ```
-        mkdir  $workplace/rootfs/system
-        cp -r $workplace/../bin/wireless/system/*    $workplace/rootfs/system/
-        cp   $workplace/../bin/wireless/rcS.sh    $workplace/rootfs/etc/profile.d/
-        cp   $workplace/../bin/wireless/enable_bt    $workplace/rootfs/usr/bin/
-        chmod +x  $workplace/rootfs/usr/bin/enable_bt  $workplace/rootfs/etc/profile.d/rcS.sh
+        mkdir  $WORKDIR/rootfs/system
+        cp -r $WORKDIR/wireless/system/*    $WORKDIR/rootfs/system/
+        cp   $WORKDIR/wireless/rcS.sh    $WORKDIR/rootfs/etc/profile.d/
+        cp   $WORKDIR/wireless/enable_bt    $WORKDIR/rootfs/usr/bin/
+        chmod +x  $WORKDIR/rootfs/usr/bin/enable_bt  $WORKDIR/rootfs/etc/profile.d/rcS.sh
         ```
 
 4.  设置 NTP 服务器
 
     ```
-    sed -i 's/#NTP=/NTP=0.cn.pool.ntp.org/g' $workplace/rootfs/etc/systemd/timesyncd.conf
-    sed -i 's/#FallbackNTP=/FallbackNTP=1.asia.pool.ntp.org 2.asia.pool.ntp.org/g' $workplace/rootfs/etc/systemd/timesyncd.conf
+    sed -i 's/#NTP=/NTP=0.cn.pool.ntp.org/g' $WORKDIR/rootfs/etc/systemd/timesyncd.conf
+    sed -i 's/#FallbackNTP=/FallbackNTP=1.asia.pool.ntp.org 2.asia.pool.ntp.org/g' $WORKDIR/rootfs/etc/systemd/timesyncd.conf
     ```
 
 5.  添加第一次开机扩容脚本
 
-    在 `$workplace/rootfs/etc/rc.d/init.d/expand-rootfs.sh` 写入以下内容：
+    在 `$WORKDIR/rootfs/etc/rc.d/init.d/expand-rootfs.sh` 写入以下内容：
         
         echo "#!/bin/bash
         # chkconfig: - 99 10
@@ -284,26 +294,23 @@ dnf --installroot=/root/rootfs/ install -y alsa-utils wpa_supplicant vim net-too
 
         ln -s /system/etc/firmware /etc/firmware
 
-        if [ -f /etc/rc.d/init.d/expand-rootfs.sh ];then rm /etc/rc.d/init.d/expand-rootfs.sh; fi" >> ${workspace}/rootfs/etc/rc.d/init.d/expand-rootfs.sh
+        if [ -f /etc/rc.d/init.d/expand-rootfs.sh ];then rm /etc/rc.d/init.d/expand-rootfs.sh; fi" >> ${WORKDIR}/rootfs/etc/rc.d/init.d/expand-rootfs.sh
 
     设置可执行权限：
 
-        `chmod +x $workplace/rootfs/etc/rc.d/init.d/expand-rootfs.sh`
-
+        `chmod +x $WORKDIR/rootfs/etc/rc.d/init.d/expand-rootfs.sh`
 
 ## rootfs 设置
 
 1.  挂载必要的路径
 
-        mount --bind /dev $workplace/rootfs/dev
-        mount -t proc /proc $workplace/rootfs/proc
-        mount -t sysfs /sys $workplace/rootfs/sys
-
+        mount --bind /dev $WORKDIR/rootfs/dev
+        mount -t proc /proc $WORKDIR/rootfs/proc
+        mount -t sysfs /sys $WORKDIR/rootfs/sys
 
 2.  run chroot
 
-    `chroot $workplace/rootfs /bin/bash`
-    
+    `chroot $WORKDIR/rootfs /bin/bash`
 
 3.  设置 root 密码
     
@@ -330,9 +337,9 @@ dnf --installroot=/root/rootfs/ install -y alsa-utils wpa_supplicant vim net-too
 7.  取消临时挂载的目录
 
     ```
-    umount -l $workplace/rootfs/dev
-    umount -l $workplace/rootfs/proc
-    umount -l $workplace/rootfs/sys
+    umount -l $WORKDIR/rootfs/dev
+    umount -l $WORKDIR/rootfs/proc
+    umount -l $WORKDIR/rootfs/sys
     ```
 
 8.  制作镜像
@@ -345,20 +352,29 @@ dnf --installroot=/root/rootfs/ install -y alsa-utils wpa_supplicant vim net-too
 
         `mkfs.ext4 rootfs.img`
 
-    3.  挂载镜像：
-   
-        ```   
+    3.  创建挂载目录
+
+        ```
         mkdir rootfsimg
+        ```
+
+    4.  挂载镜像
+
+        ```
         mount rootfs.img rootfsimg/
+        ```
+
+    5.  rootfs 拷贝到挂载目录
+
+        ```
         cp -rfp rootfs/* rootfsimg/
         ```
 
-    4.  卸载镜像
+    6.  卸载镜像
 
         `umount rootfsimg/`
 
-
-    5.  修复文件系统
+    7.  修复文件系统
 
         ```
         e2fsck -p -f rootfs.img  
@@ -373,30 +389,57 @@ dnf --installroot=/root/rootfs/ install -y alsa-utils wpa_supplicant vim net-too
 
 ### 创建空镜像
 
-  `dd if=/dev/zero of=openeuler-rk3399.img bs=1MiB count=3072 status=progress && sync`
+    ```
+    cd $WORKDIR
+    dd if=/dev/zero of=openeuler-rk3399.img bs=1MiB count=3072 status=progress && sync
+    ```
 
 注意：这里创建了一个大小为3G的文件，可以根据实际情况适当调整。
 
 ### 镜像分区
 
-1.  创建分区表
+#### 创建分区表
 
     `parted openeuler-rk3399.img mktable gpt`
 
-2.  镜像分区
-    
-    1.  进入交互式界面
+#### 镜像分区
 
-        `fdisk openeuler-rk3399.img`
+执行 `fdisk openeuler-rk3399.img` 后，根据提示依次输入：
 
-    2.  输入 n 创建第 1 个分区，用于写入 idbloader.img，起始于 64 ，结束于 16383。
-    3.  输入 n 创建第 2 个分区，用于写入 u-boot.itb，起始于 16384，结束于 24575。
-    4.  输入 n 创建第 3 个分区，用于写入 trust.img（SPL/TPL方式不需要），起始于 24576，结束于 32767。
-    5.  输入 n 创建第 4 个分区，作为 boot分区，起始于 32768，结束与 262143。
-    6.  输入 n 创建第 5 个分区，作为 rootfs 分区，起始于 262144，然后输入回车使此空间最大。
-    7.  输入 w 保存，再输入 q 退出。
+1.  输入 p，查看分区信息，可以看到当前无分区。
+2.  输入 n，创建 idbloader 分区。
+3.  输入 p 或直接按 Enter，创建 Primary 类型的分区。
+4.  输入 1 或直接按 Enter，创建序号为 1 的分区。
+5.  输入 64，输入第一个分区的起始扇区号。
+6.  输入 16383，输入第一个分区的末尾扇区号。
+7.  输入 p，查看当前分区情况，可以看到当前有一个分区。
+8.  输入 n，创建 u-boot 分区。
+9.  输入 p 或直接按 Enter，创建 Primary 类型的分区。
+10.  输入 2 或直接按 Enter，创建序号为 2 的分区。
+11.  输入 16384，输入第二个分区的起始扇区号。
+12.  输入 24575，输入第二个分区的末尾扇区号。
+13.  输入 p，查看当前分区情况，可以看到当前有两个分区。
+14.  输入 n，创建 trust 分区。
+15.  输入 p 或直接按 Enter，创建 Primary 类型的分区。
+16.  输入 3 或直接按 Enter，创建序号为 3 的分区。
+17.  输入 24576，输入第二个分区的起始扇区号。
+18.  输入 32767，输入第二个分区的末尾扇区号。
+19.  输入 p，查看当前分区情况，可以看到当前有三个分区。
+20.  输入 n，创建 boot 分区。
+21.  输入 p 或直接按 Enter，创建 Primary 类型的分区。
+22.  输入 4 或直接按 Enter，创建序号为 4 的分区。
+23.  输入 32768，输入第二个分区的起始扇区号。
+24.  输入 262143，输入第二个分区的末尾扇区号。
+25.  输入 p，查看当前分区情况，可以看到当前有四个分区。
+26.  输入 n，创建 rootfs 分区。
+27.  输入 p 或直接按 Enter，创建 Primary 类型的分区。
+28.  输入 5 或直接按 Enter，创建序号为 5 的分区。
+29.  输入 262144，输入第三个分区的起始扇区号。
+30.  按 Enter，输入第三个分区的末尾扇区号，使用最后一个扇区号作为第五个分区的末尾扇区号。
+31.  输入 p，查看当前分区情况，可以看到当前有五个分区。
+32.  输入 w，写入并退出。
 
-3.  设置 boot 分区为可启动
+#### 设置 boot 分区为可启动
 
     `parted openeuler-rk3399.img -s set 4 boot on`
 
@@ -419,7 +462,7 @@ add map loop0p4 ...
 add map loop0p5 ...
 ```
 
-运行 `ls /dev/mapper/loop0p*` 可以看到分区分别对应刚才为 openeuler-rk3399.img 做的三个分区：
+运行 `ls /dev/mapper/loop0p*` 可以看到分区分别对应刚才为 openeuler-rk3399.img 做的五个分区：
 
 ```
 /dev/mapper/loop0p1 /dev/mapper/loop0p2 /dev/mapper/loop0p3 /dev/mapper/loop0p4 /dev/mapper/loop0p5
@@ -447,13 +490,13 @@ add map loop0p5 ...
 
 ## 创建要挂载的根目录和 boot 分区路径
 
-`mkdir $workplace/rootp $workplace/bootp`
+`mkdir $WORKDIR/rootp $WORKDIR/bootp`
 
 ## 挂载根目录和 boot 分区
 
-`mount -t vfat -o uid=root,gid=root,umask=0000 /dev/mapper/loop0p4 $workplace/bootp/`
+`mount -t vfat -o uid=root,gid=root,umask=0000 /dev/mapper/loop0p4 $WORKDIR/bootp/`
 
-`mount -t ext4 /dev/mapper/loop0p5 $workplace/rootp/`
+`mount -t ext4 /dev/mapper/loop0p5 $WORKDIR/rootp/`
 
 ## 获取生成的 img 镜像的 blkid
 
@@ -466,7 +509,7 @@ add map loop0p5 ...
 
 ## 修改 fstab
 
-`vim $workplace/rootfs/etc/fstab`
+`vim $WORKDIR/rootfs/etc/fstab`
 
 内容：
 ```
@@ -476,11 +519,11 @@ UUID=2785-C7C3  /boot vfat    defaults,noatime 0 0
 
 ## rootfs 拷贝到镜像
 
-`rsync -avHAXq ${workspace}/rootfs/* $workplace/rootp`
+`rsync -avHAXq $WORKDIR/rootfs/* $WORKDIR/rootp`
 
 ## boot 引导拷贝到镜像
 
-`cp -r ${workspace}/boot/* $workplace/bootp`
+`cp -r $WORKDIR/boot/* $WORKDIR/bootp`
 
 ## 卸载镜像
 
@@ -490,9 +533,9 @@ UUID=2785-C7C3  /boot vfat    defaults,noatime 0 0
 
 ### 卸载
 
-`umount $workplace/root`
+`umount $WORKDIR/root`
 
-`umount $workplace/boot`
+`umount $WORKDIR/boot`
 
 ### 卸载镜像文件虚拟的块设备
 

@@ -12,16 +12,16 @@
 
 # 使用 Windows 刷写
 
-1.  生成的分立刷写文件压缩包为 output 下的 openEuler-VERSION-BOARD-RELEASE.tar.gz，将其解压。
+1.  生成的刷写文件压缩包为 build 下的 openEuler-VERSION-BOARD-RELEASE.tar.gz，将其解压。
 
 2.  下载 [RKDevTool 工具](http://www.t-firefly.com/doc/download/page/id/3.html#other_374)。
 
 3.  进入 Loader 模式
 
-    1.  使用 Type-C data cable 连接好设备和主机。
+    1.  使用 Type-C data cable 连接好开发板和主机。
 
-    2.  使设备进入升级模式。
-        - 按住设备上的 RECOVERY （恢复）键并保持
+    2.  使开发板进入 Loader 模式。
+        - 按住开发板上的 RECOVERY （恢复）键并保持
         - 短按一下 RESET（复位）键
         - 大约两秒钟后，松开 RECOVERY 键
 
@@ -33,11 +33,11 @@
 
     ![emmcaddress](images/emmcaddress.png)
 
-6.  点击执行按钮开始升级，升级结束后设备会自动重启。
+6.  点击执行按钮开始升级，升级结束后开发板会自动重启。
 
 # 使用 Linux 刷写
 
-1.  生成的分立刷写文件压缩包为 output 下的 openEuler-VERSION-BOARD-RELEASE.tar.gz，将其解压。
+1.  生成的刷写文件压缩包为 build 下的 openEuler-VERSION-BOARD-RELEASE.tar.gz，将其解压。
 
 2.  编译安装 rkdeveloptool ，具体可以参考 [Rockchip 官方 wiki - rkdeveloptool](http://opensource.rock-chips.com/wiki_Rkdeveloptool)
     
@@ -46,6 +46,8 @@
         `git clone https://github.com/rockchip-linux/rkdeveloptool.git`
 
     2.  编译安装
+
+        `cd rkdeveloptool`
 
         `autoreconf -i`
 
@@ -56,14 +58,14 @@
         `make install`
 
 
-3.  确保开发板能够进入系统，待开发板进入系统后，清除 EMMC 上的引导程序，从而设备进入 maskrom 模式
+3.  开发板开机，登录到开发板后，清除 EMMC 上的引导程序，此时开发板会自动进入 maskrom 模式
 
     ```
     dd if=/dev/zero of=/dev/mmcblk0 bs=1M count=8
     reboot
     ```
 
-    使用 Type-C data cable 连接好设备和主机，使用 `lsblk` 命令看到以下信息即为成功进入 MaskRom Mode
+    使用 Type-C data cable 连接好开发板和主机，使用 `lsblk` 命令看到以下信息即为成功进入 MaskRom Mode
 
     ```
     Bus 001 Device 008: ID 2207:330c Fuzhou Rockchip Electronics Company RK3399 in Mask ROM mode
@@ -71,10 +73,10 @@
 
     ![maskrommode](images/maskrommode.png)
 
-4.  然后将系统刷写进 EMMC，如下：
+4.  刷写镜像等文件到 EMMC，如下：
 
 ```
-cd output
+cd build
 rkdeveloptool db rk3399_loader.bin
 rkdeveloptool gpt parameter.gpt
 rkdeveloptool wl 0x40 idbloader.img

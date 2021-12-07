@@ -1,19 +1,19 @@
 <!-- TOC -->
 
 - [描述](#描述)
-- [基于 openeuler 内核制作 RK3399-firefly 内核镜像](#基于-openeuler-内核制作-rk3399-firefly-内核镜像)
+- [基于 openEuler 内核制作 Firefly-RK3399 内核镜像](#基于-openEuler-内核制作-Firefly-RK3399-内核镜像)
   - [准备编译环境](#准备编译环境)
   - [编译内核代码](#编译内核代码)
-  - [准备 firefly sdk 环境](#准备-firefly-sdk-环境)
+  - [准备 Firefly SDK 环境](#准备-firefly-sdk-环境)
   - [重新构建 boot.img](#重新构建-bootimg)
 
 <!-- /TOC -->
 
 # 描述
 
-本文档介绍基于 firefly sdk 交叉编译出适用于 Firefly RK3399 的内核镜像。
+本文档介绍基于 Firefly SDK 交叉编译出适用于 Firefly RK3399 的内核镜像。
 
-# 基于 openeuler 内核制作 RK3399-firefly 内核镜像
+# 基于 openEuler 内核制作 Firefly-RK3399 内核镜像
 
 ## 准备编译环境
 
@@ -48,7 +48,7 @@
     ```             
     说明：生成的 Image 文件与 dtb 文件所在路径为 rockchip-kernel/test/。
            
-## 准备 firefly sdk 环境
+## 准备 Firefly SDK 环境
    
 1.  下载 [Firefly_Linux_SDK 源码包](http://www.t-firefly.com/doc/download/page/id/3.html#other_186)。
 
@@ -79,9 +79,9 @@
     
 ## 重新构建 boot.img
 
-1.  将上述 [编译内核代码](#编译内核代码) 步骤中生成的 Image 和 dts 替换到 firefly sdk 环境中（进行拷贝操作即可）。
+1.  将上述 [编译内核代码](#编译内核代码) 步骤中生成的 Image 和 dts 替换到 Firefly SDK 环境中（进行拷贝操作即可）。
                
-    firefly sdk 环境中 Image 和 dts 所在路径: rk3399_linux_release_v2.5.1_20210301/kernel/arch/arm64/boot/。
+    Firefly SDK 环境中 Image 和 dts 所在路径: rk3399_linux_release_v2.5.1_20210301/kernel/arch/arm64/boot/。
         
 2.  生成 boot.img。
                 

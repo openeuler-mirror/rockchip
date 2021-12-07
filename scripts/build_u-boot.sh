@@ -18,7 +18,7 @@ help()
 
 default_param() {
     config="firely-rk3399_defconfig"
-    workdir=$(pwd)/builddir
+    workdir=$(pwd)/build
 }
 
 parseargs()

@@ -17,8 +17,7 @@ help()
 }
 
 default_param() {
-    workdir=$(pwd)/builddir
-    output_dir=$(pwd)/output
+    workdir=$(pwd)/build
     name=openEuler-Firefly-RK3399-aarch64-alpha1
     rootfs_dir=${workdir}/rootfs
     boot_mnt=${workdir}/boot_tmp
@@ -174,11 +173,6 @@ outputd(){
     sha256sum ${name}.img.xz >> ${name}.img.xz.sha256sum
     tar -zcvf ${name}.tar.gz rk3399_loader.bin parameter.gpt idbloader.img u-boot.itb boot.img rootfs.img
     sha256sum ${name}.tar.gz >> ${name}.tar.gz.sha256sum
-
-    cd ..
-    mkdir output
-    mv $workdir/${name}.tar.gz* $output_dir
-    mv $workdir/${name}.img.xz* $output_dir
 }
 
 default_param
