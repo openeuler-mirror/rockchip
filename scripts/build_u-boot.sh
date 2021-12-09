@@ -6,7 +6,7 @@ Build rk3399 u-boot image.
 The target file idbloader.img u-boot.itb will be generated in the directory where the build_u-boot.sh script is located
 
 Options: 
-  -c, --config BOARD_CONFIG     Required! The name of target board which should be a space separated list, which defaults to firely-rk3399_defconfig.
+  -c, --config BOARD_CONFIG     Required! The name of target board which should be a space separated list, which defaults to firefly-rk3399_defconfig.
   -h, --help                    Show command help.
 "
 
@@ -17,7 +17,7 @@ help()
 }
 
 default_param() {
-    config="firely-rk3399_defconfig"
+    config="firefly-rk3399_defconfig"
     workdir=$(pwd)/build
 }
 
@@ -59,7 +59,7 @@ build_u-boot() {
         git pull origin $u_boot_ver
         cd ..
     else
-        git clone --depth=1 -b $u_boot_ver https://github.com/u-boot/u-boot.git
+        git clone --depth=1 -b $u_boot_ver https://gitlab.arm.com/systemready/firmware-build/u-boot.git
     fi
     cd u-boot
     mv $workdir/bl31.elf .
