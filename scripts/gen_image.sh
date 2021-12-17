@@ -18,6 +18,7 @@ help()
 
 default_param() {
     workdir=$(pwd)/build
+    outputdir=$workdir/$(date +'%Y-%m-%d')
     name=openEuler-Firefly-RK3399-aarch64-alpha1
     rootfs_dir=${workdir}/rootfs
     boot_mnt=${workdir}/boot_tmp
@@ -71,6 +72,15 @@ LOSETUP_D_IMG(){
         rm -rf ${boot_mnt}
     fi
     set -e
+}
+
+set_cmdline(){
+    vmlinuz_name=$(ls $workdir/boot | grep vmlinuz)
+    dtb_name=$(ls $workdir/boot | grep dtb)
+    echo "label openEuler
+    kernel /${vmlinuz_name}
+    fdt /${dtb_name}
+    append  earlyprintk console=ttyS2,1500000 rw root=$1 rootfstype=ext4 init=/sbin/init rootwait" > $2
 }
 
 UMOUNT_ALL(){
@@ -128,20 +138,12 @@ EOF
 
     echo "LABEL=rootfs  / ext4    defaults,noatime 0 0" > ${rootfs_dir}/etc/fstab
     echo "LABEL=boot  /boot vfat    defaults,noatime 0 0" >> ${rootfs_dir}/etc/fstab
-
-    vmlinuz_name=$(ls boot | grep vmlinuz)
-    dtb_name=$(ls boot | grep dtb)
-
-    echo "label openEuler
-    kernel /${vmlinuz_name}
-    fdt /${dtb_name}
-    append  earlyprintk console=ttyS2,1500000 rw root=/dev/mmcblk1p5 rootfstype=ext4 init=/sbin/init rootwait" > boot/extlinux/extlinux.conf
     
-    dd if=idbloader.img of=$idbloaderp
-    dd if=u-boot.itb of=$ubootp
+    dd if=$workdir/u-boot/idbloader.img of=$idbloaderp
+    dd if=$workdir/u-boot/u-boot.itb of=$ubootp
     dd if=/dev/zero of=$trustp bs=1M count=4
 
-    cp -rfp boot/* ${boot_mnt}
+    cp -rfp $workdir/boot/* ${boot_mnt}
     rsync -avHAXq ${rootfs_dir}/* ${root_mnt}
 
     sync
@@ -150,14 +152,12 @@ EOF
     umount $rootp
     umount $bootp
 
-    dd if=${rootp} of=rootfs.img status=progress
-    dd if=${bootp} of=boot.img status=progress
+    dd if=${rootp} of=$workdir/rootfs.img status=progress
+    dd if=${bootp} of=$workdir/boot.img status=progress
     mkdir boot_emmc
-    mount boot.img boot_emmc
-    echo "label openEuler
-    kernel /${vmlinuz_name}
-    fdt /${dtb_name}
-    append  earlyprintk console=ttyS2,1500000 rw root=/dev/mmcblk2p5 rootfstype=ext4 init=/sbin/init rootwait" > boot_emmc/extlinux/extlinux.conf
+    mount $workdir/boot.img boot_emmc
+    set_cmdline /dev/mmcblk2p5 boot_emmc/extlinux/extlinux.conf
+
     umount boot_emmc
     rmdir boot_emmc
     sync
@@ -169,10 +169,20 @@ EOF
 
 outputd(){
     cd $workdir
+    if [ -f $outputdir ];then rm -rf $outputdir; fi
+    mkdir -p $outputdir
     xz ${name}.img
-    sha256sum ${name}.img.xz >> ${name}.img.xz.sha256sum
-    tar -zcvf ${name}.tar.gz rk3399_loader.bin parameter.gpt idbloader.img u-boot.itb boot.img rootfs.img
-    sha256sum ${name}.tar.gz >> ${name}.tar.gz.sha256sum
+    mv ${name}.img.xz ${outputdir}
+    sha256sum ${outputdir}/${name}.img.xz >> ${outputdir}/${name}.img.xz.sha256sum
+
+    tar -zcvf ${outputdir}/${name}.tar.gz \
+    $workdir/../bin/rk3399_loader.bin \
+    $workdir/../bin/parameter.gpt \
+    $workdir/u-boot/idbloader.img \
+    $workdir/u-boot/u-boot.itb \
+    $workdir/boot.img \
+    $workdir/rootfs.img
+    sha256sum ${outputdir}/${name}.tar.gz >> ${outputdir}/${name}.tar.gz.sha256sum
 }
 
 set -e

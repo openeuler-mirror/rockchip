@@ -39,13 +39,14 @@ default_param() {
     repo_file="https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-20.03-LTS/generic.repo"
     kernel_url="https://gitee.com/openeuler/rockchip-kernel.git"
     workdir=$(pwd)/build
+    outputdir=$workdir/$(date +'%Y-%m-%d')
     name=${branch}-${dtb_name}-aarch64-alpha1
 }
 
 
 deppkg_install() {
     dnf makecache
-    dnf install git wget make gcc bison dtc m4 flex bc openssl-devel tar dosfstools rsync parted dnf-plugins-core tar -y
+    dnf install git wget make gcc bison dtc m4 flex bc openssl-devel tar dosfstools rsync parted dnf-plugins-core tar kpartx diffutils -y
 }
 
 parseargs()
@@ -96,8 +97,24 @@ parseargs "$@" || help $?
 used_param
 deppkg_install
 
-mkdir $workdir
-bash build_u-boot.sh -c $config
-bash build_boot.sh -b $branch -d $dtb_name -k $kernel_url
-bash build_rootfs.sh -r $repo_file
+if [ -d $outputdir ];then
+    rm -rf $outputdir
+fi
+mkdir -p $outputdir
+
+while [ ! -f $workdir/.u-boot.down ]
+do
+    bash build_u-boot.sh -c $config
+done
+
+while [ ! -f $workdir/.boot.down ]
+do
+    bash build_boot.sh -b $branch -d $dtb_name -k $kernel_url
+done
+
+while [ ! -f $workdir/.rootfs.down ]
+do
+    bash build_rootfs.sh -r $repo_file
+done
+
 bash gen_image.sh -n $name

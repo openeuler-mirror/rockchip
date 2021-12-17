@@ -142,9 +142,10 @@ build_rootfs() {
     dnf --installroot=$workdir/rootfs/ makecache
     dnf --installroot=$workdir/rootfs/ install -y alsa-utils wpa_supplicant vim net-tools iproute iputils NetworkManager openssh-server passwd hostname ntp bluez pulseaudio-module-bluetooth linux-firmware parted gdisk
     cp -L /etc/resolv.conf ${workdir}/rootfs/etc/resolv.conf
+    rm ${workdir}/*rpm
     
     if [ -d rootfs/lib/modules ];then rm -rf rootfs/lib/modules; fi
-    cp -rfp kernel/kernel-bin/lib/modules rootfs/lib 
+    cp -rfp $workdir/kernel-bin/lib/modules rootfs/lib 
     
     echo "   nameserver 8.8.8.8
    nameserver 114.114.114.114"  > "$workdir/rootfs/etc/resolv.conf"
@@ -185,19 +186,12 @@ EOF
     umount -l ${workdir}/rootfs/proc
     umount -l ${workdir}/rootfs/sys
 
-    os_name=${repo_url#*raw/}
-    if [ "x${os_name:0:12}" == "xopenEuler-20" ]; then
-        mkdir  ${workdir}/rootfs/system
-        cp -r $nonfree_bin_dir/wireless/system/*    ${workdir}/rootfs/system/
-        cp   $nonfree_bin_dir/wireless/rcS.sh    ${workdir}/rootfs/etc/profile.d/
-        cp   $nonfree_bin_dir/wireless/enable_bt    ${workdir}/rootfs/usr/bin/
-        chmod +x  ${workdir}/rootfs/usr/bin/enable_bt  ${workdir}/rootfs/etc/profile.d/rcS.sh
-    fi
-
     sed -i 's/#NTP=/NTP=0.cn.pool.ntp.org/g' ${workdir}/rootfs/etc/systemd/timesyncd.conf
     sed -i 's/#FallbackNTP=/FallbackNTP=1.asia.pool.ntp.org 2.asia.pool.ntp.org/g' ${workdir}/rootfs/etc/systemd/timesyncd.conf
 
-    cp $nonfree_bin_dir/brcmfmac4356-sdio.firefly,firefly-rk3399.txt ${workdir}/rootfs/lib/firmware/brcm
+    if [ -d $workdir/rootfs_ext ]; then
+        cp -rfp $workdir/rootfs_ext/* ${workdir}/rootfs
+    fi
 
 }
 set -e
@@ -209,3 +203,4 @@ if [ ! -d $workdir ]; then
     mkdir $workdir
 fi
 build_rootfs
+touch $workdir/.rootfs.down

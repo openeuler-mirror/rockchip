@@ -70,11 +70,7 @@ build_u-boot() {
         echo "u-boot file can not be found!"
         exit 2
     fi
-    cp u-boot.itb ..
-    cp idbloader.img ..
-    cd ..
-    cp ../bin/rk3399_loader.bin .
-    cp ../bin/parameter.gpt .
+
 }
 
 set -e
@@ -87,3 +83,4 @@ if [ ! -d $workdir ]; then
 fi
 get_tf-a
 build_u-boot
+touch $workdir/.u-boot.down
