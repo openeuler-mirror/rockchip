@@ -83,6 +83,10 @@ set_cmdline(){
     append  earlyprintk console=ttyS2,1500000 rw root=$1 rootfstype=ext4 init=/sbin/init rootwait" > $2
 }
 
+clean_build_flags(){
+    rm -f $workdir/.*.down
+}
+
 UMOUNT_ALL(){
     set +e
     if grep -q "${rootfs_dir}/dev " /proc/mounts ; then
@@ -171,8 +175,8 @@ outputd(){
     cd $workdir
     if [ -f $outputdir ];then rm -rf $outputdir; fi
     mkdir -p $outputdir
-    xz ${name}.img
-    mv ${name}.img.xz ${outputdir}
+    mv ${name}.img ${outputdir}
+    xz ${outputdir}/${name}.img
     sha256sum ${outputdir}/${name}.img.xz >> ${outputdir}/${name}.img.xz.sha256sum
 
     tar -zcvf ${outputdir}/${name}.tar.gz \
@@ -192,3 +196,4 @@ trap 'UMOUNT_ALL' EXIT
 UMOUNT_ALL
 make_img
 outputd
+clean_build_flags

@@ -39,10 +39,8 @@ default_param() {
     repo_file="https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-20.03-LTS/generic.repo"
     kernel_url="https://gitee.com/openeuler/rockchip-kernel.git"
     workdir=$(pwd)/build
-    outputdir=$workdir/$(date +'%Y-%m-%d')
     name=${branch}-${dtb_name}-aarch64-alpha1
 }
-
 
 deppkg_install() {
     dnf makecache
@@ -96,11 +94,6 @@ default_param
 parseargs "$@" || help $?
 used_param
 deppkg_install
-
-if [ -d $outputdir ];then
-    rm -rf $outputdir
-fi
-mkdir -p $outputdir
 
 while [ ! -f $workdir/.u-boot.down ]
 do
