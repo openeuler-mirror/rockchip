@@ -4,9 +4,6 @@
 
 本仓库提供适用于 RK3399 开发板的 openEuler 镜像的构建脚本和相关文档。
 
-<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
-<!-- code_chunk_output -->
-
 - [Rockchip](#rockchip)
   - [文件说明](#文件说明)
   - [最新镜像](#最新镜像)
@@ -17,8 +14,6 @@
   - [刷写镜像](#刷写镜像)
     - [刷写到 SD 卡](#刷写到-sd-卡)
     - [刷写到 EMMC](#刷写到-emmc)
-
-<!-- /code_chunk_output -->
 
 ## 文件说明
 
@@ -48,25 +43,72 @@
 <th class="cellrowborder" valign="top" width="10%"><p><strong>镜像类型</strong></p></th>
 </tr></thead>
 <tbody><tr>
-<td class="cellrowborder" valign="top" width="10%"><a href="https://isrc.iscas.ac.cn/eulixos/repo/others/openeuler-rk3399/FIREFLY-RK3399-BUILDROOT-GPT-20210401-2212.tar.gz">openEuler-rk3399 20210401-2212 </a></td>
-<td class="cellrowborder" valign="top" width="10%"><ul><li>root（openeuler）</li></ul></td>
-<td class="cellrowborder" valign="top" width="10%"><p>2021/04/01</p></td>
-<td class="cellrowborder" valign="top" width="10%"><p>346 MiB</p></td>
-<td class="cellrowborder" valign="top" width="10%"><p>4.19.90-ge221bb1</p></td>
+<td class="cellrowborder" valign="top" width="10%"><a href="https://eulixos.com/repo/others/openeuler-rk3399/openEuler-20.03-LTS-rk3399-firefly-aarch64-alpha1.img.xz">openEuler 20.03 LTS Firefly-RK3399</a></td>
+<td class="cellrowborder" valign="top" width="10%"><ul><li>root (openeuler)</li></ul></td>
+<td class="cellrowborder" valign="top" width="10%"><p>2021/12/20</p></td>
+<td class="cellrowborder" valign="top" width="10%"><p>288 MiB</p></td>
+<td class="cellrowborder" valign="top" width="10%"><p>4.19.90</p></td>
 <td class="cellrowborder" valign="top" width="10%"><a href="https://gitee.com/src-openeuler/openEuler-repos/blob/openEuler-20.03-LTS/generic.repo">openEuler 20.03 LTS 源仓库</a></td>
-<td class="cellrowborder" valign="top" width="10%"><p>EMMC 刷写镜像</p></td>
+<td class="cellrowborder" valign="top" width="10%"><p>压缩后的 SD 卡启动镜像</p></td>
+</tr>
+<tbody><tr>
+<td class="cellrowborder" valign="top" width="10%"><a href="https://eulixos.com/repo/others/openeuler-rk3399/openEuler-20.03-LTS-rk3399-firefly-aarch64-alpha1.tar.gz">openEuler 20.03 LTS Firefly-RK3399</a></td>
+<td class="cellrowborder" valign="top" width="10%"><ul><li>root (openeuler)</li></ul></td>
+<td class="cellrowborder" valign="top" width="10%"><p>2021/12/20</p></td>
+<td class="cellrowborder" valign="top" width="10%"><p>493 MiB</p></td>
+<td class="cellrowborder" valign="top" width="10%"><p>4.19.90</p></td>
+<td class="cellrowborder" valign="top" width="10%"><a href="https://gitee.com/src-openeuler/openEuler-repos/blob/openEuler-20.03-LTS/generic.repo">openEuler 20.03 LTS 源仓库</a></td>
+<td class="cellrowborder" valign="top" width="10%"><p>打包后的 EMMC 刷写文件</p></td>
+</tr>
+<tbody><tr>
+<td class="cellrowborder" valign="top" width="10%"><a href="https://eulixos.com/repo/others/openeuler-rk3399/openEuler-20.03-LTS-RockPi-4A-aarch64-alpha1.img.xz">openEuler 20.03 LTS RockPi-4A</a></td>
+<td class="cellrowborder" valign="top" width="10%"><ul><li>root (openeuler)</li></ul></td>
+<td class="cellrowborder" valign="top" width="10%"><p>2021/12/20</p></td>
+<td class="cellrowborder" valign="top" width="10%"><p>295 MiB</p></td>
+<td class="cellrowborder" valign="top" width="10%"><p>4.19.90</p></td>
+<td class="cellrowborder" valign="top" width="10%"><a href="https://gitee.com/src-openeuler/openEuler-repos/blob/openEuler-20.03-LTS/generic.repo">openEuler 20.03 LTS repository</a></td>
+<td class="cellrowborder" valign="top" width="10%"><p>压缩后的 SD 卡启动镜像</p></td>
+</tr>
+<tbody><tr>
+<td class="cellrowborder" valign="top" width="10%"><a href="https://eulixos.com/repo/others/openeuler-rk3399/openEuler-21.09-Firefly-RK3399-aarch64-alpha1.img.xz">openEuler 21.09 Firefly-RK3399</a></td>
+<td class="cellrowborder" valign="top" width="10%"><ul><li>root (openeuler)</li></ul></td>
+<td class="cellrowborder" valign="top" width="10%"><p>2021/12/20</p></td>
+<td class="cellrowborder" valign="top" width="10%"><p>420 MiB</p></td>
+<td class="cellrowborder" valign="top" width="10%"><p>5.10.0</p></td>
+<td class="cellrowborder" valign="top" width="10%"><a href="https://gitee.com/src-openeuler/openEuler-repos/blob/openEuler-21.09/generic.repo">openEuler 21.09 源仓库</a></td>
+<td class="cellrowborder" valign="top" width="10%"><p>压缩后的 SD 卡启动镜像</p></td>
+</tr>
+<tbody><tr>
+<td class="cellrowborder" valign="top" width="10%"><a href="https://eulixos.com/repo/others/openeuler-rk3399/openEuler-21.09-Firefly-RK3399-aarch64-alpha1.tar.gz">openEuler 21.09 Firefly-RK3399</a></td>
+<td class="cellrowborder" valign="top" width="10%"><ul><li>root (openeuler)</li></ul></td>
+<td class="cellrowborder" valign="top" width="10%"><p>2021/12/20</p></td>
+<td class="cellrowborder" valign="top" width="10%"><p>717 MiB</p></td>
+<td class="cellrowborder" valign="top" width="10%"><p>5.10.0</p></td>
+<td class="cellrowborder" valign="top" width="10%"><a href="https://gitee.com/src-openeuler/openEuler-repos/blob/openEuler-21.09/generic.repo">openEuler 21.09 源仓库</a></td>
+<td class="cellrowborder" valign="top" width="10%"><p>打包后的 EMMC 刷写文件</p></td>
+</tr>
+<tbody><tr>
+<td class="cellrowborder" valign="top" width="10%"><a href="https://eulixos.com/repo/others/openeuler-rk3399/openEuler-21.09-RockPi-4A-aarch64-alpha1.img.xz">openEuler 21.09 RockPi-4A</a></td>
+<td class="cellrowborder" valign="top" width="10%"><ul><li>root (openeuler)</li></ul></td>
+<td class="cellrowborder" valign="top" width="10%"><p>2021/12/20</p></td>
+<td class="cellrowborder" valign="top" width="10%"><p>717 MiB</p></td>
+<td class="cellrowborder" valign="top" width="10%"><p>5.10.0</p></td>
+<td class="cellrowborder" valign="top" width="10%"><a href="https://gitee.com/src-openeuler/openEuler-repos/blob/openEuler-21.09/generic.repo">openEuler 21.09 源仓库</a></td>
+<td class="cellrowborder" valign="top" width="10%"><p>压缩后的 SD 卡启动镜像</p></td>
 </tr>
 </tbody></table>
 
 ## 镜像构建
 
 ### 准备环境
-- 操作系统：openEuler 20.03-LTS、 openEuler 21.03、 Fedora 34
+- 操作系统：openEuler 20.03 LTS、 openEuler 21.03、 Fedora 34
 - 架构：AArch64 ，如树莓派、 RK3399 开发板
 
 详细过程参见 [openEuler 镜像的构建](documents/openEuler镜像的构建.md)。
 
 ### 一次构建
+
+构建镜像需执行命令：
 
 `sudo bash build.sh -n NAME -k KERNEL_URL -b KERNEL_BRANCH -c BOARD_CONFIG -r REPO_INFO -d DTB_NAME`
 
@@ -74,7 +116,7 @@
 
 脚本执行完成后，会在脚本所在目录的 build/YYYY-MM-DD 文件夹下生成以下文件：
 
-- 压缩后的 EMMC 刷写文件：openEuler-VERSION-BOARD-RELEASE.tar.gz。
+- 打包后的 EMMC 刷写文件：openEuler-VERSION-BOARD-RELEASE.tar.gz。
 - 压缩后的 SD 卡启动镜像：openEuler-VERSION-BOARD-ARCH-RELEASE.img.xz。
 
 >打包后的 EMMC 刷写文件和压缩后的 openEuler SD 卡启动文件有什么区别？
@@ -88,6 +130,9 @@
 1. -n, --name IMAGE_NAME
 
     构建的镜像名称。
+    可以参考下面的命名方式：
+
+    - -n openEuler-20.03-LTS-Firefly-RK3399-aarch64-alpha1
 
 2. -k, --kernel KERNEL_URL
 
@@ -100,7 +145,6 @@
     - -k https://gitee.com/openeuler/rockchip-kernel.git
         - openEuler-20.03-LTS
     - -k https://gitee.com/openeuler/kernel.git
-        - openEuler-21.03
         - openEuler-21.09
 
 4. -c, --config BOARD_CONFIG
@@ -117,7 +161,7 @@
 
         `./openEuler-20.03-LTS.repo`：生成 openEuler 20.03 LTS 版本的镜像，该文件内容参考 <https://gitee.com/src-openeuler/openEuler-repos/blob/openEuler-20.03-LTS/generic.repo>。
 
-    - 资源库的 baseurl 列表，如 `http://repo.openeuler.org/openEuler-20.03-LTS-SP2/OS/aarch64/ http://repo.openeuler.org/openEuler-20.03-LTS/EPOL/aarch64/`。
+    - 资源库的 baseurl 列表，如 `http://repo.openeuler.org/openEuler-20.03-LTS/OS/aarch64/ http://repo.openeuler.org/openEuler-20.03-LTS/EPOL/aarch64/`。
 
 6. -d, --device-tree DTB_NAME
 
