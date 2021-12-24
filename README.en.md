@@ -5,16 +5,16 @@ English | [简体中文](./README.md)
 This repository provides scripts for building openEuler image for RK3399 SoCs and related documents.
 
 - [Rockchip](#rockchip)
-  - [File description](#file-description)
-  - [How to download latest image](#how-to-download-latest-image)
-  - [How to build image locally](#how-to-build-image-locally)
-    - [Prepare the environment](#prepare-the-environment)
-    - [Run the scripts to build image](#run-the-scripts-to-build-image)
-  - [How to Use image](#how-to-use-image)
-    - [Install an Image on an SD card](#install-an-image-on-an-sd-card)
+  - [File Description](#file-description)
+  - [How to Download Latest Image](#how-to-download-latest-image)
+  - [How to Build Image](#how-to-build-image)
+    - [Prepare the Environment](#prepare-the-environment)
+    - [Run the Scripts to Build Image](#run-the-scripts-to-build-image)
+  - [How to Use Image](#how-to-use-image)
+    - [Install an Image on an SD Card](#install-an-image-on-an-sd-card)
     - [Install an Image on an EMMC](#install-an-image-on-an-emmc)
 
-## File description
+## File Description
 
 - [documents](./documents/):
     - [Building openEuler image for RK3399 SoCs](documents/openEuler镜像的构建.md)
@@ -28,7 +28,7 @@ This repository provides scripts for building openEuler image for RK3399 SoCs an
     - [Compile u-boot](scripts/build_u-boot.sh)
     - [Generate a bootable image](scripts/gen_image.sh)
 
-## How to download latest image
+## How to Download Latest Image
 
 Basic information of the image is as follows:
 
@@ -97,17 +97,17 @@ Basic information of the image is as follows:
 </tr>
 </tbody></table>
 
-## How to build image locally
+## How to Build Image
 
-### Prepare the environment
+### Prepare the Environment
 - OS: openEuler 20.03 LTS/21.03 or Fedora 34
 - Hardware: AArch64 hardware, Such as the RaspberryPi or RK3399 SoCs
 
 Refer to [Building an openEuler image](documents/openEuler镜像的构建.md) for details.
 
-### Run the scripts to build image
+### Run the Scripts to Build Image
 
-Run the following command to build an images:
+Run the following command to build images:
 
 `sudo bash build.sh -n NAME -k KERNEL_URL -b KERNEL_BRANCH -c BOARD_CONFIG -r REPO_INFO -d DTB_NAME`
 
@@ -120,18 +120,16 @@ After the script is executed, the following files will be generated in the build
 
 >What is the difference between a compressed image for the EMMC and a compressed image for the SD card?
 
->1. A compressed image for the EMMC: They are suitable for development boards with built-in EMMC storage media such as Firefly-RK3399. They need to be flashed with Rockchip special tools. The flashing process is introduced in [Install an Image on the EMMC](#install-openeuler-to-the-emmc).
->2. A compressed image for the SD card: They are suitable for development boards with SD card slots. The flashing process is introduced in [Install an Image on the SD Card](#install-openeuler-to-the-sd-card).
->3. Single Board Computer (SBC) with EMMC can also use SD cards to boot the image. But the storage medium selected for booting varies, If the EMMC boot priority is greater than the SD card, the system in the EMMC will be booted first. In this case, if you want to use the system in the SD card, you need to clear the EMMC first.
+>1. A compressed image for the EMMC: It is suitable for SoC with EMMC storage media such as Firefly-RK3399. They need to be flashed with Rockchip special tools. The flashing process is introduced in [Install an Image on the EMMC](#install-an-image-on-an-sd-card).
+>2. A compressed image for the SD card: It is suitable for SoC with SD card slot. The flashing process is introduced in [Install an Image on the SD Card](#install-an-image-on-an-emmc).
+>3. SoC with EMMC can also use SD cards to boot the image. But the storage medium selected for booting varies, If the EMMC boot priority is greater than the SD card, the system in the EMMC will be booted first. In this case, if you want to use the system in the SD card, you need to clear the EMMC first.
 
 The meaning of each parameter:
 
 1. -n, --name IMAGE_NAME
 
-    The image name to be built.
-    Examples are as follows:
+    The image name to be built. For example, `openEuler-20.03-LTS-Firefly-RK3399-aarch64-alpha1` or `openEuler-21.09-Firefly-RK3399-aarch64-alpha1`.
 
-    - -n openEuler-20.03-LTS-Firefly-RK3399-aarch64-alpha1
 
 2. -k, --kernel KERNEL_URL
 
@@ -149,7 +147,7 @@ The meaning of each parameter:
 
 4. -c, --config BOARD_CONFIG
 
-    The file name of the defconfig corresponding to the development board corresponds to the `BOARD_CONFIG` file under [u-boot/configs](https://github.com/u-boot/u-boot/tree/master/configs), which defaults to `firefly-rk3399_defconfig`.
+    The file name of the defconfig corresponding to the SoC corresponds to the `BOARD_CONFIG` file under [u-boot/configs](https://github.com/u-boot/u-boot/tree/master/configs), which defaults to `firefly-rk3399_defconfig`.
 
 5. -r, --repo REPO_INFO
 
@@ -173,17 +171,17 @@ The meaning of each parameter:
 
 Applicable RK3399 SoCs:
 
-The development boards that have been tested are as follows, and the other types of RK3399 SoCss are to be tested.
+The SoCs that have been tested are as follows, and the other types of RK3399 SoCs are to be tested.
 
 1. Firefly-RK3399
 
     The tested versions are as follows:
 
-    - openEuler-20.03-LTS, build command as follows:
+    - openEuler-20.03-LTS, run the following command:
 
         `sudo bash build.sh -n openEuler-20.03-LTS-Firefly-RK3399-aarch64-alpha1 -k https://gitee.com/openeuler/rockchip-kernel.git -b openEuler-20.03-LTS -c firefly-rk3399_defconfig -r https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-20.03-LTS/generic.repo -d rk3399-firefly`
 
-    - openEuler-21.09, build command as follows:
+    - openEuler-21.09, run the following command:
 
         `sudo bash build.sh -n openEuler-21.09-Firefly-RK3399-aarch64-alpha1 -k https://gitee.com/openeuler/kernel.git -b openEuler-21.09 -c firefly-rk3399_defconfig -r https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-21.09/generic.repo -d rk3399-firefly`
 
@@ -191,23 +189,23 @@ The development boards that have been tested are as follows, and the other types
 
     The tested versions are as follows:
 
-    - openEuler-20.03-LTS, build command as follows:
+    - openEuler-20.03-LTS, run the following command:
 
         `sudo bash build.sh -n openEuler-20.03-LTS-RockPi-4A-aarch64-alpha1 -k https://gitee.com/openeuler/rockchip-kernel.git -b openEuler-20.03-LTS -c rock-pi-4-rk3399_defconfig -r https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-20.03-LTS/generic.repo -d rk3399-rock-pi-4a`
 
-    - openEuler-21.09, build command as follows:
+    - openEuler-21.09, run the following command:
 
         `sudo bash build.sh -n openEuler-21.09-RockPi-4A-aarch64-alpha1 -k https://gitee.com/openeuler/kernel.git -b openEuler-21.09 -c rock-pi-4-rk3399_defconfig -r https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-21.09/generic.repo -d rk3399-rock-pi-4a`
 
-## How to Use image
+## How to Use an Image
 
-### Install an Image on an SD card
+### Install an Image on an SD Card
 
-After extracting the compressed SD card bootable image and writing it to the SD card, please refer to [Install openEuler on RaspberryPi](https://gitee.com/openeuler/raspberrypi/blob/master/documents/%E5%88%B7%E5%86%99%E9%95%9C%E5%83%8F.md), the image used in the process should provide the project with an image for the RK3399 board.
+After decompressing the bootable image for the SD card, please refer to [Install openEuler on RaspberryPi](https://gitee.com/openeuler/raspberrypi/blob/master/documents/%E5%88%B7%E5%86%99%E9%95%9C%E5%83%8F.md) for details of writing an image on an SD card. You should use images provided in this project.
 
->Note: Because the Firefly-RK3399 differs from other RK3399 SoCs, the system on the EMMC will boot first, the system on the EMMC needs to be cleared before use the SD card bootable image on the Firefly-RK3399, and the power button needs to be pressed to boot after power-up.
+>Note: Because Firefly-RK3399 is different from other RK3399 development boards, the system on EMMC will be booted first. The system on the EMMC needs to be cleared before using the system in the SD card to boot the Firefly-RK3399. Besides, you need to press the power button to boot after powering up the device.
 
 ### Install an Image on an EMMC
 
-Write EMMC flashing image to EMMC, see [Install openEuler to the EMMC](documents/刷写EMMC镜像.md) for details.
+Refer to [Install openEuler to the EMMC](documents/刷写EMMC镜像.md) for details about how to write images for the EMMC to an EMMC.
 
