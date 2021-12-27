@@ -6,12 +6,13 @@ This repository provides scripts for building openEuler image for RK3399 SoCs an
 
 - [Rockchip](#rockchip)
   - [File Description](#file-description)
-  - [How to Download Latest Image](#how-to-download-latest-image)
-  - [How to Build Image](#how-to-build-image)
+  - [the Latest](#the-latest)
+  - [How to Build Images](#how-to-build-images)
     - [Prepare the Environment](#prepare-the-environment)
-    - [Run the Scripts to Build Image](#run-the-scripts-to-build-image)
-  - [How to Use Image](#how-to-use-image)
+    - [Run the Scripts to Build Images](#run-the-scripts-to-build-images)
+  - [How to Use an Image](#how-to-use-an-image)
     - [Install an Image on an SD Card](#install-an-image-on-an-sd-card)
+    - [Install an Image on an EMMC](#install-an-image-on-an-emmc)
     - [Install an Image on an EMMC](#install-an-image-on-an-emmc)
 
 ## File Description
@@ -28,7 +29,7 @@ This repository provides scripts for building openEuler image for RK3399 SoCs an
     - [Compile u-boot](scripts/build_u-boot.sh)
     - [Generate a bootable image](scripts/gen_image.sh)
 
-## How to Download Latest Image
+## the Latest
 
 Basic information of the image is as follows:
 
@@ -97,7 +98,7 @@ Basic information of the image is as follows:
 </tr>
 </tbody></table>
 
-## How to Build Image
+## How to Build Images
 
 ### Prepare the Environment
 - OS: openEuler 20.03 LTS/21.03 or Fedora 34
@@ -105,7 +106,7 @@ Basic information of the image is as follows:
 
 Refer to [Building an openEuler image](documents/openEuler镜像的构建.md) for details.
 
-### Run the Scripts to Build Image
+### Run the Scripts to Build Images
 
 Run the following command to build images:
 
@@ -120,9 +121,9 @@ After the script is executed, the following files will be generated in the build
 
 >What is the difference between a compressed image for the EMMC and a compressed image for the SD card?
 
->1. A compressed image for the EMMC: It is suitable for SoC with EMMC storage media such as Firefly-RK3399. They need to be flashed with Rockchip special tools. The flashing process is introduced in [Install an Image on the EMMC](#install-an-image-on-an-sd-card).
->2. A compressed image for the SD card: It is suitable for SoC with SD card slot. The flashing process is introduced in [Install an Image on the SD Card](#install-an-image-on-an-emmc).
->3. SoC with EMMC can also use SD cards to boot the image. But the storage medium selected for booting varies, If the EMMC boot priority is greater than the SD card, the system in the EMMC will be booted first. In this case, if you want to use the system in the SD card, you need to clear the EMMC first.
+>1. A compressed image for the EMMC: It is suitable for a development board with EMMC storage media such as Firefly-RK3399. They need to be flashed with Rockchip special tool. The flashing process is introduced in [Install an Image on an EMMC](#install-an-image-on-an-emmc).
+>2. A compressed image for the SD card: It is suitable for a development board with SD card slots. The flashing process is introduced in [Install an Image on an SD Card](#install-an-image-on-an-sd-card).
+>3. A development board with EMMC can also use an SD card to boot the image. But the storage medium selected for booting varies, If the EMMC boot priority is greater than the SD card, the system in the EMMC will be booted first. In this case, if you want to use the system in the SD card, you need to clear the EMMC first.
 
 The meaning of each parameter:
 
@@ -147,7 +148,7 @@ The meaning of each parameter:
 
 4. -c, --config BOARD_CONFIG
 
-    The file name of the defconfig corresponding to the SoC corresponds to the `BOARD_CONFIG` file under [u-boot/configs](https://github.com/u-boot/u-boot/tree/master/configs), which defaults to `firefly-rk3399_defconfig`.
+    The file name of the defconfig corresponding to the development board corresponds to the `BOARD_CONFIG` file under [u-boot/configs](https://github.com/u-boot/u-boot/tree/master/configs), which defaults to `firefly-rk3399_defconfig`.
 
 5. -r, --repo REPO_INFO
 
@@ -171,7 +172,7 @@ The meaning of each parameter:
 
 Applicable RK3399 SoCs:
 
-The SoCs that have been tested are as follows, and the other types of RK3399 SoCs are to be tested.
+The development board that have been tested are as follows, and the other types of RK3399 SoCs are to be tested.
 
 1. Firefly-RK3399
 
