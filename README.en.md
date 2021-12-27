@@ -6,7 +6,7 @@ This repository provides scripts for building openEuler image for RK3399 SoCs an
 
 - [Rockchip](#rockchip)
   - [File Description](#file-description)
-  - [the Latest](#the-latest)
+  - [How To Download the Latest Image](#how-to-download-the-latest-image)
   - [How to Build Images](#how-to-build-images)
     - [Prepare the Environment](#prepare-the-environment)
     - [Run the Scripts to Build Images](#run-the-scripts-to-build-images)
@@ -29,7 +29,7 @@ This repository provides scripts for building openEuler image for RK3399 SoCs an
     - [Compile u-boot](scripts/build_u-boot.sh)
     - [Generate a bootable image](scripts/gen_image.sh)
 
-## the Latest
+## How To Download the Latest Image
 
 Basic information of the image is as follows:
 
