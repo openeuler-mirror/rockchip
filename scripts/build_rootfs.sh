@@ -19,7 +19,6 @@ help()
 
 default_param() {
     repo_file="https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-20.03-LTS/generic.repo"
-    img_name="rootfs.img"
     tmp_dir=${workdir}/tmp
     workdir=$(pwd)/build
     nonfree_bin_dir=${workdir}/../bin
@@ -119,7 +118,7 @@ build_rootfs() {
         index=$((index+1))
     done
     
-    os_release_name=openEuler-release
+    os_release_name="openEuler-release"
     dnf ${repo_info} --disablerepo="*" --downloaddir=${workdir}/ download ${os_release_name}
     if [ $? != 0 ]; then
         echo "Fail to download ${os_release_name}!"

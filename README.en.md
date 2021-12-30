@@ -121,8 +121,8 @@ After the script is executed, the following files will be generated in the build
 
 >What is the difference between a compressed image for the EMMC and a compressed image for the SD card?
 
->1. A compressed image for the EMMC: It is suitable for a development board with EMMC storage media such as Firefly-RK3399. They need to be flashed with Rockchip special tool. The flashing process is introduced in [Install an Image on an EMMC](#install-an-image-on-an-emmc).
->2. A compressed image for the SD card: It is suitable for a development board with SD card slots. The flashing process is introduced in [Install an Image on an SD Card](#install-an-image-on-an-sd-card).
+>1. A compressed image for the EMMC: It is suitable for development boards with EMMC storage media such as Firefly-RK3399. They need to be flashed with Rockchip special tool. The flashing process is introduced in [Install an Image on an EMMC](#install-an-image-on-an-emmc).
+>2. A compressed image for the SD card: It is suitable for development boards with SD card slots. The flashing process is introduced in [Install an Image on an SD Card](#install-an-image-on-an-sd-card).
 >3. A development board with EMMC can also use an SD card to boot the image. But the storage medium selected for booting varies, If the EMMC boot priority is greater than the SD card, the system in the EMMC will be booted first. In this case, if you want to use the system in the SD card, you need to clear the EMMC first.
 
 The meaning of each parameter:

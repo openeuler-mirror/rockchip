@@ -59,10 +59,24 @@ parseargs()
 
 build_kernel() {
     cd $workdir
-    if [ -d kernel ];then
-        rm -rf kernel
+    if [ -d kernel ]; then
+        remote_url_exist=`git remote -v | grep "origin"`
+        remote_url=`git ls-remote --get-url origin`
+        if [[ ${remote_url_exist} = "" || ${remote_url} != ${kernel_url} ]]; then
+            cd ../
+            rm -rf $workdir/kernel
+            git clone -b $branch $kernel_url
+            if [[ $? -eq 0 ]]; then
+                LOG "clone kernel done."
+            else
+                ERROR "clone kernel failed."
+                exit 1
+            fi
+        fi
+
+    else
+        git clone -b $branch $kernel_url
     fi
-    git clone --depth=1 -b $branch $kernel_url
     if [ "x$dtb_name" == "xrk3399-firefly" ];then
         cp $workdir/../configs/rk3399-firefly_defconfig kernel/arch/arm64/configs
         cd kernel
@@ -77,10 +91,23 @@ build_kernel() {
 
 build_rockchip-kernel() {
     cd $workdir
-    if [ -d kernel ];then
-        rm -rf kernel
+    if [ -d kernel ]; then
+        remote_url_exist=`git remote -v | grep "origin"`
+        remote_url=`git ls-remote --get-url origin`
+        if [[ ${remote_url_exist} = "" || ${remote_url} != ${kernel_url} ]]; then
+            cd ../
+            rm -rf $workdir/kernel
+            git clone -b $branch $kernel_url kernel
+            if [[ $? -eq 0 ]]; then
+                LOG "clone kernel done."
+            else
+                ERROR "clone kernel failed."
+                exit 1
+            fi
+        fi
+    else
+        git clone -b $branch $kernel_url kernel
     fi
-    git clone --depth=1 -b $branch $kernel_url kernel
     cp $workdir/../configs/firefly_4_defconfig kernel/arch/arm64/configs
     cd kernel
     make ARCH=arm64 firefly_4_defconfig

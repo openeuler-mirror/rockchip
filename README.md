@@ -129,7 +129,7 @@
 
 1. -n, --name IMAGE_NAME
 
-    构建的镜像名称，例如：For example, `openEuler-20.03-LTS-Firefly-RK3399-aarch64-alpha1` 或 `openEuler-21.09-Firefly-RK3399-aarch64-alpha1`。
+    构建的镜像名称，例如：`openEuler-20.03-LTS-Firefly-RK3399-aarch64-alpha1` 或 `openEuler-21.09-Firefly-RK3399-aarch64-alpha1`。
 
 2. -k, --kernel KERNEL_URL
 

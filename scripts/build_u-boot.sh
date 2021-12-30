@@ -19,6 +19,8 @@ help()
 default_param() {
     config="firefly-rk3399_defconfig"
     workdir=$(pwd)/build
+    u_boot_url="https://gitlab.arm.com/systemready/firmware-build/u-boot.git"
+    rk3399_bl31_url="https://github.com/rockchip-linux/rkbin/raw/master/bin/rk33/rk3399_bl31_v1.35.elf"
 }
 
 parseargs()
@@ -47,7 +49,7 @@ parseargs()
 get_tf-a() {
     cd $workdir
     if [ -f bl31.elf ];then rm bl31.elf; fi
-    wget -O bl31.elf https://github.com/rockchip-linux/rkbin/raw/master/bin/rk33/rk3399_bl31_v1.35.elf
+    wget -O bl31.elf ${rk3399_bl31_url}
 
 }
 
@@ -55,11 +57,21 @@ build_u-boot() {
     cd $workdir
     if [ -d u-boot ];then
         cd u-boot
-        make clean
-        git pull origin $u_boot_ver
-        cd ..
+        remote_url_exist=`git remote -v | grep "origin"`
+        remote_url=`git ls-remote --get-url origin`
+        if [[ ${remote_url_exist} = "" || ${remote_url} != ${u_boot_url} ]]; then
+            cd ../
+            rm -rf $workdir/u-boot
+            git clone -b ${u_boot_ver} ${u_boot_url}
+            if [[ $? -eq 0 ]]; then
+                LOG "clone u-boot done."
+            else
+                ERROR "clone u-boot failed."
+                exit 1
+            fi
+        fi
     else
-        git clone --depth=1 -b $u_boot_ver https://gitlab.arm.com/systemready/firmware-build/u-boot.git
+        git clone -b ${u_boot_ver} ${u_boot_url}
     fi
     cd u-boot
     mv $workdir/bl31.elf .
