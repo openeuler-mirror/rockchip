@@ -20,7 +20,14 @@ default_param() {
     config="firefly-rk3399_defconfig"
     workdir=$(pwd)/build
     u_boot_url="https://gitlab.arm.com/systemready/firmware-build/u-boot.git"
-    rk3399_bl31_url="https://github.com/rockchip-linux/rkbin/raw/master/bin/rk33/rk3399_bl31_v1.35.elf"
+    rk3399_bl31_url="http://dl.chainsx.cn/share/bl31.elf"
+}
+
+local_param(){
+    if [ -f $workdir/.param ]; then
+        config=$(cat $workdir/.param | grep config)
+        config=${config:7}
+    fi
 }
 
 parseargs()
@@ -46,13 +53,6 @@ parseargs()
     done
 }
 
-get_tf-a() {
-    cd $workdir
-    if [ -f bl31.elf ];then rm bl31.elf; fi
-    wget -O bl31.elf ${rk3399_bl31_url}
-
-}
-
 build_u-boot() {
     cd $workdir
     if [ -d u-boot ];then
@@ -62,22 +62,27 @@ build_u-boot() {
         if [[ ${remote_url_exist} = "" || ${remote_url} != ${u_boot_url} ]]; then
             cd ../
             rm -rf $workdir/u-boot
-            git clone -b ${u_boot_ver} ${u_boot_url}
+            git clone --depth=1 -b ${u_boot_ver} ${u_boot_url}
             if [[ $? -eq 0 ]]; then
-                LOG "clone u-boot done."
+                echo "clone u-boot done."
             else
-                ERROR "clone u-boot failed."
+                echo "clone u-boot failed."
                 exit 1
             fi
         fi
     else
-        git clone -b ${u_boot_ver} ${u_boot_url}
+        git clone --depth=1 -b ${u_boot_ver} ${u_boot_url}
     fi
-    cd u-boot
-    mv $workdir/bl31.elf .
-    make ARCH=arm $config
-    make ARCH=arm -j$(nproc)
-    make ARCH=arm u-boot.itb -j$(nproc)
+    cd $workdir/u-boot
+    if [[ -f $workdir/u-boot/u-boot.itb && -f $workdir/u-boot/idbloader.img ]];then
+        echo "u-boot is the latest"
+    else
+        if [ -f bl31.elf ];then rm bl31.elf; fi
+        wget -O bl31.elf ${rk3399_bl31_url}
+        make ARCH=arm $config
+        make ARCH=arm -j$(nproc)
+        make ARCH=arm u-boot.itb -j$(nproc)
+    fi
     if [ -z u-boot.itb ]; then
         echo "u-boot file can not be found!"
         exit 2
@@ -88,11 +93,12 @@ build_u-boot() {
 set -e
 u_boot_ver="v2020.10"
 default_param
+local_param
 parseargs "$@" || help $?
 
 if [ ! -d $workdir ]; then
     mkdir $workdir
 fi
-get_tf-a
+sed -i 's/u-boot//g' $workdir/.down
 build_u-boot
-touch $workdir/.u-boot.down
+echo "u-boot" >> $workdir/.down

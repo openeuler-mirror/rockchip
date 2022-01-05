@@ -42,6 +42,20 @@ default_param() {
     name=${branch}-${dtb_name}-aarch64-alpha1
 }
 
+save_param() {
+    if [ -f $workdir/.param_last ]; then
+        rm $workdir/.param_last
+    fi
+    if [ -f $workdir/.param ]; then
+        mv $workdir/.param $workdir/.param_last
+    fi
+    echo "config=$config
+dtb_name=$dtb_name
+branch=$branch
+repo_file=$repo_file
+kernel_url=$kernel_url" > $workdir/.param
+}
+
 deppkg_install() {
     dnf makecache
     dnf install git wget make gcc bison dtc m4 flex bc openssl-devel tar dosfstools rsync parted dnf-plugins-core tar kpartx diffutils -y
@@ -93,21 +107,39 @@ parseargs()
 default_param
 parseargs "$@" || help $?
 used_param
-deppkg_install
+if [ ! -d $workdir ]; then
+    mkdir $workdir
+fi
+save_param
 
-while [ ! -f $workdir/.u-boot.down ]
+if [ -f $workdir/.down ];then
+    echo "Checking the previous build."
+    if [[ $(cat $workdir/.down | grep u-boot) == "u-boot" && \
+    $(cat $workdir/.down | grep bootimg) == "bootimg" && \
+    $(cat $workdir/.down | grep rootfs) == "rootfs" && \
+    $(cat $workdir/.down | grep image) == "image" ]];then
+        echo "Found complete build, clean build flag."
+        rm $workdir/.down
+        touch $workdir/.down
+    fi
+else
+    deppkg_install
+    touch $workdir/.down
+fi
+
+while [[ $(cat $workdir/.down | grep u-boot) != "u-boot" ]]
 do
-    bash build_u-boot.sh -c $config
+    bash build_u-boot.sh
 done
 
-while [ ! -f $workdir/.boot.down ]
+while [[ $(cat $workdir/.down | grep bootimg) != "bootimg" ]]
 do
-    bash build_boot.sh -b $branch -d $dtb_name -k $kernel_url
+    bash build_boot.sh
 done
 
-while [ ! -f $workdir/.rootfs.down ]
+while [[ $(cat $workdir/.down | grep rootfs) != "rootfs" ]]
 do
-    bash build_rootfs.sh -r $repo_file
+    bash build_rootfs.sh
 done
 
 bash gen_image.sh -n $name

@@ -22,8 +22,20 @@ default_param() {
     workdir=$(pwd)/build
     branch=openEuler-20.03-LTS
     dtb_name=rk3399-firefly
-    nonfree_bin_dir=${workdir}/../bin
     kernel_url="https://gitee.com/openeuler/rockchip-kernel.git"
+}
+
+local_param(){
+    if [ -f $workdir/.param ]; then
+        branch=$(cat $workdir/.param | grep branch)
+        branch=${branch:7}
+
+        dtb_name=$(cat $workdir/.param | grep dtb_name)
+        dtb_name=${dtb_name:9}
+
+        kernel_url=$(cat $workdir/.param | grep kernel_url)
+        kernel_url=${kernel_url:11}
+    fi
 }
 
 parseargs()
@@ -57,30 +69,63 @@ parseargs()
     done
 }
 
-build_kernel() {
+LOSETUP_D_IMG(){
+    set +e
+    if [ -d $workdir/boot_emmc ]; then
+        if grep -q "$workdir/boot_emmc " /proc/mounts ; then
+            umount $workdir/boot_emmc
+        fi
+    fi
+    set -e
+}
+
+set_cmdline(){
+    vmlinuz_name=$(ls $workdir/kernel-bin/boot | grep vmlinuz)
+    dtb_name=$(ls $workdir/kernel-bin/boot | grep dtb)
+    echo "label openEuler
+    kernel /${vmlinuz_name}
+    fdt /${dtb_name}
+    append  earlyprintk console=ttyS2,1500000 rw root=$1 rootfstype=ext4 init=/sbin/init rootwait" > $2
+}
+
+clone_and_check_kernel_source() {
     cd $workdir
     if [ -d kernel ]; then
-        remote_url_exist=`git remote -v | grep "origin"`
-        remote_url=`git ls-remote --get-url origin`
-        if [[ ${remote_url_exist} = "" || ${remote_url} != ${kernel_url} ]]; then
-            cd ../
-            rm -rf $workdir/kernel
-            git clone -b $branch $kernel_url
-            if [[ $? -eq 0 ]]; then
-                LOG "clone kernel done."
-            else
-                ERROR "clone kernel failed."
-                exit 1
+        if [ -f $workdir/.param_last ]; then
+            last_branch=$(cat $workdir/.param_last | grep branch)
+            last_branch=${branch:7}
+
+            last_dtb_name=$(cat $workdir/.param_last | grep dtb_name)
+            last_dtb_name=${dtb_name:9}
+
+            last_kernel_url=$(cat $workdir/.param_last | grep kernel_url)
+            last_kernel_url=${kernel_url:11}
+
+            git remote -v update
+            lastest_kernel_version=$(git rev-parse @{u})
+            local_kernel_version=$(git rev-parse @)
+
+            if [[ ${last_branch} != ${branch} || \
+            ${last_dtb_name} != ${dtb_name} || \
+            ${last_kernel_url} != ${kernel_url} || \
+            ${lastest_kernel_version} != ${local_kernel_version} ]]; then
+                if [ -d $workdir/kernel ];then rm -rf $workdir/kernel; fi
+                if [ -d $workdir/boot ];then rm -rf $workdir/boot; fi
+                if [ -f $workdir/boot.img ];then rm $workdir/boot.img; fi
+                git clone --depth=1 -b $branch $kernel_url kernel
             fi
         fi
-
     else
-        git clone -b $branch $kernel_url
+        git clone --depth=1 -b $branch $kernel_url kernel
     fi
+}
+
+build_kernel() {
+    cd $workdir
     if [ "x$dtb_name" == "xrk3399-firefly" ];then
-        cp $workdir/../configs/rk3399-firefly_defconfig kernel/arch/arm64/configs
+        cp $workdir/../configs/rk3399-firefly_5.10.0_defconfig kernel/arch/arm64/configs
         cd kernel
-        make ARCH=arm64 rk3399-firefly_defconfig
+        make ARCH=arm64 rk3399-firefly_5.10.0_defconfig
     else
         cp $workdir/../configs/rockchip64_defconfig kernel/arch/arm64/configs
         cd kernel
@@ -90,27 +135,9 @@ build_kernel() {
 }
 
 build_rockchip-kernel() {
-    cd $workdir
-    if [ -d kernel ]; then
-        remote_url_exist=`git remote -v | grep "origin"`
-        remote_url=`git ls-remote --get-url origin`
-        if [[ ${remote_url_exist} = "" || ${remote_url} != ${kernel_url} ]]; then
-            cd ../
-            rm -rf $workdir/kernel
-            git clone -b $branch $kernel_url kernel
-            if [[ $? -eq 0 ]]; then
-                LOG "clone kernel done."
-            else
-                ERROR "clone kernel failed."
-                exit 1
-            fi
-        fi
-    else
-        git clone -b $branch $kernel_url kernel
-    fi
-    cp $workdir/../configs/firefly_4_defconfig kernel/arch/arm64/configs
-    cd kernel
-    make ARCH=arm64 firefly_4_defconfig
+    cp $workdir/../configs/rockchip64_4.19.90_defconfig kernel/arch/arm64/configs
+    cd $workdir/kernel
+    make ARCH=arm64 rockchip64_4.19.90_defconfig
     make ARCH=arm64 -j$(nproc)
 }
 
@@ -127,16 +154,7 @@ install_kernel() {
     cp arch/arm64/boot/dts/rockchip/${dtb_name}.dtb $workdir/kernel-bin/boot
 }
 
-set_cmdline(){
-    vmlinuz_name=$(ls $workdir/kernel-bin/boot | grep vmlinuz)
-    dtb_name=$(ls $workdir/kernel-bin/boot | grep dtb)
-    echo "label openEuler
-    kernel /${vmlinuz_name}
-    fdt /${dtb_name}
-    append  earlyprintk console=ttyS2,1500000 rw root=$1 rootfstype=ext4 init=/sbin/init rootwait" > $2
-}
-
-mk_bootdir() {
+mk_boot() {
     mkdir -p $workdir/boot/extlinux
     if [ "x$branch" == "xopenEuler-20.03-LTS" -a "x$dtb_name" == "xrk3399-rock-pi-4a" ]; then
         set_cmdline /dev/mmcblk0p5 $workdir/boot/extlinux/extlinux.conf
@@ -144,43 +162,44 @@ mk_bootdir() {
         set_cmdline /dev/mmcblk1p5 $workdir/boot/extlinux/extlinux.conf
     fi
     cp -r $workdir/kernel-bin/boot/* $workdir/boot
-}
 
-customize_rootfs() {
-    cd $workdir
-    if [ -d $workdir/rootfs_ext ];then rm -rf $workdir/rootfs_ext; fi
-    mkdir $workdir/rootfs_ext
-    if [ "x$branch" == "xopenEuler-20.03-LTS" ]; then
-        mkdir -p $workdir/rootfs_ext/system
-        mkdir -p $workdir/rootfs_ext/etc/profile.d/
-        mkdir -p $workdir/rootfs_ext/usr/bin/
-        cp -r $nonfree_bin_dir/wireless/system/*    $workdir/rootfs_ext/system/
-        cp   $nonfree_bin_dir/wireless/rcS.sh    $workdir/rootfs_ext/etc/profile.d/
-        cp   $nonfree_bin_dir/wireless/enable_bt    $workdir/rootfs_ext/usr/bin/
-        chmod +x  $workdir/rootfs_ext/usr/bin/enable_bt  $workdir/rootfs_ext/etc/profile.d/rcS.sh
-    fi
-    mkdir -p $workdir/rootfs_ext/usr/lib/firmware/brcm
-    cp $nonfree_bin_dir/brcmfmac4356-sdio.firefly,firefly-rk3399.txt $workdir/rootfs_ext/usr/lib/firmware/brcm
+    dd if=/dev/zero of=$workdir/boot.img bs=1M count=112 status=progress
+    mkfs.vfat -n boot $workdir/boot.img
+    if [ -d $workdir/boot_emmc ];then rm -rf $workdir/boot_emmc; fi
+    mkdir $workdir/boot_emmc
+    mount $workdir/boot.img $workdir/boot_emmc/
+    cp -r $workdir/boot/* $workdir/boot_emmc/
+    set_cmdline /dev/mmcblk2p5 $workdir/boot_emmc/extlinux/extlinux.conf
+    umount $workdir/boot.img
+    rmdir $workdir/boot_emmc
 }
 
 default_param
+local_param
 parseargs "$@" || help $?
 set -e
 
 if [ ! -d $workdir ]; then
     mkdir $workdir
 fi
+sed -i 's/bootimg//g' $workdir/.down
+clone_and_check_kernel_source
 
-if [ "x$branch" == "xopenEuler-20.03-LTS" ];then
-    build_rockchip-kernel
+if [[ -f $workdir/kernel/arch/arm64/boot/dts/rockchip/${dtb_name}.dtb && -f $workdir/kernel/arch/arm64/boot/Image ]];then
+    echo "kernel is the latest"
 else
-    build_kernel
+    if [ "x$branch" == "xopenEuler-20.03-LTS" ];then
+        build_rockchip-kernel
+    else
+        build_kernel
+    fi
 fi
-
-if [ "x$dtb_name" == "xrk3399-firefly" ]; then
-    customize_rootfs
+if [[ -f $workdir/boot/${dtb_name}.dtb && -f $workdir/boot.img ]];then
+    echo "boot is the latest"
+else
+    trap 'LOSETUP_D_IMG' EXIT
+    LOSETUP_D_IMG
+    install_kernel
+    mk_boot
 fi
-
-install_kernel
-mk_bootdir
-touch $workdir/.boot.down
+echo "bootimg" >> $workdir/.down

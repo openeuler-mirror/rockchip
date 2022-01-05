@@ -24,6 +24,19 @@ default_param() {
     nonfree_bin_dir=${workdir}/../bin
 }
 
+local_param(){
+    if [ -f $workdir/.param ]; then
+        repo_file=$(cat $workdir/.param | grep repo_file)
+        repo_file=${repo_file:10}
+
+        branch=$(cat $workdir/.param | grep branch)
+        branch=${branch:7}
+
+        dtb_name=$(cat $workdir/.param | grep dtb_name)
+        dtb_name=${dtb_name:9}
+    fi
+}
+
 parseargs()
 {
     if [ "x$#" == "x0" ]; then
@@ -46,6 +59,21 @@ parseargs()
         fi
     done
 }
+
+UMOUNT_ALL(){
+    set +e
+    if grep -q "${workdir}/rootfs/dev " /proc/mounts ; then
+        umount -l ${workdir}/rootfs/dev
+    fi
+    if grep -q "${workdir}/rootfs/proc " /proc/mounts ; then
+        umount -l ${workdir}/rootfs/proc
+    fi
+    if grep -q "${workdir}/rootfs/sys " /proc/mounts ; then
+        umount -l ${workdir}/rootfs/sys
+    fi
+    set -e
+}
+
 root_need() {
     if [[ $EUID -ne 0 ]]; then
         echo "Error:This script must be run as root!" 1>&2
@@ -143,9 +171,6 @@ build_rootfs() {
     cp -L /etc/resolv.conf ${workdir}/rootfs/etc/resolv.conf
     rm ${workdir}/*rpm
     
-    if [ -d rootfs/lib/modules ];then rm -rf rootfs/lib/modules; fi
-    cp -rfp $workdir/kernel-bin/lib/modules rootfs/lib 
-    
     echo "   nameserver 8.8.8.8
    nameserver 114.114.114.114"  > "$workdir/rootfs/etc/resolv.conf"
    if [ ! -d ${workdir}/rootfs/etc/sysconfig/network-scripts ]; then mkdir "${workdir}/rootfs/etc/sysconfig/network-scripts"; fi
@@ -181,25 +206,71 @@ build_rootfs() {
     chkconfig expand-rootfs.sh on
 EOF
 
-    umount -l ${workdir}/rootfs/dev
-    umount -l ${workdir}/rootfs/proc
-    umount -l ${workdir}/rootfs/sys
-
     sed -i 's/#NTP=/NTP=0.cn.pool.ntp.org/g' ${workdir}/rootfs/etc/systemd/timesyncd.conf
     sed -i 's/#FallbackNTP=/FallbackNTP=1.asia.pool.ntp.org 2.asia.pool.ntp.org/g' ${workdir}/rootfs/etc/systemd/timesyncd.conf
 
-    if [ -d $workdir/rootfs_ext ]; then
-        cp -rfp $workdir/rootfs_ext/* ${workdir}/rootfs
+    echo "LABEL=rootfs  / ext4    defaults,noatime 0 0" > ${workdir}/rootfs/etc/fstab
+    echo "LABEL=boot  /boot vfat    defaults,noatime 0 0" >> ${workdir}/rootfs/etc/fstab
+
+    if [ -d ${rootfs_dir}/boot/grub2 ]; then
+        rm -rf ${rootfs_dir}/boot/grub2
+    fi
+
+    if [ -f $workdir/.param ]; then
+        dtb_name=$(cat $workdir/.param | grep dtb_name)
+        dtb_name=${dtb_name:9}
+        if [ "x$dtb_name" == "xrk3399-firefly" ]; then
+            cd $workdir
+            if [ "x$branch" == "xopenEuler-20.03-LTS" ]; then
+                mkdir -p $workdir/rootfs/system
+                mkdir -p $workdir/rootfs/etc/profile.d/
+                mkdir -p $workdir/rootfs/usr/bin/
+                cp -r $nonfree_bin_dir/wireless/system/*    $workdir/rootfs/system/
+                cp   $nonfree_bin_dir/wireless/rcS.sh    $workdir/rootfs/etc/profile.d/
+                cp   $nonfree_bin_dir/wireless/enable_bt    $workdir/rootfs/usr/bin/
+                chmod +x  $workdir/rootfs/usr/bin/enable_bt  $workdir/rootfs/etc/profile.d/rcS.sh
+            fi
+            mkdir -p $workdir/rootfs/usr/lib/firmware/brcm
+            cp $nonfree_bin_dir/brcmfmac4356-sdio.firefly,firefly-rk3399.txt $workdir/rootfs/usr/lib/firmware/brcm
+        fi
     fi
 
 }
 set -e
 root_need
 default_param
+local_param
 parseargs "$@" || help $?
 
 if [ ! -d $workdir ]; then
     mkdir $workdir
 fi
-build_rootfs
-touch $workdir/.rootfs.down
+
+trap 'UMOUNT_ALL' EXIT
+UMOUNT_ALL
+cd $workdir
+sed -i 's/rootfs//g' $workdir/.down
+if [ -d rootfs ]; then
+    if [[ -f $workdir/.param_last && -f ${workdir}/rootfs/etc/fstab ]]; then
+        last_branch=$(cat $workdir/.param_last | grep branch)
+        last_branch=${branch:7}
+
+        last_dtb_name=$(cat $workdir/.param_last | grep dtb_name)
+        last_dtb_name=${dtb_name:9}
+
+        last_repo_file=$(cat $workdir/.param_last | grep repo_file)
+        last_repo_file=${repo_file:10}
+
+        if [[ ${last_branch} != ${branch} || ${last_dtb_name} != ${dtb_name} || ${last_repo_file} != ${repo_file} ]]; then
+            rm -rf rootfs
+            build_rootfs
+        fi
+    else
+        rm -rf rootfs
+        build_rootfs
+    fi
+else
+    build_rootfs
+fi
+
+echo "rootfs" >> $workdir/.down

@@ -74,33 +74,6 @@ LOSETUP_D_IMG(){
     set -e
 }
 
-set_cmdline(){
-    vmlinuz_name=$(ls $workdir/boot | grep vmlinuz)
-    dtb_name=$(ls $workdir/boot | grep dtb)
-    echo "label openEuler
-    kernel /${vmlinuz_name}
-    fdt /${dtb_name}
-    append  earlyprintk console=ttyS2,1500000 rw root=$1 rootfstype=ext4 init=/sbin/init rootwait" > $2
-}
-
-clean_build_flags(){
-    rm -f $workdir/.*.down
-}
-
-UMOUNT_ALL(){
-    set +e
-    if grep -q "${rootfs_dir}/dev " /proc/mounts ; then
-        umount -l ${rootfs_dir}/dev
-    fi
-    if grep -q "${rootfs_dir}/proc " /proc/mounts ; then
-        umount -l ${rootfs_dir}/proc
-    fi
-    if grep -q "${rootfs_dir}/sys " /proc/mounts ; then
-        umount -l ${rootfs_dir}/sys
-    fi
-    set -e
-}
-
 make_img(){
     cd $workdir
     device=""
@@ -110,6 +83,7 @@ make_img(){
     losetup -D
     img_file=${workdir}/${name}.img
     dd if=/dev/zero of=${img_file} bs=1MiB count=$size status=progress && sync
+
     cat << EOF | parted ${img_file} mklabel gpt mkpart primary 64s 16383s
     Ignore
 EOF
@@ -136,20 +110,14 @@ EOF
     mount -t vfat -o uid=root,gid=root,umask=0000 ${bootp} ${boot_mnt}
     mount -t ext4 ${rootp} ${root_mnt}
 
-    if [ -d ${rootfs_dir}/boot/grub2 ]; then
-        rm -rf ${rootfs_dir}/boot/grub2
-    fi
-
-    echo "LABEL=rootfs  / ext4    defaults,noatime 0 0" > ${rootfs_dir}/etc/fstab
-    echo "LABEL=boot  /boot vfat    defaults,noatime 0 0" >> ${rootfs_dir}/etc/fstab
-    
     dd if=$workdir/u-boot/idbloader.img of=$idbloaderp
     dd if=$workdir/u-boot/u-boot.itb of=$ubootp
     dd if=/dev/zero of=$trustp bs=1M count=4
 
-    cp -rfp $workdir/boot/* ${boot_mnt}
+    cp -rfp ${workdir}/boot/* ${boot_mnt}
+    if [ -d ${rootfs_dir}/lib/modules ];then rm -rf ${rootfs_dir}/lib/modules; fi
+    cp -rfp ${workdir}/kernel-bin/lib/modules ${rootfs_dir}/lib
     rsync -avHAXq ${rootfs_dir}/* ${root_mnt}
-
     sync
     sleep 10
 
@@ -157,27 +125,24 @@ EOF
     umount $bootp
 
     dd if=${rootp} of=$workdir/rootfs.img status=progress
-    dd if=${bootp} of=$workdir/boot.img status=progress
-    mkdir boot_emmc
-    mount $workdir/boot.img boot_emmc
-    set_cmdline /dev/mmcblk2p5 boot_emmc/extlinux/extlinux.conf
-
-    umount boot_emmc
-    rmdir boot_emmc
     sync
 
     LOSETUP_D_IMG
-
     losetup -D
 }
 
 outputd(){
     cd $workdir
-    if [ -f $outputdir ];then rm -rf $outputdir; fi
-    mkdir -p $outputdir
+    if [ -f $outputdir ];then
+        img_name_check=$(ls $outputdir | grep $name)
+        if [ "x$img_name_check" != "x" ]; then
+            rm ${name}.img*
+            rm ${name}.tar.gz*
+    else
+        mkdir -p $outputdir
+    fi
     mv ${name}.img ${outputdir}
     xz ${outputdir}/${name}.img
-    sha256sum ${outputdir}/${name}.img.xz >> ${outputdir}/${name}.img.xz.sha256sum
 
     tar -zcvf ${outputdir}/${name}.tar.gz \
     $workdir/../bin/rk3399_loader.bin \
@@ -186,14 +151,16 @@ outputd(){
     $workdir/u-boot/u-boot.itb \
     $workdir/boot.img \
     $workdir/rootfs.img
-    sha256sum ${outputdir}/${name}.tar.gz >> ${outputdir}/${name}.tar.gz.sha256sum
+
+    cd $outputdir
+    sha256sum ${name}.img.xz >> ${name}.img.xz.sha256sum
+    sha256sum ${name}.tar.gz >> ${name}.tar.gz.sha256sum
 }
 
 set -e
 default_param
 parseargs "$@" || help $?
-trap 'UMOUNT_ALL' EXIT
-UMOUNT_ALL
+sed -i 's/image//g' $workdir/.down
 make_img
 outputd
-clean_build_flags
+echo "image" >> $workdir/.down
