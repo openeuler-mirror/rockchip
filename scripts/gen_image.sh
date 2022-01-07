@@ -3,7 +3,7 @@
 __usage="
 Usage: gen-image [OPTIONS]
 Generate rk3399 bootable image.
-The target compressed bootable images will be generated in the output directory where the build_u-boot.sh script is located
+The target compressed bootable images will be generated in the build/YYYY-MM-DD folder of the directory where the gen_image.sh script is located.
 
 Options: 
   -n, --name IMAGE_NAME         The RK3399 image name to be built.
@@ -22,6 +22,7 @@ default_param() {
     name=openEuler-Firefly-RK3399-aarch64-alpha1
     rootfs_dir=${workdir}/rootfs
     boot_mnt=${workdir}/boot_tmp
+    emmc_boot_mnt=${workdir}/emmc_boot_tmp
     root_mnt=${workdir}/root_tmp
 }
 
@@ -60,6 +61,11 @@ LOSETUP_D_IMG(){
             umount ${boot_mnt}
         fi
     fi
+    if [ -d ${emmc_boot_mnt} ]; then
+        if grep -q "${emmc_boot_mnt} " /proc/mounts ; then
+            umount ${emmc_boot_mnt}
+        fi
+    fi
     if [ "x$device" != "x" ]; then
         kpartx -d ${device}
         losetup -d ${device}
@@ -71,7 +77,21 @@ LOSETUP_D_IMG(){
     if [ -d ${boot_mnt} ]; then
         rm -rf ${boot_mnt}
     fi
+    if [ -d ${emmc_boot_mnt} ]; then
+        rm -rf ${emmc_boot_mnt}
+    fi
     set -e
+}
+
+buildid=$(date +%Y%m%d%H%M%S)
+builddate=${buildid:0:8}
+
+ERROR(){
+    echo `date` - ERROR, $* | tee -a ${workdir}/${builddate}.log
+}
+
+LOG(){
+    echo `date` - INFO, $* | tee -a ${workdir}/${builddate}.log
 }
 
 make_img(){
@@ -103,29 +123,59 @@ EOF
     trustp=/dev/mapper/${loopX}p3
     bootp=/dev/mapper/${loopX}p4
     rootp=/dev/mapper/${loopX}p5
+    LOG "make image partitions down."
     
     mkfs.vfat -n boot ${bootp}
     mkfs.ext4 -L rootfs ${rootp}
+    LOG "make filesystems down."
     mkdir -p ${root_mnt} ${boot_mnt}
     mount -t vfat -o uid=root,gid=root,umask=0000 ${bootp} ${boot_mnt}
     mount -t ext4 ${rootp} ${root_mnt}
 
-    dd if=$workdir/u-boot/idbloader.img of=$idbloaderp
-    dd if=$workdir/u-boot/u-boot.itb of=$ubootp
+    if [ -z $workdir/u-boot/idbloader.img ]; then
+        ERROR "u-boot idbloader file can not be found!"
+        exit 2
+    else
+        dd if=$workdir/u-boot/idbloader.img of=$idbloaderp
+    fi
+    
+    if [ -z $workdir/u-boot/u-boot.itb ]; then
+        ERROR "u-boot.itb file can not be found!"
+        exit 2
+    else
+        dd if=$workdir/u-boot/u-boot.itb of=$ubootp
+    fi
+    
     dd if=/dev/zero of=$trustp bs=1M count=4
+    LOG "install u-boot down."
 
     cp -rfp ${workdir}/boot/* ${boot_mnt}
     if [ -d ${rootfs_dir}/lib/modules ];then rm -rf ${rootfs_dir}/lib/modules; fi
     cp -rfp ${workdir}/kernel-bin/lib/modules ${rootfs_dir}/lib
+    LOG "install kernel modules down."
     rsync -avHAXq ${rootfs_dir}/* ${root_mnt}
     sync
     sleep 10
+    LOG "copy openEuler-root down."
 
     umount $rootp
     umount $bootp
 
     dd if=${rootp} of=$workdir/rootfs.img status=progress
+    dd if=${bootp} of=$workdir/boot.img status=progress
     sync
+
+    mkdir -p ${emmc_boot_mnt}
+    mount $workdir/boot.img ${emmc_boot_mnt}
+    rm ${emmc_boot_mnt}/extlinux/extlinux.conf
+    mv ${emmc_boot_mnt}/extlinux/extlinux.conf.emmc ${emmc_boot_mnt}/extlinux/extlinux.conf
+    umount ${emmc_boot_mnt}
+    if [ -z $workdir/boot.img ]; then
+        ERROR "make emmc-boot image failed!"
+        exit 2
+    else
+        LOG "make emmc-boot image down."
+    fi
 
     LOSETUP_D_IMG
     losetup -D
@@ -138,12 +188,21 @@ outputd(){
         if [ "x$img_name_check" != "x" ]; then
             rm ${name}.img*
             rm ${name}.tar.gz*
+        fi
     else
         mkdir -p $outputdir
     fi
     mv ${name}.img ${outputdir}
+    LOG "xz openEuler image begin..."
     xz ${outputdir}/${name}.img
+    if [ -z ${name}.img.xz ]; then
+        ERROR "xz openEuler image failed!"
+        exit 2
+    else
+        LOG "xz openEuler image success."
+    fi
 
+    LOG "tar openEuler image begin..."
     tar -zcvf ${outputdir}/${name}.tar.gz \
     $workdir/../bin/rk3399_loader.bin \
     $workdir/../bin/parameter.gpt \
@@ -151,10 +210,18 @@ outputd(){
     $workdir/u-boot/u-boot.itb \
     $workdir/boot.img \
     $workdir/rootfs.img
+    if [ -z ${outputdir}/${name}.tar.gz ]; then
+        ERROR "tar openEuler image failed!"
+        exit 2
+    else
+        LOG "tar openEuler image success."
+    fi
 
     cd $outputdir
     sha256sum ${name}.img.xz >> ${name}.img.xz.sha256sum
     sha256sum ${name}.tar.gz >> ${name}.tar.gz.sha256sum
+
+    echo "The target images are generated in the ${outputdir}."
 }
 
 set -e

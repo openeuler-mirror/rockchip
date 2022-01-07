@@ -3,14 +3,14 @@
 __usage="
 Usage: build [OPTIONS]
 Build rk3399 bootable images.
-The target bootable compressed images will be generated in the output directory where the build script is located.
+The target bootable compressed images will be generated in the build/YYYY-MM-DD folder of the directory where the build script is located.
 
 Options: 
   -n, --name IMAGE_NAME            The RK3399 image name to be built.
   -k, --kernel KERNEL_URL          The URL of kernel source's repository, which defaults to https://gitee.com/openeuler/rockchip-kernel.git.
   -b, --branch KERNEL_BRANCH       The branch name of kernel source's repository, which defaults to openEuler-20.03-LTS.
   -c, --config BOARD_CONFIG        Required! The name of target board which should be a space separated list, which defaults to firefly-rk3399_defconfig.
-  -r, --repo REPO_INFO             Required! The URL/path of target repo file or list of repo's baseurls which should be a space separated list.
+  -r, --repo REPO_INFO             The URL/path of target repo file or list of repo's baseurls which should be a space separated list.
   -d, --device-tree DTB_NAME       Required! The device tree name of target board, which defaults to rk3399-firefly.
   -h, --help                       Show command help.
 "
@@ -132,7 +132,7 @@ do
     bash build_u-boot.sh
 done
 
-while [[ $(cat $workdir/.down | grep bootimg) != "bootimg" ]]
+while [[ $(cat $workdir/.down | grep bootdir) != "bootdir" ]]
 do
     bash build_boot.sh
 done

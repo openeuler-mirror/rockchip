@@ -2,12 +2,12 @@
 
 __usage="
 Usage: build-image [OPTIONS]
-Build rk3399 rootfs image.
+Build rk3399 openEuler-root directory.
 Run in root user.
-The target file rootfs.img will be generated in the directory where the build_rootfs.sh script is located
+The target directory rootfs will be generated in the build/YYYY-MM-DD folder of the directory where the build_rootfs.sh script is located.
 
 Options: 
-  -r, --repo REPO_INFO       Required! The URL/path of target repo file or list of repo's baseurls which should be a space separated list.
+  -r, --repo REPO_INFO       The URL/path of target repo file or list of repo's baseurls which should be a space separated list.
   -h, --help                 Show command help.
 "
 
@@ -58,6 +58,17 @@ parseargs()
             return 2
         fi
     done
+}
+
+buildid=$(date +%Y%m%d%H%M%S)
+builddate=${buildid:0:8}
+
+ERROR(){
+    echo `date` - ERROR, $* | tee -a ${workdir}/${builddate}.log
+}
+
+LOG(){
+    echo `date` - INFO, $* | tee -a ${workdir}/${builddate}.log
 }
 
 UMOUNT_ALL(){
@@ -149,13 +160,15 @@ build_rootfs() {
     os_release_name="openEuler-release"
     dnf ${repo_info} --disablerepo="*" --downloaddir=${workdir}/ download ${os_release_name}
     if [ $? != 0 ]; then
-        echo "Fail to download ${os_release_name}!"
+        ERROR "Fail to download ${os_release_name}!"
         exit 2
     fi
     os_release_name=`ls -r ${workdir}/${os_release_name}*.rpm 2>/dev/null| head -n 1`
     if [ -z "${os_release_name}" ]; then
-        echo "${os_release_name} can not be found!"
+        ERROR "${os_release_name} can not be found!"
         exit 2
+    else
+        LOG "Success to download ${os_release_name}."
     fi
 
     rpm -ivh --nodeps --root $workdir/rootfs/ ${os_release_name}
@@ -173,8 +186,8 @@ build_rootfs() {
     
     echo "   nameserver 8.8.8.8
    nameserver 114.114.114.114"  > "$workdir/rootfs/etc/resolv.conf"
-   if [ ! -d ${workdir}/rootfs/etc/sysconfig/network-scripts ]; then mkdir "${workdir}/rootfs/etc/sysconfig/network-scripts"; fi
-   echo "   TYPE=Ethernet
+    if [ ! -d ${workdir}/rootfs/etc/sysconfig/network-scripts ]; then mkdir "${workdir}/rootfs/etc/sysconfig/network-scripts"; fi
+    echo "   TYPE=Ethernet
    PROXY_METHOD=none
    BROWSER_ONLY=no
    BOOTPROTO=dhcp
@@ -190,6 +203,8 @@ build_rootfs() {
    ONBOOT=yes
    AUTOCONNECT_PRIORITY=-999
    DEVICE=eth0" > "$workdir/rootfs/etc/sysconfig/network-scripts/ifup-eth0"
+    
+    LOG "Configure network down."
 
     mount --bind /dev $workdir/rootfs/dev
     mount -t proc /proc $workdir/rootfs/proc
@@ -197,6 +212,7 @@ build_rootfs() {
 
     cp $nonfree_bin_dir/../bin/expand-rootfs.sh ${workdir}/rootfs/etc/rc.d/init.d/expand-rootfs.sh
     chmod +x ${workdir}/rootfs/etc/rc.d/init.d/expand-rootfs.sh
+    LOG "Set auto expand rootfs down."
 
     cat << EOF | chroot ${workdir}/rootfs  /bin/bash
     echo 'openeuler' | passwd --stdin root
@@ -211,6 +227,7 @@ EOF
 
     echo "LABEL=rootfs  / ext4    defaults,noatime 0 0" > ${workdir}/rootfs/etc/fstab
     echo "LABEL=boot  /boot vfat    defaults,noatime 0 0" >> ${workdir}/rootfs/etc/fstab
+    LOG "Set NTP and fstab down."
 
     if [ -d ${rootfs_dir}/boot/grub2 ]; then
         rm -rf ${rootfs_dir}/boot/grub2
@@ -229,6 +246,7 @@ EOF
                 cp   $nonfree_bin_dir/wireless/rcS.sh    $workdir/rootfs/etc/profile.d/
                 cp   $nonfree_bin_dir/wireless/enable_bt    $workdir/rootfs/usr/bin/
                 chmod +x  $workdir/rootfs/usr/bin/enable_bt  $workdir/rootfs/etc/profile.d/rcS.sh
+                LOG "install firefly-rk3399 wireless firmware down."
             fi
             mkdir -p $workdir/rootfs/usr/lib/firmware/brcm
             cp $nonfree_bin_dir/brcmfmac4356-sdio.firefly,firefly-rk3399.txt $workdir/rootfs/usr/lib/firmware/brcm

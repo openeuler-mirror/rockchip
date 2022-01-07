@@ -3,7 +3,7 @@
 __usage="
 Usage: build-u-boot [OPTIONS]
 Build rk3399 u-boot image.
-The target file idbloader.img u-boot.itb will be generated in the directory where the build_u-boot.sh script is located
+The target file idbloader.img u-boot.itb will be generated in the build/YYYY-MM-DD folder of the directory where the build_u-boot.sh script is located.
 
 Options: 
   -c, --config BOARD_CONFIG     Required! The name of target board which should be a space separated list, which defaults to firefly-rk3399_defconfig.
@@ -53,6 +53,17 @@ parseargs()
     done
 }
 
+buildid=$(date +%Y%m%d%H%M%S)
+builddate=${buildid:0:8}
+
+ERROR(){
+    echo `date` - ERROR, $* | tee -a ${workdir}/${builddate}.log
+}
+
+LOG(){
+    echo `date` - INFO, $* | tee -a ${workdir}/${builddate}.log
+}
+
 build_u-boot() {
     cd $workdir
     if [ -d u-boot ];then
@@ -64,14 +75,15 @@ build_u-boot() {
             rm -rf $workdir/u-boot
             git clone --depth=1 -b ${u_boot_ver} ${u_boot_url}
             if [[ $? -eq 0 ]]; then
-                echo "clone u-boot done."
+                LOG "clone u-boot done."
             else
-                echo "clone u-boot failed."
+                ERROR "clone u-boot failed."
                 exit 1
             fi
         fi
     else
         git clone --depth=1 -b ${u_boot_ver} ${u_boot_url}
+        LOG "clone u-boot done."
     fi
     cd $workdir/u-boot
     if [[ -f $workdir/u-boot/u-boot.itb && -f $workdir/u-boot/idbloader.img ]];then
@@ -79,12 +91,17 @@ build_u-boot() {
     else
         if [ -f bl31.elf ];then rm bl31.elf; fi
         wget -O bl31.elf ${rk3399_bl31_url}
+        if [ -z bl31.elf ]; then
+            ERROR "arm-trusted-firmware(bl31.elf) can not be found!"
+            exit 2
+        fi
         make ARCH=arm $config
         make ARCH=arm -j$(nproc)
         make ARCH=arm u-boot.itb -j$(nproc)
+        LOG "make u-boot done."
     fi
     if [ -z u-boot.itb ]; then
-        echo "u-boot file can not be found!"
+        ERROR "make u-boot failed!"
         exit 2
     fi
 
