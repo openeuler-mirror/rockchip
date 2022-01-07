@@ -3,7 +3,7 @@
 __usage="
 Usage: build-u-boot [OPTIONS]
 Build rk3399 u-boot image.
-The target file idbloader.img u-boot.itb will be generated in the build/YYYY-MM-DD folder of the directory where the build_u-boot.sh script is located.
+The target file idbloader.img u-boot.itb will be generated in the build/u-boot folder of the directory where the build_u-boot.sh script is located.
 
 Options: 
   -c, --config BOARD_CONFIG     Required! The name of target board which should be a space separated list, which defaults to firefly-rk3399_defconfig.

@@ -4,7 +4,7 @@ __usage="
 Usage: build-image [OPTIONS]
 Build rk3399 openEuler-root directory.
 Run in root user.
-The target directory rootfs will be generated in the build/YYYY-MM-DD folder of the directory where the build_rootfs.sh script is located.
+The target directory rootfs will be generated in the build folder of the directory where the build_rootfs.sh script is located.
 
 Options: 
   -r, --repo REPO_INFO       The URL/path of target repo file or list of repo's baseurls which should be a space separated list.

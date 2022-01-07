@@ -3,7 +3,7 @@
 __usage="
 Usage: build-boot [OPTIONS]
 Build rk3399 boot image.
-The target directory boot will be generated in the build/YYYY-MM-DD folder of the directory where the build_boot.sh script is located.
+The target directory boot will be generated in the build folder of the directory where the build_boot.sh script is located.
 
 Options: 
   -b, --branch KERNEL_BRANCH            The branch name of kernel source's repository, which defaults to openEuler-20.03-LTS.
