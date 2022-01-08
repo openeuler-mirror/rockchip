@@ -112,32 +112,32 @@ if [ ! -d $workdir ]; then
 fi
 save_param
 
-if [ -f $workdir/.down ];then
+if [ -f $workdir/.done ];then
     echo "Checking the previous build."
-    if [[ $(cat $workdir/.down | grep u-boot) == "u-boot" && \
-    $(cat $workdir/.down | grep bootimg) == "bootimg" && \
-    $(cat $workdir/.down | grep rootfs) == "rootfs" && \
-    $(cat $workdir/.down | grep image) == "image" ]];then
+    if [[ $(cat $workdir/.done | grep u-boot) == "u-boot" && \
+    $(cat $workdir/.done | grep bootimg) == "bootimg" && \
+    $(cat $workdir/.done | grep rootfs) == "rootfs" && \
+    $(cat $workdir/.done | grep image) == "image" ]];then
         echo "Found complete build, clean build flag."
-        rm $workdir/.down
-        touch $workdir/.down
+        rm $workdir/.done
+        touch $workdir/.done
     fi
 else
     deppkg_install
-    touch $workdir/.down
+    touch $workdir/.done
 fi
 
-while [[ $(cat $workdir/.down | grep u-boot) != "u-boot" ]]
+while [[ $(cat $workdir/.done | grep u-boot) != "u-boot" ]]
 do
     bash build_u-boot.sh
 done
 
-while [[ $(cat $workdir/.down | grep bootdir) != "bootdir" ]]
+while [[ $(cat $workdir/.done | grep bootimg) != "bootimg" ]]
 do
     bash build_boot.sh
 done
 
-while [[ $(cat $workdir/.down | grep rootfs) != "rootfs" ]]
+while [[ $(cat $workdir/.done | grep rootfs) != "rootfs" ]]
 do
     bash build_rootfs.sh
 done

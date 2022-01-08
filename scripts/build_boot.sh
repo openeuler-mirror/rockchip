@@ -3,7 +3,7 @@
 __usage="
 Usage: build-boot [OPTIONS]
 Build rk3399 boot image.
-The target directory boot will be generated in the build folder of the directory where the build_boot.sh script is located.
+The target boot.img will be generated in the build folder of the directory where the build_boot.sh script is located.
 
 Options: 
   -b, --branch KERNEL_BRANCH            The branch name of kernel source's repository, which defaults to openEuler-20.03-LTS.
@@ -80,6 +80,19 @@ LOG(){
     echo `date` - INFO, $* | tee -a ${workdir}/${builddate}.log
 }
 
+LOSETUP_D_IMG(){
+    set +e
+    if [ -d $workdir/boot_emmc ]; then
+        if grep -q "$workdir/boot_emmc " /proc/mounts ; then
+            umount $workdir/boot_emmc
+        fi
+    fi
+    if [ -d $workdir/boot_emmc ]; then
+        rm -rf $workdir/boot_emmc
+    fi
+    set -e
+}
+
 set_cmdline(){
     vmlinuz_name=$(ls $workdir/kernel-bin/boot | grep vmlinuz)
     dtb_name=$(ls $workdir/kernel-bin/boot | grep dtb)
@@ -116,12 +129,12 @@ clone_and_check_kernel_source() {
                 if [ -d $workdir/boot ];then rm -rf $workdir/boot; fi
                 if [ -f $workdir/boot.img ];then rm $workdir/boot.img; fi
                 git clone --depth=1 -b $branch $kernel_url kernel
-                LOG "clone kernel source down."
+                LOG "clone kernel source done."
             fi
         fi
     else
         git clone --depth=1 -b $branch $kernel_url kernel
-        LOG "clone kernel source down."
+        LOG "clone kernel source done."
     fi
 }
 
@@ -153,7 +166,7 @@ install_kernel() {
         ERROR "kernel Image can not be found!"
         exit 2
     else
-        LOG "make kernel down."
+        LOG "make kernel done."
     fi
     if [ -d $workdir/kernel-bin ];then rm -rf $workdir/kernel-bin; fi
     mkdir -p $workdir/kernel-bin/boot
@@ -161,7 +174,7 @@ install_kernel() {
     make ARCH=arm64 install INSTALL_PATH=$workdir/kernel-bin/boot
     make ARCH=arm64 modules_install INSTALL_MOD_PATH=$workdir/kernel-bin
     cp $workdir/kernel/arch/arm64/boot/dts/rockchip/${dtb_name}.dtb $workdir/kernel-bin/boot
-    LOG "prepare kernel down."
+    LOG "prepare kernel done."
 }
 
 mk_boot() {
@@ -174,12 +187,20 @@ mk_boot() {
     fi
     cp -r $workdir/kernel-bin/boot/* $workdir/boot
 
-    set_cmdline /dev/mmcblk2p5 $workdir/boot/extlinux/extlinux.conf.emmc
+    dd if=/dev/zero of=$workdir/boot.img bs=1M count=112 status=progress
+    mkfs.vfat -n boot $workdir/boot.img
+    if [ -d $workdir/boot_emmc ];then rm -rf $workdir/boot_emmc; fi
+    mkdir $workdir/boot_emmc
+    mount $workdir/boot.img $workdir/boot_emmc/
+    cp -r $workdir/boot/* $workdir/boot_emmc/
+    set_cmdline /dev/mmcblk2p5 $workdir/boot_emmc/extlinux/extlinux.conf
+    umount $workdir/boot.img
+    rmdir $workdir/boot_emmc
 
-    if [ -d $workdir/boot ]; then
-        LOG "make boot down."
+    if [ -f $workdir/boot.img ]; then
+        LOG "make boot image done."
     else
-        ERROR "make boot failed!"
+        ERROR "make boot image failed!"
         exit 2
     fi
 }
@@ -192,7 +213,7 @@ set -e
 if [ ! -d $workdir ]; then
     mkdir $workdir
 fi
-sed -i 's/bootdir//g' $workdir/.down
+sed -i 's/bootimg//g' $workdir/.done
 clone_and_check_kernel_source
 
 if [[ -f $workdir/kernel/arch/arm64/boot/dts/rockchip/${dtb_name}.dtb && -f $workdir/kernel/arch/arm64/boot/Image ]];then
@@ -204,10 +225,12 @@ else
         build_kernel
     fi
 fi
-if [[ -f $workdir/boot/${dtb_name}.dtb && -f $workdir/boot_emmc/${dtb_name}.dtb ]];then
+if [[ -f $workdir/boot/${dtb_name}.dtb && -f $workdir/boot.img ]];then
     echo "boot is the latest"
 else
+    trap 'LOSETUP_D_IMG' EXIT
+    LOSETUP_D_IMG
     install_kernel
     mk_boot
 fi
-echo "bootdir" >> $workdir/.down
+echo "bootimg" >> $workdir/.done

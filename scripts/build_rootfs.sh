@@ -4,7 +4,7 @@ __usage="
 Usage: build-image [OPTIONS]
 Build rk3399 openEuler-root directory.
 Run in root user.
-The target directory rootfs will be generated in the build folder of the directory where the build_rootfs.sh script is located.
+The target rootfs.img will be generated in the build folder of the directory where the build_rootfs.sh script is located.
 
 Options: 
   -r, --repo REPO_INFO       The URL/path of target repo file or list of repo's baseurls which should be a space separated list.
@@ -69,6 +69,19 @@ ERROR(){
 
 LOG(){
     echo `date` - INFO, $* | tee -a ${workdir}/${builddate}.log
+}
+
+LOSETUP_D_IMG(){
+    set +e
+    if [ -d ${workdir}/rootfs_tmp ]; then
+        if grep -q "${workdir}/rootfs_tmp " /proc/mounts ; then
+            umount ${workdir}/rootfs_tmp
+        fi
+    fi
+    if [ -d ${workdir}/rootfs_tmp ]; then
+        rm -rf ${workdir}/rootfs_tmp
+    fi
+    set -e
 }
 
 UMOUNT_ALL(){
@@ -204,7 +217,7 @@ build_rootfs() {
    AUTOCONNECT_PRIORITY=-999
    DEVICE=eth0" > "$workdir/rootfs/etc/sysconfig/network-scripts/ifup-eth0"
     
-    LOG "Configure network down."
+    LOG "Configure network done."
 
     mount --bind /dev $workdir/rootfs/dev
     mount -t proc /proc $workdir/rootfs/proc
@@ -212,7 +225,7 @@ build_rootfs() {
 
     cp $nonfree_bin_dir/../bin/expand-rootfs.sh ${workdir}/rootfs/etc/rc.d/init.d/expand-rootfs.sh
     chmod +x ${workdir}/rootfs/etc/rc.d/init.d/expand-rootfs.sh
-    LOG "Set auto expand rootfs down."
+    LOG "Set auto expand rootfs done."
 
     cat << EOF | chroot ${workdir}/rootfs  /bin/bash
     echo 'openeuler' | passwd --stdin root
@@ -227,10 +240,10 @@ EOF
 
     echo "LABEL=rootfs  / ext4    defaults,noatime 0 0" > ${workdir}/rootfs/etc/fstab
     echo "LABEL=boot  /boot vfat    defaults,noatime 0 0" >> ${workdir}/rootfs/etc/fstab
-    LOG "Set NTP and fstab down."
+    LOG "Set NTP and fstab done."
 
-    if [ -d ${rootfs_dir}/boot/grub2 ]; then
-        rm -rf ${rootfs_dir}/boot/grub2
+    if [ -d $workdir/rootfs/boot/grub2 ]; then
+        rm -rf $workdir/rootfs/boot/grub2
     fi
 
     if [ -f $workdir/.param ]; then
@@ -246,13 +259,39 @@ EOF
                 cp   $nonfree_bin_dir/wireless/rcS.sh    $workdir/rootfs/etc/profile.d/
                 cp   $nonfree_bin_dir/wireless/enable_bt    $workdir/rootfs/usr/bin/
                 chmod +x  $workdir/rootfs/usr/bin/enable_bt  $workdir/rootfs/etc/profile.d/rcS.sh
-                LOG "install firefly-rk3399 wireless firmware down."
+                LOG "install firefly-rk3399 wireless firmware done."
             fi
             mkdir -p $workdir/rootfs/usr/lib/firmware/brcm
             cp $nonfree_bin_dir/brcmfmac4356-sdio.firefly,firefly-rk3399.txt $workdir/rootfs/usr/lib/firmware/brcm
         fi
     fi
+}
 
+mk_rootfsimg() {
+    cd $workdir
+    size=`du -sh --block-size=1MiB $workdir/rootfs | cut -f 1 | xargs`
+    size=$(($size+500))
+    rootfs_img=${workdir}/rootfs.img
+    dd if=/dev/zero of=${rootfs_img} bs=1MiB count=$size status=progress && sync
+    mkfs.ext4 -L rootfs ${workdir}/rootfs.img
+
+    if [ -d ${workdir}/rootfs_tmp ];then rm -rf ${workdir}/rootfs_tmp; fi
+    mkdir ${workdir}/rootfs_tmp
+    mount ${workdir}/rootfs.img ${workdir}/rootfs_tmp
+
+    rsync -avHAXq $workdir/rootfs/* ${workdir}/rootfs_tmp
+    sync
+    sleep 10
+
+    umount ${workdir}/rootfs_tmp
+    rmdir ${workdir}/rootfs_tmp
+
+    if [ -f $workdir/rootfs.img ]; then
+        LOG "make rootfs image done."
+    else
+        ERROR "make rootfs image failed!"
+        exit 2
+    fi
 }
 set -e
 root_need
@@ -267,7 +306,7 @@ fi
 trap 'UMOUNT_ALL' EXIT
 UMOUNT_ALL
 cd $workdir
-sed -i 's/rootfs//g' $workdir/.down
+sed -i 's/rootfs//g' $workdir/.done
 if [ -d rootfs ]; then
     if [[ -f $workdir/.param_last && -f ${workdir}/rootfs/etc/fstab ]]; then
         last_branch=$(cat $workdir/.param_last | grep branch)
@@ -282,13 +321,25 @@ if [ -d rootfs ]; then
         if [[ ${last_branch} != ${branch} || ${last_dtb_name} != ${dtb_name} || ${last_repo_file} != ${repo_file} ]]; then
             rm -rf rootfs
             build_rootfs
+            trap 'LOSETUP_D_IMG' EXIT
+            LOSETUP_D_IMG
+            UMOUNT_ALL
+            mk_rootfsimg
         fi
     else
         rm -rf rootfs
         build_rootfs
+        trap 'LOSETUP_D_IMG' EXIT
+        LOSETUP_D_IMG
+        UMOUNT_ALL
+        mk_rootfsimg
     fi
 else
     build_rootfs
+    trap 'LOSETUP_D_IMG' EXIT
+    LOSETUP_D_IMG
+    UMOUNT_ALL
+    mk_rootfsimg
 fi
 
-echo "rootfs" >> $workdir/.down
+echo "rootfs" >> $workdir/.done

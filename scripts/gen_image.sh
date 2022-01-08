@@ -123,11 +123,11 @@ EOF
     trustp=/dev/mapper/${loopX}p3
     bootp=/dev/mapper/${loopX}p4
     rootp=/dev/mapper/${loopX}p5
-    LOG "make image partitions down."
+    LOG "make image partitions done."
     
     mkfs.vfat -n boot ${bootp}
     mkfs.ext4 -L rootfs ${rootp}
-    LOG "make filesystems down."
+    LOG "make filesystems done."
     mkdir -p ${root_mnt} ${boot_mnt}
     mount -t vfat -o uid=root,gid=root,umask=0000 ${bootp} ${boot_mnt}
     mount -t ext4 ${rootp} ${root_mnt}
@@ -147,35 +147,19 @@ EOF
     fi
     
     dd if=/dev/zero of=$trustp bs=1M count=4
-    LOG "install u-boot down."
+    LOG "install u-boot done."
 
     cp -rfp ${workdir}/boot/* ${boot_mnt}
     if [ -d ${rootfs_dir}/lib/modules ];then rm -rf ${rootfs_dir}/lib/modules; fi
     cp -rfp ${workdir}/kernel-bin/lib/modules ${rootfs_dir}/lib
-    LOG "install kernel modules down."
+    LOG "install kernel modules done."
     rsync -avHAXq ${rootfs_dir}/* ${root_mnt}
     sync
     sleep 10
-    LOG "copy openEuler-root down."
+    LOG "copy openEuler-root done."
 
     umount $rootp
     umount $bootp
-
-    dd if=${rootp} of=$workdir/rootfs.img status=progress
-    dd if=${bootp} of=$workdir/boot.img status=progress
-    sync
-
-    mkdir -p ${emmc_boot_mnt}
-    mount $workdir/boot.img ${emmc_boot_mnt}
-    rm ${emmc_boot_mnt}/extlinux/extlinux.conf
-    mv ${emmc_boot_mnt}/extlinux/extlinux.conf.emmc ${emmc_boot_mnt}/extlinux/extlinux.conf
-    umount ${emmc_boot_mnt}
-    if [ -z $workdir/boot.img ]; then
-        ERROR "make emmc-boot image failed!"
-        exit 2
-    else
-        LOG "make emmc-boot image down."
-    fi
 
     LOSETUP_D_IMG
     losetup -D
@@ -183,6 +167,20 @@ EOF
 
 outputd(){
     cd $workdir
+
+    if [[ -f $workdir/boot.img && $(cat $workdir/.done | grep bootimg) == "bootimg" ]];then
+        echo "boot.img check done."
+    else
+        ERROR "boot.img check failed, please re-run build_boot.sh."
+        exit 2
+    fi
+    if [[ -f $workdir/rootfs.img && $(cat $workdir/.done | grep rootfs) == "rootfs" ]];then
+        echo "rootfs.img check done."
+    else
+        ERROR "rootfs.img check failed, please re-run build_rootfs.sh."
+        exit 2
+    fi
+
     if [ -f $outputdir ];then
         img_name_check=$(ls $outputdir | grep $name)
         if [ "x$img_name_check" != "x" ]; then
@@ -227,7 +225,7 @@ outputd(){
 set -e
 default_param
 parseargs "$@" || help $?
-sed -i 's/image//g' $workdir/.down
+sed -i 's/image//g' $workdir/.done
 make_img
 outputd
-echo "image" >> $workdir/.down
+echo "image" >> $workdir/.done

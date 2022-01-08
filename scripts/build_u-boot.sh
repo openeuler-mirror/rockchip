@@ -3,7 +3,7 @@
 __usage="
 Usage: build-u-boot [OPTIONS]
 Build rk3399 u-boot image.
-The target file idbloader.img u-boot.itb will be generated in the build/u-boot folder of the directory where the build_u-boot.sh script is located.
+The target files idbloader.img u-boot.itb will be generated in the build/u-boot folder of the directory where the build_u-boot.sh script is located.
 
 Options: 
   -c, --config BOARD_CONFIG     Required! The name of target board which should be a space separated list, which defaults to firefly-rk3399_defconfig.
@@ -20,7 +20,7 @@ default_param() {
     config="firefly-rk3399_defconfig"
     workdir=$(pwd)/build
     u_boot_url="https://gitlab.arm.com/systemready/firmware-build/u-boot.git"
-    rk3399_bl31_url="http://dl.chainsx.cn/share/bl31.elf"
+    rk3399_bl31_url="https://github.com/rockchip-linux/rkbin/raw/master/bin/rk33/rk3399_bl31_v1.35.elf"
 }
 
 local_param(){
@@ -116,6 +116,6 @@ parseargs "$@" || help $?
 if [ ! -d $workdir ]; then
     mkdir $workdir
 fi
-sed -i 's/u-boot//g' $workdir/.down
+sed -i 's/u-boot//g' $workdir/.done
 build_u-boot
-echo "u-boot" >> $workdir/.down
+echo "u-boot" >> $workdir/.done
