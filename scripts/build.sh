@@ -104,6 +104,17 @@ parseargs()
     done
 }
 
+buildid=$(date +%Y%m%d%H%M%S)
+builddate=${buildid:0:8}
+
+ERROR(){
+    echo `date` - ERROR, $* | tee -a ${log_dir}/${builddate}.log
+}
+
+LOG(){
+    echo `date` - INFO, $* | tee -a ${log_dir}/${builddate}.log
+}
+
 default_param
 parseargs "$@" || help $?
 used_param
@@ -111,7 +122,7 @@ if [ ! -d $workdir ]; then
     mkdir $workdir
 fi
 save_param
-
+if [ ! -d ${log_dir} ];then mkdir -p ${log_dir}; fi
 if [ -f $workdir/.done ];then
     LOG "Checking the previous build."
     if [[ $(cat $workdir/.done | grep u-boot) == "u-boot" && \

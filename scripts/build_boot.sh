@@ -96,8 +96,8 @@ LOSETUP_D_IMG(){
 }
 
 set_cmdline(){
-    vmlinuz_name=$(ls $workdir/kernel-bin/boot | grep vmlinuz)
-    dtb_name=$(ls $workdir/kernel-bin/boot | grep dtb)
+    vmlinuz_name=$(ls $boot_dir | grep vmlinuz)
+    dtb_name=$(ls $boot_dir | grep dtb)
     echo "label openEuler
     kernel /${vmlinuz_name}
     fdt /${dtb_name}
