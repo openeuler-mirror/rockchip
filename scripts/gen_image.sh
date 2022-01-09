@@ -22,7 +22,7 @@ default_param() {
     name=openEuler-Firefly-RK3399-aarch64-alpha1
     rootfs_dir=${workdir}/rootfs
     boot_dir=${workdir}/boot
-    u-boot_dir=${workdir}/u-boot
+    uboot_dir=${workdir}/u-boot
     boot_mnt=${workdir}/boot_tmp
     emmc_boot_mnt=${workdir}/emmc_boot_tmp
     root_mnt=${workdir}/root_tmp
@@ -131,8 +131,8 @@ make_img(){
 
     device=""
     LOSETUP_D_IMG
-    size=`du -sh --block-size=1MiB ${rootfs_dir} | cut -f 1 | xargs`
-    size=$(($size+1150))
+    size=`du -sh --block-size=1MiB ${workdir}/rootfs.img | cut -f 1 | xargs`
+    size=$(($size+550))
     losetup -D
     img_file=${workdir}/${name}.img
     dd if=/dev/zero of=${img_file} bs=1MiB count=$size status=progress && sync
@@ -165,26 +165,28 @@ EOF
     mount -t vfat -o uid=root,gid=root,umask=0000 ${bootp} ${boot_mnt}
     mount -t ext4 ${rootp} ${root_mnt}
 
-    if [ -z ${u-boot_dir}/idbloader.img ]; then
+    if [ -z ${uboot_dir}/idbloader.img ]; then
         ERROR "u-boot idbloader file can not be found!"
         exit 2
     else
-        dd if=${u-boot_dir}/idbloader.img of=$idbloaderp
+        dd if=${uboot_dir}/idbloader.img of=$idbloaderp
     fi
     
-    if [ -z ${u-boot_dir}/u-boot.itb ]; then
+    if [ -z ${uboot_dir}/u-boot.itb ]; then
         ERROR "u-boot.itb file can not be found!"
         exit 2
     else
-        dd if=${u-boot_dir}/u-boot.itb of=$ubootp
+        dd if=${uboot_dir}/u-boot.itb of=$ubootp
     fi
     
     dd if=/dev/zero of=$trustp bs=1M count=4
     LOG "install u-boot done."
 
     if [ -d ${rootfs_dir} ];then rm -rf ${rootfs_dir}; fi
+    mkdir ${rootfs_dir}
     mount $workdir/rootfs.img ${rootfs_dir}
     if [ -d ${boot_dir} ];then rm -rf ${boot_dir}; fi
+    mkdir ${boot_dir}
     mount $workdir/boot.img ${boot_dir}
 
     cp -rfp ${boot_dir}/* ${boot_mnt}
