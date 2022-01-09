@@ -1,7 +1,7 @@
 #!/bin/bash
 
 __usage="
-Usage: build-boot [OPTIONS]
+Usage: build_boot [OPTIONS]
 Build rk3399 boot image.
 The target boot.img will be generated in the build folder of the directory where the build_boot.sh script is located.
 
@@ -23,6 +23,8 @@ default_param() {
     branch=openEuler-20.03-LTS
     dtb_name=rk3399-firefly
     kernel_url="https://gitee.com/openeuler/rockchip-kernel.git"
+    boot_dir=$workdir/boot
+    log_dir=$workdir/log
 }
 
 local_param(){
@@ -71,13 +73,14 @@ parseargs()
 
 buildid=$(date +%Y%m%d%H%M%S)
 builddate=${buildid:0:8}
+if [ ! -d ${log_dir} ];then mkdir ${log_dir}; fi
 
 ERROR(){
-    echo `date` - ERROR, $* | tee -a ${workdir}/${builddate}.log
+    echo `date` - ERROR, $* | tee -a ${log_dir}/${builddate}.log
 }
 
 LOG(){
-    echo `date` - INFO, $* | tee -a ${workdir}/${builddate}.log
+    echo `date` - INFO, $* | tee -a ${log_dir}/${builddate}.log
 }
 
 LOSETUP_D_IMG(){
@@ -168,31 +171,31 @@ install_kernel() {
     else
         LOG "make kernel done."
     fi
-    if [ -d $workdir/kernel-bin ];then rm -rf $workdir/kernel-bin; fi
-    mkdir -p $workdir/kernel-bin/boot
+    if [ -d $workdir/kernel/kernel-modules ];then rm -rf $workdir/kernel/kernel-modules; fi
+    if [ -d ${boot_dir} ];then rm -rf ${boot_dir}; fi
+    mkdir -p ${boot_dir}
+    mkdir -p $workdir/kernel/kernel-modules
     cd $workdir/kernel
-    make ARCH=arm64 install INSTALL_PATH=$workdir/kernel-bin/boot
-    make ARCH=arm64 modules_install INSTALL_MOD_PATH=$workdir/kernel-bin
-    cp $workdir/kernel/arch/arm64/boot/dts/rockchip/${dtb_name}.dtb $workdir/kernel-bin/boot
+    make ARCH=arm64 install INSTALL_PATH=${boot_dir}
+    make ARCH=arm64 modules_install INSTALL_MOD_PATH=$workdir/kernel/kernel-modules
+    cp $workdir/kernel/arch/arm64/boot/dts/rockchip/${dtb_name}.dtb ${boot_dir}
     LOG "prepare kernel done."
 }
 
 mk_boot() {
-    if [ -d $workdir/boot ];then rm -rf $workdir/boot; fi
-    mkdir -p $workdir/boot/extlinux
+    mkdir -p ${boot_dir}/extlinux
     if [ "x$branch" == "xopenEuler-20.03-LTS" -a "x$dtb_name" == "xrk3399-rock-pi-4a" ]; then
-        set_cmdline /dev/mmcblk0p5 $workdir/boot/extlinux/extlinux.conf
+        set_cmdline /dev/mmcblk0p5 ${boot_dir}/extlinux/extlinux.conf.sd
     else
-        set_cmdline /dev/mmcblk1p5 $workdir/boot/extlinux/extlinux.conf
+        set_cmdline /dev/mmcblk1p5 ${boot_dir}/extlinux/extlinux.conf.sd
     fi
-    cp -r $workdir/kernel-bin/boot/* $workdir/boot
 
     dd if=/dev/zero of=$workdir/boot.img bs=1M count=112 status=progress
     mkfs.vfat -n boot $workdir/boot.img
     if [ -d $workdir/boot_emmc ];then rm -rf $workdir/boot_emmc; fi
     mkdir $workdir/boot_emmc
     mount $workdir/boot.img $workdir/boot_emmc/
-    cp -r $workdir/boot/* $workdir/boot_emmc/
+    cp -r ${boot_dir}/* $workdir/boot_emmc/
     set_cmdline /dev/mmcblk2p5 $workdir/boot_emmc/extlinux/extlinux.conf
     umount $workdir/boot.img
     rmdir $workdir/boot_emmc
@@ -203,6 +206,9 @@ mk_boot() {
         ERROR "make boot image failed!"
         exit 2
     fi
+
+    LOG "clean boot directory."
+    rm -rf ${boot_dir}
 }
 
 default_param
@@ -214,10 +220,11 @@ if [ ! -d $workdir ]; then
     mkdir $workdir
 fi
 sed -i 's/bootimg//g' $workdir/.done
+LOG "build boot..."
 clone_and_check_kernel_source
 
 if [[ -f $workdir/kernel/arch/arm64/boot/dts/rockchip/${dtb_name}.dtb && -f $workdir/kernel/arch/arm64/boot/Image ]];then
-    echo "kernel is the latest"
+    LOG "kernel is the latest"
 else
     if [ "x$branch" == "xopenEuler-20.03-LTS" ];then
         build_rockchip-kernel
@@ -226,11 +233,12 @@ else
     fi
 fi
 if [[ -f $workdir/boot/${dtb_name}.dtb && -f $workdir/boot.img ]];then
-    echo "boot is the latest"
+    LOG "boot is the latest"
 else
     trap 'LOSETUP_D_IMG' EXIT
     LOSETUP_D_IMG
     install_kernel
     mk_boot
 fi
+LOG "The boot.img is generated in the ${workdir}."
 echo "bootimg" >> $workdir/.done

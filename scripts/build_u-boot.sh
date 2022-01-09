@@ -1,9 +1,9 @@
 #!/bin/bash
 
 __usage="
-Usage: build-u-boot [OPTIONS]
+Usage: build_u-boot [OPTIONS]
 Build rk3399 u-boot image.
-The target files idbloader.img u-boot.itb will be generated in the build/u-boot folder of the directory where the build_u-boot.sh script is located.
+The target files idbloader.img and u-boot.itb will be generated in the build/u-boot folder of the directory where the build_u-boot.sh script is located.
 
 Options: 
   -c, --config BOARD_CONFIG     Required! The name of target board which should be a space separated list, which defaults to firefly-rk3399_defconfig.
@@ -21,6 +21,7 @@ default_param() {
     workdir=$(pwd)/build
     u_boot_url="https://gitlab.arm.com/systemready/firmware-build/u-boot.git"
     rk3399_bl31_url="https://github.com/rockchip-linux/rkbin/raw/master/bin/rk33/rk3399_bl31_v1.35.elf"
+    log_dir=$workdir/log
 }
 
 local_param(){
@@ -55,13 +56,14 @@ parseargs()
 
 buildid=$(date +%Y%m%d%H%M%S)
 builddate=${buildid:0:8}
+if [ ! -d ${log_dir} ];then mkdir ${log_dir}; fi
 
 ERROR(){
-    echo `date` - ERROR, $* | tee -a ${workdir}/${builddate}.log
+    echo `date` - ERROR, $* | tee -a ${log_dir}/${builddate}.log
 }
 
 LOG(){
-    echo `date` - INFO, $* | tee -a ${workdir}/${builddate}.log
+    echo `date` - INFO, $* | tee -a ${log_dir}/${builddate}.log
 }
 
 build_u-boot() {
@@ -87,7 +89,7 @@ build_u-boot() {
     fi
     cd $workdir/u-boot
     if [[ -f $workdir/u-boot/u-boot.itb && -f $workdir/u-boot/idbloader.img ]];then
-        echo "u-boot is the latest"
+        LOG "u-boot is the latest"
     else
         if [ -f bl31.elf ];then rm bl31.elf; fi
         wget -O bl31.elf ${rk3399_bl31_url}
@@ -117,5 +119,7 @@ if [ ! -d $workdir ]; then
     mkdir $workdir
 fi
 sed -i 's/u-boot//g' $workdir/.done
+LOG "build u-boot..."
 build_u-boot
+LOG "The u-boot.itb and idbloader.img are generated in the ${workdir}/u-boot."
 echo "u-boot" >> $workdir/.done

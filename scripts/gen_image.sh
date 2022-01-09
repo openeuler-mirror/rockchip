@@ -1,7 +1,7 @@
 #!/bin/bash
 
 __usage="
-Usage: gen-image [OPTIONS]
+Usage: gen_image [OPTIONS]
 Generate rk3399 bootable image.
 The target compressed bootable images will be generated in the build/YYYY-MM-DD folder of the directory where the gen_image.sh script is located.
 
@@ -18,12 +18,15 @@ help()
 
 default_param() {
     workdir=$(pwd)/build
-    outputdir=$workdir/$(date +'%Y-%m-%d')
+    outputdir=${workdir}/$(date +'%Y-%m-%d')
     name=openEuler-Firefly-RK3399-aarch64-alpha1
     rootfs_dir=${workdir}/rootfs
+    boot_dir=${workdir}/boot
+    u-boot_dir=${workdir}/u-boot
     boot_mnt=${workdir}/boot_tmp
     emmc_boot_mnt=${workdir}/emmc_boot_tmp
     root_mnt=${workdir}/root_tmp
+    log_dir=${workdir}/log
 }
 
 parseargs()
@@ -66,6 +69,16 @@ LOSETUP_D_IMG(){
             umount ${emmc_boot_mnt}
         fi
     fi
+    if [ -d ${rootfs_dir} ]; then
+        if grep -q "${rootfs_dir} " /proc/mounts ; then
+            umount ${rootfs_dir}
+        fi
+    fi
+    if [ -d ${boot_dir} ]; then
+        if grep -q "${boot_dir} " /proc/mounts ; then
+            umount ${boot_dir}
+        fi
+    fi
     if [ "x$device" != "x" ]; then
         kpartx -d ${device}
         losetup -d ${device}
@@ -80,22 +93,43 @@ LOSETUP_D_IMG(){
     if [ -d ${emmc_boot_mnt} ]; then
         rm -rf ${emmc_boot_mnt}
     fi
+    if [ -d ${rootfs_dir} ]; then
+        rm -rf ${rootfs_dir}
+    fi
+    if [ -d ${boot_dir} ]; then
+        rm -rf ${boot_dir}
+    fi
     set -e
 }
 
 buildid=$(date +%Y%m%d%H%M%S)
 builddate=${buildid:0:8}
+if [ ! -d ${log_dir} ];then mkdir ${log_dir}; fi
 
 ERROR(){
-    echo `date` - ERROR, $* | tee -a ${workdir}/${builddate}.log
+    echo `date` - ERROR, $* | tee -a ${log_dir}/${builddate}.log
 }
 
 LOG(){
-    echo `date` - INFO, $* | tee -a ${workdir}/${builddate}.log
+    echo `date` - INFO, $* | tee -a ${log_dir}/${builddate}.log
 }
 
 make_img(){
     cd $workdir
+
+    if [[ -f $workdir/boot.img && $(cat $workdir/.done | grep bootimg) == "bootimg" ]];then
+        LOG "boot.img check done."
+    else
+        ERROR "boot.img check failed, please re-run build_boot.sh."
+        exit 2
+    fi
+    if [[ -f $workdir/rootfs.img && $(cat $workdir/.done | grep rootfs) == "rootfs" ]];then
+        LOG "rootfs.img check done."
+    else
+        ERROR "rootfs.img check failed, please re-run build_rootfs.sh."
+        exit 2
+    fi
+
     device=""
     LOSETUP_D_IMG
     size=`du -sh --block-size=1MiB ${rootfs_dir} | cut -f 1 | xargs`
@@ -132,34 +166,45 @@ EOF
     mount -t vfat -o uid=root,gid=root,umask=0000 ${bootp} ${boot_mnt}
     mount -t ext4 ${rootp} ${root_mnt}
 
-    if [ -z $workdir/u-boot/idbloader.img ]; then
+    if [ -z ${u-boot_dir}/idbloader.img ]; then
         ERROR "u-boot idbloader file can not be found!"
         exit 2
     else
-        dd if=$workdir/u-boot/idbloader.img of=$idbloaderp
+        dd if=${u-boot_dir}/idbloader.img of=$idbloaderp
     fi
     
-    if [ -z $workdir/u-boot/u-boot.itb ]; then
+    if [ -z ${u-boot_dir}/u-boot.itb ]; then
         ERROR "u-boot.itb file can not be found!"
         exit 2
     else
-        dd if=$workdir/u-boot/u-boot.itb of=$ubootp
+        dd if=${u-boot_dir}/u-boot.itb of=$ubootp
     fi
     
     dd if=/dev/zero of=$trustp bs=1M count=4
     LOG "install u-boot done."
 
-    cp -rfp ${workdir}/boot/* ${boot_mnt}
-    if [ -d ${rootfs_dir}/lib/modules ];then rm -rf ${rootfs_dir}/lib/modules; fi
-    cp -rfp ${workdir}/kernel-bin/lib/modules ${rootfs_dir}/lib
-    LOG "install kernel modules done."
+    if [ -d ${rootfs_dir} ];then rm -rf ${rootfs_dir}; fi
+    mount $workdir/rootfs.img ${rootfs_dir}
+    if [ -d ${boot_dir} ];then rm -rf ${boot_dir}; fi
+    mount $workdir/boot.img ${boot_dir}
+
+    cp -rfp ${boot_dir}/* ${boot_mnt}
+    rm ${boot_mnt}/extlinux/extlinux.conf
+    mv ${boot_mnt}/extlinux/extlinux.conf.sd ${boot_mnt}/extlinux/extlinux.conf
+
     rsync -avHAXq ${rootfs_dir}/* ${root_mnt}
     sync
     sleep 10
     LOG "copy openEuler-root done."
 
+    if [ -d ${root_mnt}/lib/modules ];then rm -rf ${root_mnt}/lib/modules; fi
+    cp -rfp $workdir/kernel/kernel-modules/lib/modules ${root_mnt}/lib
+    LOG "install kernel modules done."
+
     umount $rootp
     umount $bootp
+    umount ${rootfs_dir}
+    umount ${boot_dir}
 
     LOSETUP_D_IMG
     losetup -D
@@ -167,19 +212,6 @@ EOF
 
 outputd(){
     cd $workdir
-
-    if [[ -f $workdir/boot.img && $(cat $workdir/.done | grep bootimg) == "bootimg" ]];then
-        echo "boot.img check done."
-    else
-        ERROR "boot.img check failed, please re-run build_boot.sh."
-        exit 2
-    fi
-    if [[ -f $workdir/rootfs.img && $(cat $workdir/.done | grep rootfs) == "rootfs" ]];then
-        echo "rootfs.img check done."
-    else
-        ERROR "rootfs.img check failed, please re-run build_rootfs.sh."
-        exit 2
-    fi
 
     if [ -f $outputdir ];then
         img_name_check=$(ls $outputdir | grep $name)
@@ -201,31 +233,41 @@ outputd(){
     fi
 
     LOG "tar openEuler image begin..."
+    cp $workdir/../bin/rk3399_loader.bin $workdir
+    cp $workdir/../bin/parameter.gpt $workdir
+    cp $workdir/u-boot/idbloader.img $workdir
+    cp $workdir/u-boot/u-boot.itb $workdir
+    cd $workdir
     tar -zcvf ${outputdir}/${name}.tar.gz \
-    $workdir/../bin/rk3399_loader.bin \
-    $workdir/../bin/parameter.gpt \
-    $workdir/u-boot/idbloader.img \
-    $workdir/u-boot/u-boot.itb \
-    $workdir/boot.img \
-    $workdir/rootfs.img
+    rk3399_loader.bin \
+    parameter.gpt \
+    idbloader.img \
+    u-boot.itb \
+    boot.img \
+    rootfs.img
     if [ -z ${outputdir}/${name}.tar.gz ]; then
         ERROR "tar openEuler image failed!"
         exit 2
     else
         LOG "tar openEuler image success."
     fi
+    rm $workdir/rk3399_loader.bin
+    rm $workdir/parameter.gpt
+    rm $workdir/idbloader.img
+    rm $workdir/u-boot.itb
 
     cd $outputdir
     sha256sum ${name}.img.xz >> ${name}.img.xz.sha256sum
     sha256sum ${name}.tar.gz >> ${name}.tar.gz.sha256sum
 
-    echo "The target images are generated in the ${outputdir}."
+    LOG "The target images are generated in the ${outputdir}."
 }
 
 set -e
 default_param
 parseargs "$@" || help $?
 sed -i 's/image//g' $workdir/.done
+LOG "gen image..."
 make_img
 outputd
 echo "image" >> $workdir/.done

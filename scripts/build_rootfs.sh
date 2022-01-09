@@ -1,8 +1,8 @@
 #!/bin/bash
 
 __usage="
-Usage: build-image [OPTIONS]
-Build rk3399 openEuler-root directory.
+Usage: build_rootfs [OPTIONS]
+Build rk3399 openEuler-root image.
 Run in root user.
 The target rootfs.img will be generated in the build folder of the directory where the build_rootfs.sh script is located.
 
@@ -22,6 +22,8 @@ default_param() {
     tmp_dir=${workdir}/tmp
     workdir=$(pwd)/build
     nonfree_bin_dir=${workdir}/../bin
+    rootfs_dir=${workdir}/rootfs
+    log_dir=${workdir}/log
 }
 
 local_param(){
@@ -62,13 +64,14 @@ parseargs()
 
 buildid=$(date +%Y%m%d%H%M%S)
 builddate=${buildid:0:8}
+if [ ! -d ${log_dir} ];then mkdir ${log_dir}; fi
 
 ERROR(){
-    echo `date` - ERROR, $* | tee -a ${workdir}/${builddate}.log
+    echo `date` - ERROR, $* | tee -a ${log_dir}/${builddate}.log
 }
 
 LOG(){
-    echo `date` - INFO, $* | tee -a ${workdir}/${builddate}.log
+    echo `date` - INFO, $* | tee -a ${log_dir}/${builddate}.log
 }
 
 LOSETUP_D_IMG(){
@@ -86,14 +89,14 @@ LOSETUP_D_IMG(){
 
 UMOUNT_ALL(){
     set +e
-    if grep -q "${workdir}/rootfs/dev " /proc/mounts ; then
-        umount -l ${workdir}/rootfs/dev
+    if grep -q "${rootfs_dir}/dev " /proc/mounts ; then
+        umount -l ${rootfs_dir}/dev
     fi
-    if grep -q "${workdir}/rootfs/proc " /proc/mounts ; then
-        umount -l ${workdir}/rootfs/proc
+    if grep -q "${rootfs_dir}/proc " /proc/mounts ; then
+        umount -l ${rootfs_dir}/proc
     fi
-    if grep -q "${workdir}/rootfs/sys " /proc/mounts ; then
-        umount -l ${workdir}/rootfs/sys
+    if grep -q "${rootfs_dir}/sys " /proc/mounts ; then
+        umount -l ${rootfs_dir}/sys
     fi
     set -e
 }
@@ -116,8 +119,8 @@ build_rootfs() {
         rm -rf ${tmp_dir}/*
     fi
 
-    mkdir -p rootfs/var/lib/rpm
-    rpm --root  rootfs/ --initdb
+    mkdir -p ${rootfs_dir}/var/lib/rpm
+    rpm --root  ${rootfs_dir}/ --initdb
 
     if [ "x$repo_file" == "x" ] ; then
         echo `date` - ERROR, \"-r REPO_INFO or --repo REPO_INFO\" missing.
@@ -184,22 +187,22 @@ build_rootfs() {
         LOG "Success to download ${os_release_name}."
     fi
 
-    rpm -ivh --nodeps --root $workdir/rootfs/ ${os_release_name}
+    rpm -ivh --nodeps --root ${rootfs_dir}/ ${os_release_name}
 
-    mkdir -p ${workdir}/rootfs/etc/rpm
-    chmod a+rX ${workdir}/rootfs/etc/rpm
-    echo "%_install_langs en_US" > ${workdir}/rootfs/etc/rpm/macros.image-language-conf
-    mkdir -p ${workdir}/rootfs/etc/yum.repos.d
-    cp ${tmp_dir}/generic.repo ${workdir}/rootfs/etc/yum.repos.d/generic.repo
-    dnf --installroot=$workdir/rootfs/ install dnf --nogpgcheck -y 
-    dnf --installroot=$workdir/rootfs/ makecache
-    dnf --installroot=$workdir/rootfs/ install -y alsa-utils wpa_supplicant vim net-tools iproute iputils NetworkManager openssh-server passwd hostname ntp bluez pulseaudio-module-bluetooth linux-firmware parted gdisk
-    cp -L /etc/resolv.conf ${workdir}/rootfs/etc/resolv.conf
+    mkdir -p ${rootfs_dir}/etc/rpm
+    chmod a+rX ${rootfs_dir}/etc/rpm
+    echo "%_install_langs en_US" > ${rootfs_dir}/etc/rpm/macros.image-language-conf
+    mkdir -p ${rootfs_dir}/etc/yum.repos.d
+    cp ${tmp_dir}/generic.repo ${rootfs_dir}/etc/yum.repos.d/generic.repo
+    dnf --installroot=${rootfs_dir}/ install dnf --nogpgcheck -y 
+    dnf --installroot=${rootfs_dir}/ makecache
+    dnf --installroot=${rootfs_dir}/ install -y alsa-utils wpa_supplicant vim net-tools iproute iputils NetworkManager openssh-server passwd hostname ntp bluez pulseaudio-module-bluetooth linux-firmware parted gdisk
+    cp -L /etc/resolv.conf ${rootfs_dir}/etc/resolv.conf
     rm ${workdir}/*rpm
     
     echo "   nameserver 8.8.8.8
    nameserver 114.114.114.114"  > "$workdir/rootfs/etc/resolv.conf"
-    if [ ! -d ${workdir}/rootfs/etc/sysconfig/network-scripts ]; then mkdir "${workdir}/rootfs/etc/sysconfig/network-scripts"; fi
+    if [ ! -d ${rootfs_dir}/etc/sysconfig/network-scripts ]; then mkdir "${rootfs_dir}/etc/sysconfig/network-scripts"; fi
     echo "   TYPE=Ethernet
    PROXY_METHOD=none
    BROWSER_ONLY=no
@@ -215,19 +218,19 @@ build_rootfs() {
    UUID=851a6f36-e65c-3a43-8f4a-78fd0fc09dc9
    ONBOOT=yes
    AUTOCONNECT_PRIORITY=-999
-   DEVICE=eth0" > "$workdir/rootfs/etc/sysconfig/network-scripts/ifup-eth0"
+   DEVICE=eth0" > "${rootfs_dir}/etc/sysconfig/network-scripts/ifup-eth0"
     
     LOG "Configure network done."
 
-    mount --bind /dev $workdir/rootfs/dev
-    mount -t proc /proc $workdir/rootfs/proc
-    mount -t sysfs /sys $workdir/rootfs/sys
+    mount --bind /dev ${rootfs_dir}/dev
+    mount -t proc /proc ${rootfs_dir}/proc
+    mount -t sysfs /sys ${rootfs_dir}/sys
 
-    cp $nonfree_bin_dir/../bin/expand-rootfs.sh ${workdir}/rootfs/etc/rc.d/init.d/expand-rootfs.sh
-    chmod +x ${workdir}/rootfs/etc/rc.d/init.d/expand-rootfs.sh
+    cp $nonfree_bin_dir/../bin/expand-rootfs.sh ${rootfs_dir}/etc/rc.d/init.d/expand-rootfs.sh
+    chmod +x ${rootfs_dir}/etc/rc.d/init.d/expand-rootfs.sh
     LOG "Set auto expand rootfs done."
 
-    cat << EOF | chroot ${workdir}/rootfs  /bin/bash
+    cat << EOF | chroot ${rootfs_dir}  /bin/bash
     echo 'openeuler' | passwd --stdin root
     echo openEuler > /etc/hostname
     ln -s /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
@@ -235,15 +238,15 @@ build_rootfs() {
     chkconfig expand-rootfs.sh on
 EOF
 
-    sed -i 's/#NTP=/NTP=0.cn.pool.ntp.org/g' ${workdir}/rootfs/etc/systemd/timesyncd.conf
-    sed -i 's/#FallbackNTP=/FallbackNTP=1.asia.pool.ntp.org 2.asia.pool.ntp.org/g' ${workdir}/rootfs/etc/systemd/timesyncd.conf
+    sed -i 's/#NTP=/NTP=0.cn.pool.ntp.org/g' ${rootfs_dir}/etc/systemd/timesyncd.conf
+    sed -i 's/#FallbackNTP=/FallbackNTP=1.asia.pool.ntp.org 2.asia.pool.ntp.org/g' ${rootfs_dir}/etc/systemd/timesyncd.conf
 
-    echo "LABEL=rootfs  / ext4    defaults,noatime 0 0" > ${workdir}/rootfs/etc/fstab
-    echo "LABEL=boot  /boot vfat    defaults,noatime 0 0" >> ${workdir}/rootfs/etc/fstab
+    echo "LABEL=rootfs  / ext4    defaults,noatime 0 0" > ${rootfs_dir}/etc/fstab
+    echo "LABEL=boot  /boot vfat    defaults,noatime 0 0" >> ${rootfs_dir}/etc/fstab
     LOG "Set NTP and fstab done."
 
-    if [ -d $workdir/rootfs/boot/grub2 ]; then
-        rm -rf $workdir/rootfs/boot/grub2
+    if [ -d ${rootfs_dir}/boot/grub2 ]; then
+        rm -rf ${rootfs_dir}/boot/grub2
     fi
 
     if [ -f $workdir/.param ]; then
@@ -252,24 +255,24 @@ EOF
         if [ "x$dtb_name" == "xrk3399-firefly" ]; then
             cd $workdir
             if [ "x$branch" == "xopenEuler-20.03-LTS" ]; then
-                mkdir -p $workdir/rootfs/system
-                mkdir -p $workdir/rootfs/etc/profile.d/
-                mkdir -p $workdir/rootfs/usr/bin/
-                cp -r $nonfree_bin_dir/wireless/system/*    $workdir/rootfs/system/
-                cp   $nonfree_bin_dir/wireless/rcS.sh    $workdir/rootfs/etc/profile.d/
-                cp   $nonfree_bin_dir/wireless/enable_bt    $workdir/rootfs/usr/bin/
-                chmod +x  $workdir/rootfs/usr/bin/enable_bt  $workdir/rootfs/etc/profile.d/rcS.sh
+                mkdir -p ${rootfs_dir}/system
+                mkdir -p ${rootfs_dir}/etc/profile.d/
+                mkdir -p ${rootfs_dir}/usr/bin/
+                cp -r $nonfree_bin_dir/wireless/system/*    ${rootfs_dir}/system/
+                cp   $nonfree_bin_dir/wireless/rcS.sh    ${rootfs_dir}/etc/profile.d/
+                cp   $nonfree_bin_dir/wireless/enable_bt    ${rootfs_dir}/usr/bin/
+                chmod +x  ${rootfs_dir}/usr/bin/enable_bt  ${rootfs_dir}/etc/profile.d/rcS.sh
                 LOG "install firefly-rk3399 wireless firmware done."
             fi
-            mkdir -p $workdir/rootfs/usr/lib/firmware/brcm
-            cp $nonfree_bin_dir/brcmfmac4356-sdio.firefly,firefly-rk3399.txt $workdir/rootfs/usr/lib/firmware/brcm
+            mkdir -p ${rootfs_dir}/usr/lib/firmware/brcm
+            cp $nonfree_bin_dir/brcmfmac4356-sdio.firefly,firefly-rk3399.txt ${rootfs_dir}/usr/lib/firmware/brcm
         fi
     fi
 }
 
 mk_rootfsimg() {
     cd $workdir
-    size=`du -sh --block-size=1MiB $workdir/rootfs | cut -f 1 | xargs`
+    size=`du -sh --block-size=1MiB ${rootfs_dir} | cut -f 1 | xargs`
     size=$(($size+500))
     rootfs_img=${workdir}/rootfs.img
     dd if=/dev/zero of=${rootfs_img} bs=1MiB count=$size status=progress && sync
@@ -279,7 +282,7 @@ mk_rootfsimg() {
     mkdir ${workdir}/rootfs_tmp
     mount ${workdir}/rootfs.img ${workdir}/rootfs_tmp
 
-    rsync -avHAXq $workdir/rootfs/* ${workdir}/rootfs_tmp
+    rsync -avHAXq ${rootfs_dir}/* ${workdir}/rootfs_tmp
     sync
     sleep 10
 
@@ -292,6 +295,9 @@ mk_rootfsimg() {
         ERROR "make rootfs image failed!"
         exit 2
     fi
+
+    LOG "clean rootfs directory."
+    rm -rf ${rootfs_dir}
 }
 set -e
 root_need
@@ -307,6 +313,7 @@ trap 'UMOUNT_ALL' EXIT
 UMOUNT_ALL
 cd $workdir
 sed -i 's/rootfs//g' $workdir/.done
+LOG "build rootfs..."
 if [ -d rootfs ]; then
     if [[ -f $workdir/.param_last && -f ${workdir}/rootfs/etc/fstab ]]; then
         last_branch=$(cat $workdir/.param_last | grep branch)
@@ -341,5 +348,5 @@ else
     UMOUNT_ALL
     mk_rootfsimg
 fi
-
+LOG "The rootfs.img is generated in the ${workdir}."
 echo "rootfs" >> $workdir/.done

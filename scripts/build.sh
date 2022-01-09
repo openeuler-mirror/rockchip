@@ -113,12 +113,12 @@ fi
 save_param
 
 if [ -f $workdir/.done ];then
-    echo "Checking the previous build."
+    LOG "Checking the previous build."
     if [[ $(cat $workdir/.done | grep u-boot) == "u-boot" && \
     $(cat $workdir/.done | grep bootimg) == "bootimg" && \
     $(cat $workdir/.done | grep rootfs) == "rootfs" && \
     $(cat $workdir/.done | grep image) == "image" ]];then
-        echo "Found complete build, clean build flag."
+        LOG "Found complete build, clean build flag."
         rm $workdir/.done
         touch $workdir/.done
     fi
