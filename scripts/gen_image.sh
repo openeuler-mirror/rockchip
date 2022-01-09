@@ -104,7 +104,6 @@ LOSETUP_D_IMG(){
 
 buildid=$(date +%Y%m%d%H%M%S)
 builddate=${buildid:0:8}
-if [ ! -d ${log_dir} ];then mkdir ${log_dir}; fi
 
 ERROR(){
     echo `date` - ERROR, $* | tee -a ${log_dir}/${builddate}.log
@@ -266,6 +265,7 @@ outputd(){
 set -e
 default_param
 parseargs "$@" || help $?
+if [ ! -d ${log_dir} ];then mkdir -p ${log_dir}; fi
 sed -i 's/image//g' $workdir/.done
 LOG "gen image..."
 make_img

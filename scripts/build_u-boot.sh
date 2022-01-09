@@ -56,7 +56,6 @@ parseargs()
 
 buildid=$(date +%Y%m%d%H%M%S)
 builddate=${buildid:0:8}
-if [ ! -d ${log_dir} ];then mkdir ${log_dir}; fi
 
 ERROR(){
     echo `date` - ERROR, $* | tee -a ${log_dir}/${builddate}.log
@@ -118,6 +117,7 @@ parseargs "$@" || help $?
 if [ ! -d $workdir ]; then
     mkdir $workdir
 fi
+if [ ! -d ${log_dir} ];then mkdir -p ${log_dir}; fi
 sed -i 's/u-boot//g' $workdir/.done
 LOG "build u-boot..."
 build_u-boot

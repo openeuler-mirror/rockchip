@@ -73,7 +73,6 @@ parseargs()
 
 buildid=$(date +%Y%m%d%H%M%S)
 builddate=${buildid:0:8}
-if [ ! -d ${log_dir} ];then mkdir ${log_dir}; fi
 
 ERROR(){
     echo `date` - ERROR, $* | tee -a ${log_dir}/${builddate}.log
@@ -219,6 +218,7 @@ set -e
 if [ ! -d $workdir ]; then
     mkdir $workdir
 fi
+if [ ! -d ${log_dir} ];then mkdir -p ${log_dir}; fi
 sed -i 's/bootimg//g' $workdir/.done
 LOG "build boot..."
 clone_and_check_kernel_source
