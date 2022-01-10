@@ -232,7 +232,7 @@ else
         build_kernel
     fi
 fi
-if [[ -f $workdir/boot/${dtb_name}.dtb && -f $workdir/boot.img ]];then
+if [[ -f ${boot_dir}/${dtb_name}.dtb && -f $workdir/boot.img ]];then
     LOG "boot is the latest"
 else
     trap 'LOSETUP_D_IMG' EXIT

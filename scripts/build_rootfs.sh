@@ -108,6 +108,7 @@ root_need() {
 }
 
 build_rootfs() {
+    trap 'UMOUNT_ALL' EXIT
     cd $workdir
     if [ -d rootfs ];then rm -rf rootfs; fi
     mkdir rootfs
@@ -200,7 +201,7 @@ build_rootfs() {
     rm ${workdir}/*rpm
     
     echo "   nameserver 8.8.8.8
-   nameserver 114.114.114.114"  > "$workdir/rootfs/etc/resolv.conf"
+   nameserver 114.114.114.114"  > "${rootfs_dir}/etc/resolv.conf"
     if [ ! -d ${rootfs_dir}/etc/sysconfig/network-scripts ]; then mkdir "${rootfs_dir}/etc/sysconfig/network-scripts"; fi
     echo "   TYPE=Ethernet
    PROXY_METHOD=none
@@ -267,9 +268,11 @@ EOF
             cp $nonfree_bin_dir/brcmfmac4356-sdio.firefly,firefly-rk3399.txt ${rootfs_dir}/usr/lib/firmware/brcm
         fi
     fi
+    UMOUNT_ALL
 }
 
 mk_rootfsimg() {
+    trap 'LOSETUP_D_IMG' EXIT
     cd $workdir
     size=`du -sh --block-size=1MiB ${rootfs_dir} | cut -f 1 | xargs`
     size=$(($size+500))
@@ -285,8 +288,7 @@ mk_rootfsimg() {
     sync
     sleep 10
 
-    umount ${workdir}/rootfs_tmp
-    rmdir ${workdir}/rootfs_tmp
+    LOSETUP_D_IMG
 
     if [ -f $workdir/rootfs.img ]; then
         LOG "make rootfs image done."
@@ -308,13 +310,12 @@ if [ ! -d $workdir ]; then
     mkdir $workdir
 fi
 if [ ! -d ${log_dir} ];then mkdir -p ${log_dir}; fi
-trap 'UMOUNT_ALL' EXIT
-UMOUNT_ALL
+
 cd $workdir
 sed -i 's/rootfs//g' $workdir/.done
 LOG "build rootfs..."
 if [ -d rootfs ]; then
-    if [[ -f $workdir/.param_last && -f ${workdir}/rootfs/etc/fstab ]]; then
+    if [[ -f $workdir/.param_last && -f ${rootfs_dir}/etc/fstab ]]; then
         last_branch=$(cat $workdir/.param_last | grep branch)
         last_branch=${branch:7}
 
@@ -327,24 +328,15 @@ if [ -d rootfs ]; then
         if [[ ${last_branch} != ${branch} || ${last_dtb_name} != ${dtb_name} || ${last_repo_file} != ${repo_file} ]]; then
             rm -rf rootfs
             build_rootfs
-            trap 'LOSETUP_D_IMG' EXIT
-            LOSETUP_D_IMG
-            UMOUNT_ALL
             mk_rootfsimg
         fi
     else
         rm -rf rootfs
         build_rootfs
-        trap 'LOSETUP_D_IMG' EXIT
-        LOSETUP_D_IMG
-        UMOUNT_ALL
         mk_rootfsimg
     fi
 else
     build_rootfs
-    trap 'LOSETUP_D_IMG' EXIT
-    LOSETUP_D_IMG
-    UMOUNT_ALL
     mk_rootfsimg
 fi
 LOG "The rootfs.img is generated in the ${workdir}."
