@@ -109,13 +109,13 @@ clone_and_check_kernel_source() {
     if [ -d kernel ]; then
         if [ -f $workdir/.param_last ]; then
             last_branch=$(cat $workdir/.param_last | grep branch)
-            last_branch=${branch:7}
+            last_branch=${last_branch:7}
 
             last_dtb_name=$(cat $workdir/.param_last | grep dtb_name)
-            last_dtb_name=${dtb_name:9}
+            last_dtb_name=${last_dtb_name:9}
 
             last_kernel_url=$(cat $workdir/.param_last | grep kernel_url)
-            last_kernel_url=${kernel_url:11}
+            last_kernel_url=${last_kernel_url:11}
 
             cd $workdir/kernel
             git remote -v update
@@ -232,7 +232,7 @@ else
         build_kernel
     fi
 fi
-if [[ -f ${boot_dir}/${dtb_name}.dtb && -f $workdir/boot.img ]];then
+if [[ -f $workdir/boot.img && $(cat $workdir/.done | grep bootimg) == "bootimg" ]];then
     LOG "boot is the latest"
 else
     trap 'LOSETUP_D_IMG' EXIT

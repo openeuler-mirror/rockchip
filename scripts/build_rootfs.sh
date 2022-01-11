@@ -315,15 +315,15 @@ cd $workdir
 sed -i 's/rootfs//g' $workdir/.done
 LOG "build rootfs..."
 if [ -d rootfs ]; then
-    if [[ -f $workdir/.param_last && -f ${rootfs_dir}/etc/fstab ]]; then
+    if [[ -f $workdir/rootfs.img && $(cat $workdir/.done | grep rootfs) == "rootfs" ]];then
         last_branch=$(cat $workdir/.param_last | grep branch)
-        last_branch=${branch:7}
+        last_branch=${last_branch:7}
 
         last_dtb_name=$(cat $workdir/.param_last | grep dtb_name)
-        last_dtb_name=${dtb_name:9}
+        last_dtb_name=${last_dtb_name:9}
 
         last_repo_file=$(cat $workdir/.param_last | grep repo_file)
-        last_repo_file=${repo_file:10}
+        last_repo_file=${last_repo_file:10}
 
         if [[ ${last_branch} != ${branch} || ${last_dtb_name} != ${dtb_name} || ${last_repo_file} != ${repo_file} ]]; then
             rm -rf rootfs
