@@ -268,6 +268,9 @@ set -e
 default_param
 parseargs "$@" || help $?
 if [ ! -d ${log_dir} ];then mkdir -p ${log_dir}; fi
+if [ -z $workdir/.done ];then
+    touch $workdir/.done
+fi
 sed -i 's/image//g' $workdir/.done
 LOG "gen image..."
 make_img

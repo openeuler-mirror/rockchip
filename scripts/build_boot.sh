@@ -219,6 +219,9 @@ if [ ! -d $workdir ]; then
     mkdir $workdir
 fi
 if [ ! -d ${log_dir} ];then mkdir -p ${log_dir}; fi
+if [ -z $workdir/.done ];then
+    touch $workdir/.done
+fi
 sed -i 's/bootimg//g' $workdir/.done
 LOG "build boot..."
 clone_and_check_kernel_source

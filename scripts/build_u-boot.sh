@@ -118,6 +118,9 @@ if [ ! -d $workdir ]; then
     mkdir $workdir
 fi
 if [ ! -d ${log_dir} ];then mkdir -p ${log_dir}; fi
+if [ -z $workdir/.done ];then
+    touch $workdir/.done
+fi
 sed -i 's/u-boot//g' $workdir/.done
 LOG "build u-boot..."
 build_u-boot

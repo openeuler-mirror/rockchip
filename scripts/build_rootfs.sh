@@ -310,7 +310,9 @@ if [ ! -d $workdir ]; then
     mkdir $workdir
 fi
 if [ ! -d ${log_dir} ];then mkdir -p ${log_dir}; fi
-
+if [ -z $workdir/.done ];then
+    touch $workdir/.done
+fi
 cd $workdir
 sed -i 's/rootfs//g' $workdir/.done
 LOG "build rootfs..."
