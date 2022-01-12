@@ -310,7 +310,7 @@ if [ ! -d $workdir ]; then
     mkdir $workdir
 fi
 if [ ! -d ${log_dir} ];then mkdir -p ${log_dir}; fi
-if [ -z $workdir/.done ];then
+if [ ! -f $workdir/.done ];then
     touch $workdir/.done
 fi
 cd $workdir

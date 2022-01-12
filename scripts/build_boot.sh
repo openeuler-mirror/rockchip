@@ -164,7 +164,7 @@ build_rockchip-kernel() {
 }
 
 install_kernel() {
-    if [ -z $workdir/kernel/arch/arm64/boot/Image ]; then
+    if [ ! -f $workdir/kernel/arch/arm64/boot/Image ]; then
         ERROR "kernel Image can not be found!"
         exit 2
     else
@@ -219,7 +219,7 @@ if [ ! -d $workdir ]; then
     mkdir $workdir
 fi
 if [ ! -d ${log_dir} ];then mkdir -p ${log_dir}; fi
-if [ -z $workdir/.done ];then
+if [ ! -f $workdir/.done ];then
     touch $workdir/.done
 fi
 sed -i 's/bootimg//g' $workdir/.done
