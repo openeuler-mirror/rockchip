@@ -7,8 +7,10 @@ Run in root user.
 The target rootfs.img will be generated in the build folder of the directory where the build_rootfs.sh script is located.
 
 Options: 
-  -r, --repo REPO_INFO       The URL/path of target repo file or list of repo's baseurls which should be a space separated list.
-  -h, --help                 Show command help.
+  -r, --repo REPO_INFO          The URL/path of target repo file or list of repo's baseurls which should be a space separated list.
+  -b, --branch KERNEL_BRANCH    The branch name of kernel source's repository, which defaults to openEuler-20.03-LTS.
+  -d, --device-tree DTB_NAME    The device tree name of target board, which defaults to rk3399-firefly.
+  -h, --help                    Show command help.
 "
 
 help()
@@ -21,6 +23,8 @@ default_param() {
     repo_file="https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-20.03-LTS/generic.repo"
     tmp_dir=${workdir}/tmp
     workdir=$(pwd)/build
+    dtb_name=rk3399-firefly
+    branch=openEuler-20.03-LTS
     nonfree_bin_dir=${workdir}/../bin
     rootfs_dir=${workdir}/rootfs
     log_dir=${workdir}/log
@@ -53,6 +57,14 @@ parseargs()
             shift
         elif [ "x$1" == "x-r" -o "x$1" == "x--repo" ]; then
             repo_file=`echo $2`
+            shift
+            shift
+        elif [ "x$1" == "x-b" -o "x$1" == "x--branch" ]; then
+            branch=`echo $2`
+            shift
+            shift
+        elif [ "x$1" == "x-d" -o "x$1" == "x--device-tree" ]; then
+            dtb_name=`echo $2`
             shift
             shift
         else
