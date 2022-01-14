@@ -92,7 +92,7 @@ build_u-boot() {
     else
         if [ -f bl31.elf ];then rm bl31.elf; fi
         wget -O bl31.elf ${rk3399_bl31_url}
-        if [ -z bl31.elf ]; then
+        if [ ! -f bl31.elf ]; then
             ERROR "arm-trusted-firmware(bl31.elf) can not be found!"
             exit 2
         fi
@@ -101,7 +101,7 @@ build_u-boot() {
         make ARCH=arm u-boot.itb -j$(nproc)
         LOG "make u-boot done."
     fi
-    if [ -z u-boot.itb ]; then
+    if [ ! -f u-boot.itb ]; then
         ERROR "make u-boot failed!"
         exit 2
     fi
@@ -118,6 +118,9 @@ if [ ! -d $workdir ]; then
     mkdir $workdir
 fi
 if [ ! -d ${log_dir} ];then mkdir -p ${log_dir}; fi
+if [ ! -f $workdir/.done ];then
+    touch $workdir/.done
+fi
 sed -i 's/u-boot//g' $workdir/.done
 LOG "build u-boot..."
 build_u-boot

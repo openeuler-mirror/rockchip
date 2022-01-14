@@ -165,14 +165,14 @@ EOF
     mount -t vfat -o uid=root,gid=root,umask=0000 ${bootp} ${boot_mnt}
     mount -t ext4 ${rootp} ${root_mnt}
 
-    if [ -z ${uboot_dir}/idbloader.img ]; then
+    if [ ! -f ${uboot_dir}/idbloader.img ]; then
         ERROR "u-boot idbloader file can not be found!"
         exit 2
     else
         dd if=${uboot_dir}/idbloader.img of=$idbloaderp
     fi
     
-    if [ -z ${uboot_dir}/u-boot.itb ]; then
+    if [ ! -f ${uboot_dir}/u-boot.itb ]; then
         ERROR "u-boot.itb file can not be found!"
         exit 2
     else
@@ -226,7 +226,7 @@ outputd(){
     mv ${name}.img ${outputdir}
     LOG "xz openEuler image begin..."
     xz ${outputdir}/${name}.img
-    if [ -z ${name}.img.xz ]; then
+    if [ ! -f ${name}.img.xz ]; then
         ERROR "xz openEuler image failed!"
         exit 2
     else
@@ -246,7 +246,7 @@ outputd(){
     u-boot.itb \
     boot.img \
     rootfs.img
-    if [ -z ${outputdir}/${name}.tar.gz ]; then
+    if [ ! -f ${outputdir}/${name}.tar.gz ]; then
         ERROR "tar openEuler image failed!"
         exit 2
     else
@@ -268,6 +268,9 @@ set -e
 default_param
 parseargs "$@" || help $?
 if [ ! -d ${log_dir} ];then mkdir -p ${log_dir}; fi
+if [ ! -f $workdir/.done ];then
+    touch $workdir/.done
+fi
 sed -i 's/image//g' $workdir/.done
 LOG "gen image..."
 make_img

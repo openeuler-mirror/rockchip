@@ -109,13 +109,13 @@ clone_and_check_kernel_source() {
     if [ -d kernel ]; then
         if [ -f $workdir/.param_last ]; then
             last_branch=$(cat $workdir/.param_last | grep branch)
-            last_branch=${branch:7}
+            last_branch=${last_branch:7}
 
             last_dtb_name=$(cat $workdir/.param_last | grep dtb_name)
-            last_dtb_name=${dtb_name:9}
+            last_dtb_name=${last_dtb_name:9}
 
             last_kernel_url=$(cat $workdir/.param_last | grep kernel_url)
-            last_kernel_url=${kernel_url:11}
+            last_kernel_url=${last_kernel_url:11}
 
             cd $workdir/kernel
             git remote -v update
@@ -164,7 +164,7 @@ build_rockchip-kernel() {
 }
 
 install_kernel() {
-    if [ -z $workdir/kernel/arch/arm64/boot/Image ]; then
+    if [ ! -f $workdir/kernel/arch/arm64/boot/Image ]; then
         ERROR "kernel Image can not be found!"
         exit 2
     else
@@ -219,6 +219,9 @@ if [ ! -d $workdir ]; then
     mkdir $workdir
 fi
 if [ ! -d ${log_dir} ];then mkdir -p ${log_dir}; fi
+if [ ! -f $workdir/.done ];then
+    touch $workdir/.done
+fi
 sed -i 's/bootimg//g' $workdir/.done
 LOG "build boot..."
 clone_and_check_kernel_source
@@ -232,7 +235,7 @@ else
         build_kernel
     fi
 fi
-if [[ -f ${boot_dir}/${dtb_name}.dtb && -f $workdir/boot.img ]];then
+if [[ -f $workdir/boot.img && $(cat $workdir/.done | grep bootimg) == "bootimg" ]];then
     LOG "boot is the latest"
 else
     trap 'LOSETUP_D_IMG' EXIT
