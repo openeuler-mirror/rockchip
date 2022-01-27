@@ -86,7 +86,7 @@
 3. 编译 u-boot
 
     ```
-    make ARCH=arm firely-rk3399_defconfig
+    make ARCH=arm firefly-rk3399_defconfig
     make ARCH=arm -j$(nproc)
     make ARCH=arm u-boot.itb -j$(nproc)
     ```
