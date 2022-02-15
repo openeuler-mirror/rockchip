@@ -101,7 +101,7 @@ Basic information of the image is as follows:
 ## How to Build Images
 
 ### Prepare the Environment
-- OS: openEuler 20.03 LTS/21.03 or Fedora 34
+- OS: openEuler 20.03 LTS/21.03 or CentOS 8
 - Hardware: AArch64 hardware, Such as the RaspberryPi or RK3399 SoCs
 
 Refer to [Building an openEuler image](documents/openEuler镜像的构建.md) for details.

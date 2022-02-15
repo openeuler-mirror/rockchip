@@ -226,7 +226,7 @@ outputd(){
     mv ${name}.img ${outputdir}
     LOG "xz openEuler image begin..."
     xz ${outputdir}/${name}.img
-    if [ ! -f ${name}.img.xz ]; then
+    if [ ! -f ${outputdir}/${name}.img.xz ]; then
         ERROR "xz openEuler image failed!"
         exit 2
     else

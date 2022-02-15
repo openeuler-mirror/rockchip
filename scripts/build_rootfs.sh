@@ -204,11 +204,9 @@ build_rootfs() {
     mkdir -p ${rootfs_dir}/etc/rpm
     chmod a+rX ${rootfs_dir}/etc/rpm
     echo "%_install_langs en_US" > ${rootfs_dir}/etc/rpm/macros.image-language-conf
-    mkdir -p ${rootfs_dir}/etc/yum.repos.d
-    cp ${tmp_dir}/generic.repo ${rootfs_dir}/etc/yum.repos.d/generic.repo
-    dnf --installroot=${rootfs_dir}/ install dnf --nogpgcheck -y 
-    dnf --installroot=${rootfs_dir}/ makecache
-    dnf --installroot=${rootfs_dir}/ install -y alsa-utils wpa_supplicant vim net-tools iproute iputils NetworkManager openssh-server passwd hostname ntp bluez pulseaudio-module-bluetooth linux-firmware parted gdisk
+    dnf ${repo_info} --disablerepo="*" --installroot=${rootfs_dir}/ install dnf --nogpgcheck -y
+    dnf ${repo_info} --disablerepo="*" --installroot=${rootfs_dir}/ makecache
+    dnf ${repo_info} --disablerepo="*" --installroot=${rootfs_dir}/ install --nogpgcheck -y openEuler-repos openEuler-gpg-keys alsa-utils wpa_supplicant vim net-tools iproute iputils NetworkManager openssh-server passwd hostname ntp bluez pulseaudio-module-bluetooth linux-firmware parted gdisk
     cp -L /etc/resolv.conf ${rootfs_dir}/etc/resolv.conf
     rm ${workdir}/*rpm
     

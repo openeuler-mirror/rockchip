@@ -101,7 +101,7 @@
 ## 镜像构建
 
 ### 准备环境
-- 操作系统：openEuler 20.03 LTS、 openEuler 21.03、 Fedora 34
+- 操作系统：openEuler 20.03 LTS、 openEuler 21.03、 CentOS 8
 - 架构：AArch64 ，如树莓派、 RK3399 开发板
 
 详细过程参见 [openEuler 镜像的构建](documents/openEuler镜像的构建.md)。
