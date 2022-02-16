@@ -100,6 +100,13 @@ Basic information of the image is as follows:
 
 ## How to Build Images
 
+>![](documents/public_sys-resources/icon-notice.gif) **NOTICE:**  
+>Five openEuler versions are currently supported, i.e., 20.03 LTS, 20.03 LTS SP1, 20.03 LTS SP2, 20.03 LTS SP3 and 21.09.
+>When building an image with Xfce/UKUI/DDE desktop environment, you need to pay attention to three issues:
+>1. For building an image with Xfce desktop environment, note that only openEuler 20.03 LTS SP2、20.03 LTS SP3 and 21.09 are currently supported.
+>2. For building an image with UKUI/DDE desktop environment, note that only openEuler 20.03 LTS SP1、20.03 LTS SP2、20.03 LTS SP3 and 21.09 are currently supported.
+>3. Need to set the parameter `-s/--spec`. Please refer to the description of this parameter for details. The corresponding -r/-repo parameter needs to be set at the same time.
+
 ### Prepare the Environment
 - OS: openEuler 20.03 LTS/21.03 or CentOS 8
 - Hardware: AArch64 hardware, Such as the RaspberryPi or RK3399 SoCs

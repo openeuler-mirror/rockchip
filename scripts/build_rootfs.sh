@@ -370,7 +370,10 @@ if [ -d rootfs ]; then
         last_repo_file=$(cat $workdir/.param_last | grep repo_file)
         last_repo_file=${last_repo_file:10}
 
-        if [[ ${last_branch} != ${branch} || ${last_dtb_name} != ${dtb_name} || ${last_repo_file} != ${repo_file} ]]; then
+        last_spec_param=$(cat $workdir/.param_last | grep spec_param)
+        last_spec_param=${last_spec_param:11}
+
+        if [[ ${last_branch} != ${branch} || ${last_dtb_name} != ${dtb_name} || ${last_repo_file} != ${repo_file} || ${last_spec_param} != ${spec_param} ]]; then
             rm -rf rootfs
             build_rootfs
             mk_rootfsimg

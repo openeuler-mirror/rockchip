@@ -100,6 +100,13 @@
 
 ## 镜像构建
 
+>![](documents/public_sys-resources/icon-notice.gif) **须知：**  
+>当前支持 openEuler 版本：20.03 LTS、20.03 LTS SP1、20.03 LTS SP2、20.03 LTS SP3 和 21.09。
+>如果构建包含 Xfce/UKUI/DDE 桌面环境的镜像，需要注意三点：
+>1. 构建包含 Xfce 桌面环境的镜像，当前只支持 20.03 LTS SP2、20.03 LTS SP3 和 21.09 版本。
+>2. 构建包含 UKUI 或 DDE 桌面环境的镜像，当前只支持 20.03 LTS SP1、20.03 LTS SP2、20.03 LTS SP3 和 21.09 版本。
+>3. 根据需要设置 -s/--spec，其具体意义见该参数的介绍部分。同时需要设置对应 -r/--repo 参数。
+
 ### 准备环境
 - 操作系统：openEuler 20.03 LTS、 openEuler 21.03、 CentOS 8
 - 架构：AArch64 ，如树莓派、 RK3399 开发板
