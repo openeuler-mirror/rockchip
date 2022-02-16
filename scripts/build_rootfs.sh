@@ -130,7 +130,7 @@ root_need() {
 INSTALL_PACKAGES(){
     for item in $(cat $1)
     do
-        dnf ${repo_info} --disablerepo="*" --installroot=${rootfs_dir}/ install -y $item
+        dnf ${repo_info} --disablerepo="*" --installroot=${rootfs_dir}/ install -y $item --nogpgcheck
         if [ $? == 0 ]; then
             LOG install $item.
         else
