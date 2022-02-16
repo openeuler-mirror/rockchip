@@ -10,6 +10,7 @@ Options:
   -r, --repo REPO_INFO          The URL/path of target repo file or list of repo's baseurls which should be a space separated list.
   -b, --branch KERNEL_BRANCH    The branch name of kernel source's repository, which defaults to openEuler-20.03-LTS.
   -d, --device-tree DTB_NAME    The device tree name of target board, which defaults to rk3399-firefly.
+  -s, --spec SPEC               The image's specification: headless, xfce, ukui, dde or the file path of rpmlist. The default is headless.
   -h, --help                    Show command help.
 "
 
@@ -40,6 +41,9 @@ local_param(){
 
         dtb_name=$(cat $workdir/.param | grep dtb_name)
         dtb_name=${dtb_name:9}
+
+        spec_param=$(cat $workdir/.param | grep spec_param)
+        spec_param=${spec_param:11}
     fi
 }
 
@@ -65,6 +69,10 @@ parseargs()
             shift
         elif [ "x$1" == "x-d" -o "x$1" == "x--device-tree" ]; then
             dtb_name=`echo $2`
+            shift
+            shift
+        elif [ "x$1" == "x-s" -o "x$1" == "x--spec" ]; then
+            spec_param=`echo $2`
             shift
             shift
         else
@@ -119,6 +127,18 @@ root_need() {
     fi
 }
 
+INSTALL_PACKAGES(){
+    for item in $(cat $1)
+    do
+        dnf ${repo_info} --disablerepo="*" --installroot=${rootfs_dir}/ install -y $item
+        if [ $? == 0 ]; then
+            LOG install $item.
+        else
+            ERROR can not install $item.
+        fi
+    done
+}
+
 build_rootfs() {
     trap 'UMOUNT_ALL' EXIT
     cd $workdir
@@ -129,6 +149,19 @@ build_rootfs() {
         mkdir -p ${tmp_dir}
     else
         rm -rf ${tmp_dir}/*
+    fi
+
+    if [ "x$spec_param" == "xheadless" ] || [ "x$spec_param" == "x" ]; then
+        :
+    elif [ "x$spec_param" == "xxfce" ] || [ "x$spec_param" == "xukui" ] || [ "x$spec_param" == "xdde" ]; then
+        CONFIG_RPM_LIST=$workdir/../configs/rpmlist-${spec_param}
+    elif [ -f ${spec_param} ]; then
+        cp ${spec_param} ${tmp_dir}/
+        spec_file_name=${spec_param##*/}
+        CONFIG_RPM_LIST=${tmp_dir}/${spec_file_name}
+    else
+        echo `date` - ERROR, please check your params in option -s or --spec.
+        exit 2
     fi
 
     mkdir -p ${rootfs_dir}/var/lib/rpm
@@ -204,9 +237,7 @@ build_rootfs() {
     mkdir -p ${rootfs_dir}/etc/rpm
     chmod a+rX ${rootfs_dir}/etc/rpm
     echo "%_install_langs en_US" > ${rootfs_dir}/etc/rpm/macros.image-language-conf
-    dnf ${repo_info} --disablerepo="*" --installroot=${rootfs_dir}/ install dnf --nogpgcheck -y
-    dnf ${repo_info} --disablerepo="*" --installroot=${rootfs_dir}/ makecache
-    dnf ${repo_info} --disablerepo="*" --installroot=${rootfs_dir}/ install --nogpgcheck -y openEuler-repos openEuler-gpg-keys alsa-utils wpa_supplicant vim net-tools iproute iputils NetworkManager openssh-server passwd hostname ntp bluez pulseaudio-module-bluetooth linux-firmware parted gdisk
+    INSTALL_PACKAGES $CONFIG_RPM_LIST
     cp -L /etc/resolv.conf ${rootfs_dir}/etc/resolv.conf
     rm ${workdir}/*rpm
     
@@ -315,6 +346,8 @@ root_need
 default_param
 local_param
 parseargs "$@" || help $?
+
+CONFIG_RPM_LIST=$workdir/../configs/rpmlist
 
 if [ ! -d $workdir ]; then
     mkdir $workdir

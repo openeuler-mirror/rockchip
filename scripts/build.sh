@@ -12,6 +12,7 @@ Options:
   -c, --config BOARD_CONFIG        Required! The name of target board which should be a space separated list, which defaults to firefly-rk3399_defconfig.
   -r, --repo REPO_INFO             The URL/path of target repo file or list of repo's baseurls which should be a space separated list.
   -d, --device-tree DTB_NAME       Required! The device tree name of target board, which defaults to rk3399-firefly.
+  -s, --spec SPEC                  The image's specification: headless, xfce, ukui, dde or the file path of rpmlist. The default is headless.
   -h, --help                       Show command help.
 "
 
@@ -53,7 +54,8 @@ save_param() {
 dtb_name=$dtb_name
 branch=$branch
 repo_file=$repo_file
-kernel_url=$kernel_url" > $workdir/.param
+kernel_url=$kernel_url
+spec_param=$spec_param" > $workdir/.param
 }
 
 deppkg_install() {
@@ -95,6 +97,10 @@ parseargs()
             shift
         elif [ "x$1" == "x-d" -o "x$1" == "x--device-tree" ]; then
             dtb_name=`echo $2`
+            shift
+            shift
+        elif [ "x$1" == "x-s" -o "x$1" == "x--spec" ]; then
+            spec_param=`echo $2`
             shift
             shift
         else
