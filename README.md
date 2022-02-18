@@ -100,8 +100,15 @@
 
 ## 镜像构建
 
+>![](documents/public_sys-resources/icon-notice.gif) **须知：**  
+>当前支持 openEuler 版本：20.03 LTS、20.03 LTS SP1、20.03 LTS SP2、20.03 LTS SP3 和 21.09。
+>如果构建包含 Xfce/UKUI/DDE 桌面环境的镜像，需要注意三点：
+>1. 构建包含 Xfce 桌面环境的镜像，当前只支持 20.03 LTS SP2、20.03 LTS SP3 和 21.09 版本。
+>2. 构建包含 UKUI 或 DDE 桌面环境的镜像，当前只支持 20.03 LTS SP1、20.03 LTS SP2、20.03 LTS SP3 和 21.09 版本。
+>3. 根据需要设置 -s/--spec，其具体意义见该参数的介绍部分。同时需要设置对应 -r/--repo 参数。
+
 ### 准备环境
-- 操作系统：openEuler 20.03 LTS、 openEuler 21.03、 Fedora 34
+- 操作系统：openEuler 20.03 LTS、 openEuler 21.03、 CentOS 8
 - 架构：AArch64 ，如树莓派、 RK3399 开发板
 
 详细过程参见 [openEuler 镜像的构建](documents/openEuler镜像的构建.md)。
@@ -110,7 +117,7 @@
 
 构建镜像需执行命令：
 
-`sudo bash build.sh -n NAME -k KERNEL_URL -b KERNEL_BRANCH -c BOARD_CONFIG -r REPO_INFO -d DTB_NAME`
+`sudo bash build.sh -n NAME -k KERNEL_URL -b KERNEL_BRANCH -c BOARD_CONFIG -r REPO_INFO -d DTB_NAME -s SPEC`
 
 **说明: 基于 build.sh 提供的默认参数，执行 sudo bash build.sh 可构建 Firefly-RK3399 的 openEuler-20.03-LTS 镜像。**
 
@@ -164,7 +171,18 @@
 
     内核设备树中的设备名称，和开发板名称有一点区别，对应 [kernel/arch/arm64/boot/dts/rockchip](https://gitee.com/openeuler/kernel/tree/master/arch/arm64/boot/dts/rockchip) 下的 `DTB_NAME.dts` 文件，默认为 `rk3399_firefly`。
 
-7.  -h, --help
+7.  -s, --spec SPEC
+
+    构建的镜像版本：
+    - `headless`，无图形界面版的镜像。
+    - `xfce`，带 Xfce 桌面以及中文字体、输入法等全部配套软件。
+    - `ukui`，带 UKUI 桌面及必要的配套软件（不包括中文字体以及输入法）。
+    - `dde`，带 DDE 桌面及必要的配套软件（不包括中文字体以及输入法）。
+    -  rpmlist 文件路径，其中包含镜像中要安装的软件列表，内容参考 [rpmlist](./scripts/configs/rpmlist)。
+
+    默认使用 `headless` 选项。
+
+8.  -h, --help
 
     显示帮助信息。
 
@@ -178,11 +196,11 @@
 
     - openEuler-20.03-LTS, 构建命令如下:
 
-        `sudo bash build.sh -n openEuler-20.03-LTS-Firefly-RK3399-aarch64-alpha1 -k https://gitee.com/openeuler/rockchip-kernel.git -b openEuler-20.03-LTS -c firefly-rk3399_defconfig -r https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-20.03-LTS/generic.repo -d rk3399-firefly`
+        `sudo bash build.sh -n openEuler-20.03-LTS-Firefly-RK3399-aarch64-alpha1 -k https://gitee.com/openeuler/rockchip-kernel.git -b openEuler-20.03-LTS -c firefly-rk3399_defconfig -r https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-20.03-LTS/generic.repo -d rk3399-firefly -s headless`
 
     - openEuler-21.09, 构建命令如下：
 
-        `sudo bash build.sh -n openEuler-21.09-Firefly-RK3399-aarch64-alpha1 -k https://gitee.com/openeuler/kernel.git -b openEuler-21.09 -c firefly-rk3399_defconfig -r https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-21.09/generic.repo -d rk3399-firefly`
+        `sudo bash build.sh -n openEuler-21.09-Firefly-RK3399-aarch64-alpha1 -k https://gitee.com/openeuler/kernel.git -b openEuler-21.09 -c firefly-rk3399_defconfig -r https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-21.09/generic.repo -d rk3399-firefly -s headless`
 
 2. RockPi-4A
 
@@ -190,11 +208,11 @@
 
     - openEuler-20.03-LTS, 构建命令如下:
 
-        `sudo bash build.sh -n openEuler-20.03-LTS-RockPi-4A-aarch64-alpha1 -k https://gitee.com/openeuler/rockchip-kernel.git -b openEuler-20.03-LTS -c rock-pi-4-rk3399_defconfig -r https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-20.03-LTS/generic.repo -d rk3399-rock-pi-4a`
+        `sudo bash build.sh -n openEuler-20.03-LTS-RockPi-4A-aarch64-alpha1 -k https://gitee.com/openeuler/rockchip-kernel.git -b openEuler-20.03-LTS -c rock-pi-4-rk3399_defconfig -r https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-20.03-LTS/generic.repo -d rk3399-rock-pi-4a -s headless`
 
     - openEuler-21.09, 构建命令如下：
 
-        `sudo bash build.sh -n openEuler-21.09-RockPi-4A-aarch64-alpha1 -k https://gitee.com/openeuler/kernel.git -b openEuler-21.09 -c rock-pi-4-rk3399_defconfig -r https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-21.09/generic.repo -d rk3399-rock-pi-4a`
+        `sudo bash build.sh -n openEuler-21.09-RockPi-4A-aarch64-alpha1 -k https://gitee.com/openeuler/kernel.git -b openEuler-21.09 -c rock-pi-4-rk3399_defconfig -r https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-21.09/generic.repo -d rk3399-rock-pi-4a -s headless`
 
 ### 顺序构建
 
