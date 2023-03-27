@@ -2,7 +2,7 @@
 
 [English](./README.en.md) | 简体中文
 
-本仓库提供适用于 RK3399 开发板的 openEuler 镜像的构建脚本和相关文档。
+本仓库提供适用于 Rockchip 开发板的 openEuler 镜像的构建脚本和相关文档。
 
 - [Rockchip](#rockchip)
   - [文件说明](#文件说明)
@@ -22,7 +22,7 @@
     - [刷写EMMC镜像](documents/刷写EMMC镜像.md)
     - [顺序构建](documents/顺序构建.md)
     - [基于Firefly-SDK编译Firefly-RK3399的内核镜像](documents/基于Firefly-SDK编译Firefly-RK3399的内核镜像.md)
-- [scripts](./scripts/): 构建 openEuler RK3399镜像的脚本
+- [scripts](./scripts/): 构建 openEuler Rockchip镜像的脚本
     - [一次构建脚本](scripts/build.sh)
     - [boot 镜像构建脚本](scripts/build_boot.sh)
     - [rootfs 镜像构建脚本](scripts/build_rootfs.sh)
@@ -101,15 +101,16 @@
 ## 镜像构建
 
 >![](documents/public_sys-resources/icon-notice.gif) **须知：**  
->当前支持 openEuler 版本：20.03 LTS、20.03 LTS SP1、20.03 LTS SP2、20.03 LTS SP3 和 21.09。
+>RK3399 当前支持 openEuler 版本：20.03 LTS、20.03 LTS SP1、20.03 LTS SP2、20.03 LTS SP3 和 21.09。
+>RK3588 当前支持 openEuler 版本：22.03 LTS。
 >如果构建包含 Xfce/UKUI/DDE 桌面环境的镜像，需要注意三点：
->1. 构建包含 Xfce 桌面环境的镜像，当前只支持 20.03 LTS SP2、20.03 LTS SP3 和 21.09 版本。
->2. 构建包含 UKUI 或 DDE 桌面环境的镜像，当前只支持 20.03 LTS SP1、20.03 LTS SP2、20.03 LTS SP3 和 21.09 版本。
+>1. 构建包含 Xfce 桌面环境的镜像，当前只支持 20.03 LTS SP2、20.03 LTS SP3、21.09、22.03 LTS 版本。
+>2. 构建包含 UKUI 或 DDE 桌面环境的镜像，当前只支持 20.03 LTS SP1、20.03 LTS SP2、20.03 LTS SP3、21.09、22.03 LTS 版本。
 >3. 根据需要设置 -s/--spec，其具体意义见该参数的介绍部分。同时需要设置对应 -r/--repo 参数。
 
 ### 准备环境
-- 操作系统：openEuler 20.03 LTS、 openEuler 21.03、 CentOS 8
-- 架构：AArch64 ，如树莓派、 RK3399 开发板
+- 操作系统：openEuler 22.03 LTS、 CentOS 8
+- 架构：AArch64 ，如树莓派、 RK3399 开发板、 RK3588 开发板
 
 详细过程参见 [openEuler 镜像的构建](documents/openEuler镜像的构建.md)。
 
@@ -153,7 +154,7 @@
 
 4. -c, --config BOARD_CONFIG
 
-    开发板对应的 defconfig 的文件名称，对应 [u-boot/configs](https://github.com/u-boot/u-boot/tree/master/configs) 下 `BOARD_CONFIG` 文件，默认为 `firefly-rk3399_defconfig`。
+    开发板对应的 defconfig 的文件名称，对应 [u-boot/configs](https://github.com/u-boot/u-boot/tree/master/configs) 下 `BOARD_CONFIG` 文件，默认为 `firefly-rk3399_defconfig`；如需在 RK3588 开发板上使用预编译的 u-boot，可以将此项设置为 `none`。
 
 5. -r, --repo REPO_INFO
 
@@ -214,6 +215,19 @@
 
         `sudo bash build.sh -n openEuler-21.09-RockPi-4A-aarch64-alpha1 -k https://gitee.com/openeuler/kernel.git -b openEuler-21.09 -c rock-pi-4-rk3399_defconfig -r https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-21.09/generic.repo -d rk3399-rock-pi-4a -s headless`
 
+适用的 RK3588 开发板:
+
+已经测试的开发板如下，其他类型 RK3588 开发板适用情况待测试。
+
+1. Firefly ROC-RK3588S-PC
+
+    已测试的版本如下：
+
+    - openEuler-22.03-LTS, 构建命令如下:
+
+        `sudo bash build.sh -n openEuler-22.03-LTS-Station-M3-aarch64-alpha1 -k https://gitee.com/openeuler/rockchip-kernel.git -b openEuler-22.03-LTS-RK3588 -c none -r https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-22.03-LTS/generic.repo -d rk3588s-roc-pc -s headless`
+
+
 ### 顺序构建
 
 依次执行脚本构建生成压缩后的 SD 卡启动镜像和打包后的 EMMC 刷写文件，过程参考[顺序构建](documents/顺序构建.md)。
@@ -222,7 +236,7 @@
 
 ### 刷写到 SD 卡
 
-将 SD 卡启动镜像解压后写入 SD 卡，请参考[树莓派镜像烧录](https://gitee.com/openeuler/raspberrypi/blob/master/documents/%E5%88%B7%E5%86%99%E9%95%9C%E5%83%8F.md)，过程中所用到的镜像应为本项目提供适用于 RK3399 开发板的镜像。
+将 SD 卡启动镜像解压后写入 SD 卡，请参考[树莓派镜像烧录](https://gitee.com/openeuler/raspberrypi/blob/master/documents/%E5%88%B7%E5%86%99%E9%95%9C%E5%83%8F.md)，过程中所用到的镜像应为本项目提供适用于 Rockchip 开发板的镜像。
 
 >注意：由于 Firefly-RK3399 与其他 RK3399 开发板不同，会优先启动 EMMC 上的系统，在 Firefly-RK3399 上使用 SD 卡启动镜像之前需要清除 EMMC 上的系统，上电后需要按下电源键来启动。
 

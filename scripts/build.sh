@@ -60,7 +60,7 @@ spec_param=$spec_param" > $workdir/.param
 
 deppkg_install() {
     dnf makecache
-    dnf install git wget make gcc bison dtc m4 flex bc openssl-devel tar dosfstools rsync parted dnf-plugins-core tar kpartx diffutils -y
+    dnf install git wget make gcc bison dtc m4 flex bc openssl-devel tar dosfstools rsync parted dnf-plugins-core tar kpartx diffutils dracut -y
 }
 
 parseargs()

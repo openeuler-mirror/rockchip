@@ -269,26 +269,20 @@ build_rootfs() {
 
     cp $nonfree_bin_dir/../bin/expand-rootfs.sh ${rootfs_dir}/etc/rc.d/init.d/expand-rootfs.sh
     chmod +x ${rootfs_dir}/etc/rc.d/init.d/expand-rootfs.sh
-    LOG "Set auto expand rootfs done."
 
     cat << EOF | chroot ${rootfs_dir}  /bin/bash
     echo 'openeuler' | passwd --stdin root
     echo openEuler > /etc/hostname
-    ln -s /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
     chkconfig --add expand-rootfs.sh
     chkconfig expand-rootfs.sh on
+    ln -s /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 EOF
 
-    sed -i 's/#NTP=/NTP=0.cn.pool.ntp.org/g' ${rootfs_dir}/etc/systemd/timesyncd.conf
-    sed -i 's/#FallbackNTP=/FallbackNTP=1.asia.pool.ntp.org 2.asia.pool.ntp.org/g' ${rootfs_dir}/etc/systemd/timesyncd.conf
+    LOG "Set auto expand rootfs done."
 
     echo "LABEL=rootfs  / ext4    defaults,noatime 0 0" > ${rootfs_dir}/etc/fstab
     echo "LABEL=boot  /boot vfat    defaults,noatime 0 0" >> ${rootfs_dir}/etc/fstab
-    LOG "Set NTP and fstab done."
-
-    if [ -d ${rootfs_dir}/boot/grub2 ]; then
-        rm -rf ${rootfs_dir}/boot/grub2
-    fi
+    LOG "Set fstab done."
 
     if [ -f $workdir/.param ]; then
         dtb_name=$(cat $workdir/.param | grep dtb_name)

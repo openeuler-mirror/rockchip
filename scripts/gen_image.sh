@@ -132,30 +132,23 @@ make_img(){
     device=""
     LOSETUP_D_IMG
     size=`du -sh --block-size=1MiB ${workdir}/rootfs.img | cut -f 1 | xargs`
-    size=$(($size+550))
+    size=$(($size+1100))
     losetup -D
     img_file=${workdir}/${name}.img
     dd if=/dev/zero of=${img_file} bs=1MiB count=$size status=progress && sync
 
-    cat << EOF | parted ${img_file} mklabel gpt mkpart primary 64s 16383s
-    Ignore
-EOF
-    parted ${img_file} mkpart primary 16384s 24575s
-    parted ${img_file} mkpart primary 24576s 32767s
-    parted ${img_file} mkpart primary fat32 32768s 262143s
-    parted ${img_file} -s set 4 boot on
-    parted ${img_file} mkpart primary ext4 262144s 100%
+    parted ${img_file} mklabel gpt mkpart primary fat32 32768s 524287s
+    parted ${img_file} -s set 1 boot on
+    parted ${img_file} mkpart primary ext4 524288s 100%
 
     device=`losetup -f --show -P ${img_file}`
     trap 'LOSETUP_D_IMG' EXIT
     kpartx -va ${device}
     loopX=${device##*\/}
     partprobe ${device}
-    idbloaderp=/dev/mapper/${loopX}p1
-    ubootp=/dev/mapper/${loopX}p2
-    trustp=/dev/mapper/${loopX}p3
-    bootp=/dev/mapper/${loopX}p4
-    rootp=/dev/mapper/${loopX}p5
+
+    bootp=/dev/mapper/${loopX}p1
+    rootp=/dev/mapper/${loopX}p2
     LOG "make image partitions done."
     
     mkfs.vfat -n boot ${bootp}
@@ -169,17 +162,16 @@ EOF
         ERROR "u-boot idbloader file can not be found!"
         exit 2
     else
-        dd if=${uboot_dir}/idbloader.img of=$idbloaderp
+        dd if=${uboot_dir}/idbloader.img of=/dev/${loopX} seek=64
     fi
     
     if [ ! -f ${uboot_dir}/u-boot.itb ]; then
         ERROR "u-boot.itb file can not be found!"
         exit 2
     else
-        dd if=${uboot_dir}/u-boot.itb of=$ubootp
+        dd if=${uboot_dir}/u-boot.itb of=/dev/${loopX} seek=16384
     fi
     
-    dd if=/dev/zero of=$trustp bs=1M count=4
     LOG "install u-boot done."
 
     if [ -d ${rootfs_dir} ];then rm -rf ${rootfs_dir}; fi
@@ -190,8 +182,14 @@ EOF
     mount $workdir/boot.img ${boot_dir}
 
     cp -rfp ${boot_dir}/* ${boot_mnt}
-    rm ${boot_mnt}/extlinux/extlinux.conf
-    mv ${boot_mnt}/extlinux/extlinux.conf.sd ${boot_mnt}/extlinux/extlinux.conf
+    line=$(blkid | grep $rootp)
+    uuid=${line#*UUID=\"}
+    uuid=${uuid%%\"*}
+    if [ "x$dtb_name" == "xrk3399-firefly" ]; then
+        sed -i "s|/dev/mmcblk2p2|UUID=${uuid}|g" ${boot_mnt}/extlinux/extlinux.conf
+    else
+        sed -i "s|/dev/mmcblk0p2|UUID=${uuid}|g" ${boot_mnt}/extlinux/extlinux.conf
+    fi
 
     rsync -avHAXq ${rootfs_dir}/* ${root_mnt}
     sync
@@ -235,13 +233,17 @@ outputd(){
 
     LOG "tar openEuler image begin..."
     cp $workdir/../bin/rk3399_loader.bin $workdir
-    cp $workdir/../bin/parameter.gpt $workdir
+    cp $workdir/../bin/rk3399_parameter.gpt $workdir
+    cp $workdir/../bin/rk3588_loader.bin $workdir
+    cp $workdir/../bin/rk3588_parameter.gpt $workdir
     cp $workdir/u-boot/idbloader.img $workdir
     cp $workdir/u-boot/u-boot.itb $workdir
     cd $workdir
     tar -zcvf ${outputdir}/${name}.tar.gz \
     rk3399_loader.bin \
-    parameter.gpt \
+    rk3399_parameter.gpt \
+    rk3588_loader.bin \
+    rk3588_parameter.gpt \
     idbloader.img \
     u-boot.itb \
     boot.img \
@@ -253,7 +255,9 @@ outputd(){
         LOG "tar openEuler image success."
     fi
     rm $workdir/rk3399_loader.bin
-    rm $workdir/parameter.gpt
+    rm $workdir/rk3399_parameter.gpt
+    rm $workdir/rk3588_loader.bin
+    rm $workdir/rk3588_parameter.gpt
     rm $workdir/idbloader.img
     rm $workdir/u-boot.itb
 

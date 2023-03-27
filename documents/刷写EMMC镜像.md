@@ -84,6 +84,6 @@
     rkdeveloptool wl 0x40 idbloader.img
     rkdeveloptool wl 0x4000 u-boot.itb
     rkdeveloptool wl 0x8000 boot.img
-    rkdeveloptool wl 0x40000 rootfs.img
+    rkdeveloptool wl 0x80000 rootfs.img
     rkdeveloptool rd
     ```

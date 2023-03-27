@@ -95,15 +95,6 @@ LOSETUP_D_IMG(){
     set -e
 }
 
-set_cmdline(){
-    vmlinuz_name=$(ls $boot_dir | grep vmlinuz)
-    dtb_name=$(ls $boot_dir | grep dtb)
-    echo "label openEuler
-    kernel /${vmlinuz_name}
-    fdt /${dtb_name}
-    append  earlyprintk console=ttyS2,1500000 rw root=$1 rootfstype=ext4 init=/sbin/init rootwait" > $2
-}
-
 clone_and_check_kernel_source() {
     cd $workdir
     if [ -d kernel ]; then
@@ -163,6 +154,13 @@ build_rockchip-kernel() {
     make ARCH=arm64 -j$(nproc)
 }
 
+build_rk3588-kernel() {
+    cd $workdir/kernel
+    make ARCH=arm64 openeuler_rk3588_defconfig
+    LOG "make kernel begin..."
+    make ARCH=arm64 -j$(nproc)
+}
+
 install_kernel() {
     if [ ! -f $workdir/kernel/arch/arm64/boot/Image ]; then
         ERROR "kernel Image can not be found!"
@@ -177,17 +175,34 @@ install_kernel() {
     cd $workdir/kernel
     make ARCH=arm64 install INSTALL_PATH=${boot_dir}
     make ARCH=arm64 modules_install INSTALL_MOD_PATH=$workdir/kernel/kernel-modules
-    cp $workdir/kernel/arch/arm64/boot/dts/rockchip/${dtb_name}.dtb ${boot_dir}
+    LOG "device tree name is ${dtb_name}.dtb"
+    cp arch/arm64/boot/dts/rockchip/${dtb_name}.dtb ${boot_dir}
     LOG "prepare kernel done."
 }
 
 mk_boot() {
+    LOG "start make bootimg..."
     mkdir -p ${boot_dir}/extlinux
-    if [ "x$branch" == "xopenEuler-20.03-LTS" -a "x$dtb_name" == "xrk3399-rock-pi-4a" ]; then
-        set_cmdline /dev/mmcblk0p5 ${boot_dir}/extlinux/extlinux.conf.sd
-    else
-        set_cmdline /dev/mmcblk1p5 ${boot_dir}/extlinux/extlinux.conf.sd
+
+    LOG "start gen initrd..."
+    dracut --no-kernel ${boot_dir}/initrd.img
+    LOG "gen initrd donw."
+
+    kernel_name=$(ls $boot_dir | grep vmlinu)
+    dtb_name=$(ls $boot_dir | grep dtb)
+    LOG "gen extlinux config for $dtb_name"
+    echo "label openEuler
+    kernel /${kernel_name}
+    initrd /initrd.img
+    fdt /${dtb_name}
+    append  earlyprintk console=ttyS2,1500000 rw root=/dev/mmcblk0p2 rootfstype=ext4 init=/sbin/init rootwait" \
+    > ${boot_dir}/extlinux/extlinux.conf
+
+    if [ "x$dtb_name" == "xrk3399-firefly" ]; then
+        LOG "set rootfs for firefly-rk3399"
+        sed -i "s|mmcblk0p2|mmcblk2p2|g" ${boot_dir}/extlinux/extlinux.conf
     fi
+    LOG "gen extlinux config done."
 
     dd if=/dev/zero of=$workdir/boot.img bs=1M count=112 status=progress
     mkfs.vfat -n boot $workdir/boot.img
@@ -195,7 +210,6 @@ mk_boot() {
     mkdir $workdir/boot_emmc
     mount $workdir/boot.img $workdir/boot_emmc/
     cp -r ${boot_dir}/* $workdir/boot_emmc/
-    set_cmdline /dev/mmcblk2p5 $workdir/boot_emmc/extlinux/extlinux.conf
     umount $workdir/boot.img
     rmdir $workdir/boot_emmc
 
@@ -231,6 +245,8 @@ if [[ -f $workdir/kernel/arch/arm64/boot/dts/rockchip/${dtb_name}.dtb && -f $wor
 else
     if [ "x$branch" == "xopenEuler-20.03-LTS" ];then
         build_rockchip-kernel
+    elif [ "x$branch" == "xopenEuler-22.03-LTS-RK3588" ]; then
+        build_rk3588-kernel
     else
         build_kernel
     fi

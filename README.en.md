@@ -22,7 +22,7 @@ This repository provides scripts for building openEuler image for RK3399 SoCs an
     - [Install an Image on an EMMC](documents/刷写EMMC镜像.md)
     - [Build images sequentially](documents/顺序构建.md)
     - [Compile the kernel of Firefly-RK3399 based on the Firefly SDK](documents/基于Firefly-SDK编译Firefly-RK3399的内核镜像.md)
-- [scripts](./scripts/): Used to build openEuler RK3399 images
+- [scripts](./scripts/): Used to build openEuler Rockchip images
     - [One-time build images](scripts/build.sh)
     - [Build a boot Image](scripts/build_boot.sh)
     - [Build a rootfs Image](scripts/build_rootfs.sh)
@@ -101,10 +101,11 @@ Basic information of the image is as follows:
 ## How to Build Images
 
 >![](documents/public_sys-resources/icon-notice.gif) **NOTICE:**  
->Five openEuler versions are currently supported, i.e., 20.03 LTS, 20.03 LTS SP1, 20.03 LTS SP2, 20.03 LTS SP3 and 21.09.
+>Five openEuler versions are currently supported for RK3399, i.e., 20.03 LTS, 20.03 LTS SP1, 20.03 LTS SP2, 20.03 LTS SP3 and 21.09.
+>Only one openEuler versions are currently supported for RK3588, i.e., 22.03 LTS.
 >When building an image with Xfce/UKUI/DDE desktop environment, you need to pay attention to three issues:
->1. For building an image with Xfce desktop environment, note that only openEuler 20.03 LTS SP2、20.03 LTS SP3 and 21.09 are currently supported.
->2. For building an image with UKUI/DDE desktop environment, note that only openEuler 20.03 LTS SP1、20.03 LTS SP2、20.03 LTS SP3 and 21.09 are currently supported.
+>1. For building an image with Xfce desktop environment, note that only openEuler 20.03 LTS SP2、20.03 LTS SP3 ,21.09 and 22.03 LTS are currently supported.
+>2. For building an image with UKUI/DDE desktop environment, note that only openEuler 20.03 LTS SP1、20.03 LTS SP2、20.03 LTS SP3, 21.09 and 22.03 LTS are currently supported.
 >3. Need to set the parameter `-s/--spec`. Please refer to the description of this parameter for details. The corresponding -r/-repo parameter needs to be set at the same time.
 
 ### Prepare the Environment
@@ -155,7 +156,7 @@ The meaning of each parameter:
 
 4. -c, --config BOARD_CONFIG
 
-    The file name of the defconfig corresponding to the development board corresponds to the `BOARD_CONFIG` file under [u-boot/configs](https://github.com/u-boot/u-boot/tree/master/configs), which defaults to `firefly-rk3399_defconfig`.
+    The file name of the defconfig corresponding to the development board corresponds to the `BOARD_CONFIG` file under [u-boot/configs](https://github.com/u-boot/u-boot/tree/master/configs), which defaults to `firefly-rk3399_defconfig`.To use a precompiled u-boot on the RK3588, you can set this option to 'none'.
 
 5. -r, --repo REPO_INFO
 
@@ -216,13 +217,26 @@ The development board that have been tested are as follows, and the other types 
 
         `sudo bash build.sh -n openEuler-21.09-RockPi-4A-aarch64-alpha1 -k https://gitee.com/openeuler/kernel.git -b openEuler-21.09 -c rock-pi-4-rk3399_defconfig -r https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-21.09/generic.repo -d rk3399-rock-pi-4a -s headless`
 
+Applicable RK3588 SoCs:
+
+The development board that have been tested are as follows, and the other types of RK3399 SoCs are to be tested.
+
+1. Firefly ROC-RK3588S-PC
+
+    The tested versions are as follows:
+
+    - openEuler-22.03-LTS, run the following command:
+
+        `sudo bash build.sh -n openEuler-22.03-LTS-Station-M3-aarch64-alpha1 -k https://gitee.com/openeuler/rockchip-kernel.git -b openEuler-22.03-LTS-RK3588 -c none -r https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-22.03-LTS/generic.repo -d rk3588s-roc-pc -s headless`
+
+
 ## How to Use an Image
 
 ### Install an Image on an SD Card
 
 After decompressing the bootable image for the SD card, please refer to [Install openEuler on RaspberryPi](https://gitee.com/openeuler/raspberrypi/blob/master/documents/%E5%88%B7%E5%86%99%E9%95%9C%E5%83%8F.md) for details of writing an image on an SD card. You should use images provided in this project.
 
->Note: Because Firefly-RK3399 is different from other RK3399 development boards, the system on EMMC will be booted first. The system on the EMMC needs to be cleared before using the system in the SD card to boot the Firefly-RK3399. Besides, you need to press the power button to boot after powering up the device.
+>Note: Because Firefly-RK3399 is different from other Rockchip development boards, the system on EMMC will be booted first. The system on the EMMC needs to be cleared before using the system in the SD card to boot the Firefly-RK3399. Besides, you need to press the power button to boot after powering up the device.
 
 ### Install an Image on an EMMC
 

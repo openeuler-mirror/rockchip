@@ -7,5 +7,8 @@ ATAG: 0x00200800
 MACHINE: 3399
 CHECK_MASK: 0x80
 PWR_HLD: 0,0,A,0,1
+TYPE: GPT
 #in section; per section 512(0x200) bytes
-CMDLINE: mtdparts=rk29xxnand:0x00003f60@0x00000040(idbloader),0x00002000@0x00004000(uboot),0x00002000@0x00006000(trust),0x00038000@0x00008000(boot:bootable),-@0x0040000(rootfs:grow)
+CMDLINE: mtdparts=rk29xxnand:0x00078000@0x00008000(boot:bootable),-@0x0080000(rootfs:grow)
+uuid:rootfs=614e0000-0000-4b53-8000-1d28000054a9
+uuid:boot=a2d37d82-51e0-420d-83f5-470db993dd35
