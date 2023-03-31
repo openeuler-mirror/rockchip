@@ -227,6 +227,14 @@
 
         `sudo bash build.sh -n openEuler-22.03-LTS-Station-M3-aarch64-alpha1 -k https://gitee.com/openeuler/rockchip-kernel.git -b openEuler-22.03-LTS-RK3588 -c none -r https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-22.03-LTS/generic.repo -d rk3588s-roc-pc -s headless`
 
+2. Radxa Rock-5B
+
+    已测试的版本如下：
+
+    - openEuler-22.03-LTS, 构建命令如下:
+
+        `sudo bash build.sh -n openEuler-22.03-LTS-Roc-5B-aarch64-alpha1 -k https://gitee.com/openeuler/rockchip-kernel.git -b openEuler-22.03-LTS-RK3588 -c none -r https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-22.03-LTS/generic.repo -d rk3588-rock-5b -s headless`
+
 
 ### 顺序构建
 
