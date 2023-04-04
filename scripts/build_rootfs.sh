@@ -271,7 +271,7 @@ build_rootfs() {
     chmod +x ${rootfs_dir}/etc/rc.d/init.d/expand-rootfs.sh
 
     if [ ! -f ${rootfs_dir}/etc/systemd/timesyncd.conf ]; then
-        dnf install systemd-timesyncd -y
+        dnf ${repo_info} --disablerepo="*" --installroot=${rootfs_dir}/ install -y systemd-timesyncd --nogpgcheck
     fi
     sed -i -e '/^#NTP=/cNTP=0.cn.pool.ntp.org' ${rootfs_dir}/etc/systemd/timesyncd.conf
     sed -i -e 's/#FallbackNTP=/FallbackNTP=1.asia.pool.ntp.org 2.asia.pool.ntp.org /g' ${rootfs_dir}/etc/systemd/timesyncd.conf
