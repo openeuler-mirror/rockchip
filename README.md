@@ -101,7 +101,7 @@
 ## 镜像构建
 
 >![](documents/public_sys-resources/icon-notice.gif) **须知：**  
->RK3399 当前支持 openEuler 版本：20.03 LTS、20.03 LTS SP1、20.03 LTS SP2、20.03 LTS SP3 和 21.09。
+>RK3399 当前支持 openEuler 版本：20.03 LTS、20.03 LTS SP1、20.03 LTS SP2、20.03 LTS SP3、21.09 和 22.03 LTS。
 >RK3588 当前支持 openEuler 版本：22.03 LTS。
 >如果构建包含 Xfce/UKUI/DDE 桌面环境的镜像，需要注意三点：
 >1. 构建包含 Xfce 桌面环境的镜像，当前只支持 20.03 LTS SP2、20.03 LTS SP3、21.09、22.03 LTS 版本。
@@ -109,7 +109,7 @@
 >3. 根据需要设置 -s/--spec，其具体意义见该参数的介绍部分。同时需要设置对应 -r/--repo 参数。
 
 ### 准备环境
-- 操作系统：openEuler 22.03 LTS、 CentOS 8
+- 操作系统：openEuler 、CentOS 8
 - 架构：AArch64 ，如树莓派、 RK3399 开发板、 RK3588 开发板
 
 详细过程参见 [openEuler 镜像的构建](documents/openEuler镜像的构建.md)。
@@ -199,9 +199,9 @@
 
         `sudo bash build.sh -n openEuler-20.03-LTS-Firefly-RK3399-aarch64-alpha1 -k https://gitee.com/openeuler/rockchip-kernel.git -b openEuler-20.03-LTS -c firefly-rk3399_defconfig -r https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-20.03-LTS/generic.repo -d rk3399-firefly -s headless`
 
-    - openEuler-21.09, 构建命令如下：
+    - openEuler-22.03-LTS, 构建命令如下：
 
-        `sudo bash build.sh -n openEuler-21.09-Firefly-RK3399-aarch64-alpha1 -k https://gitee.com/openeuler/kernel.git -b openEuler-21.09 -c firefly-rk3399_defconfig -r https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-21.09/generic.repo -d rk3399-firefly -s headless`
+        `sudo bash build.sh -n openEuler-22.03-LTS-Firefly-RK3399-aarch64-alpha1 -k https://gitee.com/openeuler/kernel.git -b openEuler-22.03-LTS -c firefly-rk3399_defconfig -r https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-22.03-LTS/generic.repo -d rk3399-firefly -s headless`
 
 2. RockPi-4A
 
@@ -211,9 +211,9 @@
 
         `sudo bash build.sh -n openEuler-20.03-LTS-RockPi-4A-aarch64-alpha1 -k https://gitee.com/openeuler/rockchip-kernel.git -b openEuler-20.03-LTS -c rock-pi-4-rk3399_defconfig -r https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-20.03-LTS/generic.repo -d rk3399-rock-pi-4a -s headless`
 
-    - openEuler-21.09, 构建命令如下：
+    - openEuler-22.03-LTS, 构建命令如下：
 
-        `sudo bash build.sh -n openEuler-21.09-RockPi-4A-aarch64-alpha1 -k https://gitee.com/openeuler/kernel.git -b openEuler-21.09 -c rock-pi-4-rk3399_defconfig -r https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-21.09/generic.repo -d rk3399-rock-pi-4a -s headless`
+        `sudo bash build.sh -n openEuler-22.03-LTS-RockPi-4A-aarch64-alpha1 -k https://gitee.com/openeuler/kernel.git -b openEuler-22.03-LTS -c rock-pi-4-rk3399_defconfig -r https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-22.03-LTS/generic.repo -d rk3399-rock-pi-4a -s headless`
 
 适用的 RK3588 开发板:
 

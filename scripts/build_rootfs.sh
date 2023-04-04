@@ -270,15 +270,20 @@ build_rootfs() {
     cp $nonfree_bin_dir/../bin/expand-rootfs.sh ${rootfs_dir}/etc/rc.d/init.d/expand-rootfs.sh
     chmod +x ${rootfs_dir}/etc/rc.d/init.d/expand-rootfs.sh
 
+    if [ ! -f ${rootfs_dir}/etc/systemd/timesyncd.conf ]; then
+        dnf install systemd-timesyncd -y
+    fi
+    sed -i -e '/^#NTP=/cNTP=0.cn.pool.ntp.org' ${rootfs_dir}/etc/systemd/timesyncd.conf
+    sed -i -e 's/#FallbackNTP=/FallbackNTP=1.asia.pool.ntp.org 2.asia.pool.ntp.org /g' ${rootfs_dir}/etc/systemd/timesyncd.conf
+
     cat << EOF | chroot ${rootfs_dir}  /bin/bash
     echo 'openeuler' | passwd --stdin root
     echo openEuler > /etc/hostname
     chkconfig --add expand-rootfs.sh
     chkconfig expand-rootfs.sh on
-    ln -s /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 EOF
 
-    LOG "Set auto expand rootfs done."
+    LOG "Set NTP and auto expand rootfs done."
 
     echo "LABEL=rootfs  / ext4    defaults,noatime 0 0" > ${rootfs_dir}/etc/fstab
     echo "LABEL=boot  /boot vfat    defaults,noatime 0 0" >> ${rootfs_dir}/etc/fstab

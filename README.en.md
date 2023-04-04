@@ -101,7 +101,7 @@ Basic information of the image is as follows:
 ## How to Build Images
 
 >![](documents/public_sys-resources/icon-notice.gif) **NOTICE:**  
->Five openEuler versions are currently supported for RK3399, i.e., 20.03 LTS, 20.03 LTS SP1, 20.03 LTS SP2, 20.03 LTS SP3 and 21.09.
+>Five openEuler versions are currently supported for RK3399, i.e., 20.03 LTS, 20.03 LTS SP1, 20.03 LTS SP2, 20.03 LTS SP3, 21.09 and 22.03 LTS.
 >Only one openEuler versions are currently supported for RK3588, i.e., 22.03 LTS.
 >When building an image with Xfce/UKUI/DDE desktop environment, you need to pay attention to three issues:
 >1. For building an image with Xfce desktop environment, note that only openEuler 20.03 LTS SP2、20.03 LTS SP3 ,21.09 and 22.03 LTS are currently supported.
@@ -109,7 +109,7 @@ Basic information of the image is as follows:
 >3. Need to set the parameter `-s/--spec`. Please refer to the description of this parameter for details. The corresponding -r/-repo parameter needs to be set at the same time.
 
 ### Prepare the Environment
-- OS: openEuler 20.03 LTS/21.03 or CentOS 8
+- OS: openEuler or CentOS 8
 - Hardware: AArch64 hardware, Such as the RaspberryPi or RK3399 SoCs
 
 Refer to [Building an openEuler image](documents/openEuler镜像的构建.md) for details.
@@ -156,7 +156,7 @@ The meaning of each parameter:
 
 4. -c, --config BOARD_CONFIG
 
-    The file name of the defconfig corresponding to the development board corresponds to the `BOARD_CONFIG` file under [u-boot/configs](https://github.com/u-boot/u-boot/tree/master/configs), which defaults to `firefly-rk3399_defconfig`.To use a precompiled u-boot on the RK3588, you can set this option to 'none'.
+    The file name of the defconfig corresponding to the development board corresponds to the `BOARD_CONFIG` file under [u-boot/configs](https://github.com/u-boot/u-boot/tree/master/configs), which defaults to `firefly-rk3399_defconfig`. To use a precompiled u-boot on the RK3588, you can set this option to 'none'.
 
 5. -r, --repo REPO_INFO
 
@@ -201,9 +201,9 @@ The development board that have been tested are as follows, and the other types 
 
         `sudo bash build.sh -n openEuler-20.03-LTS-Firefly-RK3399-aarch64-alpha1 -k https://gitee.com/openeuler/rockchip-kernel.git -b openEuler-20.03-LTS -c firefly-rk3399_defconfig -r https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-20.03-LTS/generic.repo -d rk3399-firefly -s headless`
 
-    - openEuler-21.09, run the following command:
+    - openEuler-22.03-LTS, run the following command:
 
-        `sudo bash build.sh -n openEuler-21.09-Firefly-RK3399-aarch64-alpha1 -k https://gitee.com/openeuler/kernel.git -b openEuler-21.09 -c firefly-rk3399_defconfig -r https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-21.09/generic.repo -d rk3399-firefly -s headless`
+        `sudo bash build.sh -n openEuler-22.03-LTS-Firefly-RK3399-aarch64-alpha1 -k https://gitee.com/openeuler/kernel.git -b openEuler-22.03-LTS -c firefly-rk3399_defconfig -r https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-22.03-LTS/generic.repo -d rk3399-firefly -s headless`
 
 2. RockPi-4A
 
@@ -213,9 +213,9 @@ The development board that have been tested are as follows, and the other types 
 
         `sudo bash build.sh -n openEuler-20.03-LTS-RockPi-4A-aarch64-alpha1 -k https://gitee.com/openeuler/rockchip-kernel.git -b openEuler-20.03-LTS -c rock-pi-4-rk3399_defconfig -r https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-20.03-LTS/generic.repo -d rk3399-rock-pi-4a -s headless`
 
-    - openEuler-21.09, run the following command:
+    - openEuler-22.03-LTS, run the following command:
 
-        `sudo bash build.sh -n openEuler-21.09-RockPi-4A-aarch64-alpha1 -k https://gitee.com/openeuler/kernel.git -b openEuler-21.09 -c rock-pi-4-rk3399_defconfig -r https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-21.09/generic.repo -d rk3399-rock-pi-4a -s headless`
+        `sudo bash build.sh -n openEuler-22.03-LTS-RockPi-4A-aarch64-alpha1 -k https://gitee.com/openeuler/kernel.git -b openEuler-22.03-LTS -c rock-pi-4-rk3399_defconfig -r https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-22.03-LTS/generic.repo -d rk3399-rock-pi-4a -s headless`
 
 Applicable RK3588 SoCs:
 
