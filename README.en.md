@@ -18,7 +18,7 @@ This repository provides scripts for building openEuler image for Rockchip devel
 ## File Description
 
 - [documents](./documents/):
-    - [Building openEuler image for RK3399 SoCs](documents/openEuler镜像的构建.md)
+    - [Building openEuler image for Rockchip development boards](documents/openEuler镜像的构建.md)
     - [Install an Image on an EMMC](documents/刷写EMMC镜像.md)
     - [Build images sequentially](documents/顺序构建.md)
     - [Compile the kernel of Firefly-RK3399 based on the Firefly SDK](documents/基于Firefly-SDK编译Firefly-RK3399的内核镜像.md)
@@ -192,7 +192,7 @@ The meaning of each parameter:
 
 Applicable RK3399 development boards:
 
-The development board that have been tested are as follows, and the other types of RK3399 development board are to be tested.
+The development boards that have been tested are as follows, and the other types of RK3399 development boards are to be tested.
 
 1. Firefly-RK3399
 
@@ -220,7 +220,7 @@ The development board that have been tested are as follows, and the other types 
 
 Applicable RK3588 development board:
 
-The development board that have been tested are as follows, and the other types of RK3588 development board are to be tested.
+The development boards that have been tested are as follows, and the other types of RK3588 development boards are to be tested.
 
 1. Firefly ROC-RK3588S-PC
 
