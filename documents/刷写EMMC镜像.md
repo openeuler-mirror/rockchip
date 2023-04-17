@@ -1,13 +1,7 @@
-<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
-
-<!-- code_chunk_output -->
-
 - [描述](#描述)
 - [使用 Windows 刷写](#使用-windows-刷写)
 - [使用 Linux 刷写](#使用-linux-刷写)
 - [使用 SD 镜像启动后进入系统刷写](#使用-SD-镜像启动后进入系统刷写)
-
-<!-- /code_chunk_output -->
 
 # 描述
 

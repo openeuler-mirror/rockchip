@@ -2,11 +2,11 @@
 
 __usage="
 Usage: gen_image [OPTIONS]
-Generate rk3399 bootable image.
+Generate Rockchip bootable image.
 The target compressed bootable images will be generated in the build/YYYY-MM-DD folder of the directory where the gen_image.sh script is located.
 
 Options: 
-  -n, --name IMAGE_NAME         The RK3399 image name to be built.
+  -n, --name IMAGE_NAME         The Rockchip image name to be built.
   -h, --help                    Show command help.
 "
 

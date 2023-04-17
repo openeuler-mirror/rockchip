@@ -1,15 +1,9 @@
-<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
-
-<!-- code_chunk_output -->
-
 - [描述](#描述)
 - [基于 openEuler 内核制作 Firefly-RK3399 内核镜像](#基于-openeuler-内核制作-firefly-rk3399-内核镜像)
   - [准备编译环境](#准备编译环境)
   - [编译内核代码](#编译内核代码)
   - [准备 Firefly SDK 环境](#准备-firefly-sdk-环境)
   - [重新构建 boot.img](#重新构建-bootimg)
-
-<!-- /code_chunk_output -->
 
 # 描述
 

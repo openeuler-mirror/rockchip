@@ -22,6 +22,7 @@
     - [刷写EMMC镜像](documents/刷写EMMC镜像.md)
     - [顺序构建](documents/顺序构建.md)
     - [基于Firefly-SDK编译Firefly-RK3399的内核镜像](documents/基于Firefly-SDK编译Firefly-RK3399的内核镜像.md)
+    - [打包 ITX-RK3588J 一体化烧写镜像](documents/打包ITX-RK3588J一体化烧写镜像.md)
 - [scripts](./scripts/): 构建 openEuler Rockchip镜像的脚本
     - [一次构建脚本](scripts/build.sh)
     - [boot 镜像构建脚本](scripts/build_boot.sh)
@@ -170,7 +171,7 @@
 
 6. -d, --device-tree DTB_NAME
 
-    内核设备树中的设备名称，和开发板名称有一点区别，对应 [kernel/arch/arm64/boot/dts/rockchip](https://gitee.com/openeuler/kernel/tree/master/arch/arm64/boot/dts/rockchip) 下的 `DTB_NAME.dts` 文件，默认为 `rk3399_firefly`。
+    内核设备树中的设备名称，和开发板名称有一点区别，对应 [kernel/arch/arm64/boot/dts/rockchip](https://gitee.com/openeuler/kernel/tree/master/arch/arm64/boot/dts/rockchip) 下的 `DTB_NAME.dts` 文件，默认为 `rk3399-firefly`。
 
 7.  -s, --spec SPEC
 
@@ -233,7 +234,7 @@
 
     - openEuler-22.03-LTS, 构建命令如下:
 
-        `sudo bash build.sh -n openEuler-22.03-LTS-Roc-5B-aarch64-alpha1 -k https://gitee.com/openeuler/rockchip-kernel.git -b openEuler-22.03-LTS-RK3588 -c none -r https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-22.03-LTS/generic.repo -d rk3588-rock-5b -s headless`
+        `sudo bash build.sh -n openEuler-22.03-LTS-Rock5B-aarch64-alpha1 -k https://gitee.com/openeuler/rockchip-kernel.git -b openEuler-22.03-LTS-RK3588 -c none -r https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-22.03-LTS/generic.repo -d rk3588-rock-5b -s headless`
 
 
 ### 顺序构建

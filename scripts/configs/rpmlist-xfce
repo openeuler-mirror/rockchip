@@ -1,4 +1,5 @@
 dnf
+yum
 alsa-utils
 haveged
 wpa_supplicant
@@ -30,4 +31,5 @@ network-manager-applet
 lightdm
 lightdm-gtk
 bc
+systemd-timesyncd
 openEuler-repos

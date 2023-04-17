@@ -2,7 +2,7 @@
 
 __usage="
 Usage: build_boot [OPTIONS]
-Build rk3399 boot image.
+Build Rockchip boot image.
 The target boot.img will be generated in the build folder of the directory where the build_boot.sh script is located.
 
 Options: 

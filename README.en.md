@@ -2,7 +2,7 @@
 
 English | [简体中文](./README.md)
 
-This repository provides scripts for building openEuler image for RK3399 SoCs and related documents.
+This repository provides scripts for building openEuler image for Rockchip development boards and related documents.
 
 - [Rockchip](#rockchip)
   - [File Description](#file-description)
@@ -22,6 +22,7 @@ This repository provides scripts for building openEuler image for RK3399 SoCs an
     - [Install an Image on an EMMC](documents/刷写EMMC镜像.md)
     - [Build images sequentially](documents/顺序构建.md)
     - [Compile the kernel of Firefly-RK3399 based on the Firefly SDK](documents/基于Firefly-SDK编译Firefly-RK3399的内核镜像.md)
+    - [Packaging ITX-RK3588J Integrated Burn Write Image](documents/打包ITX-RK3588J一体化烧写镜像。md)
 - [scripts](./scripts/): Used to build openEuler Rockchip images
     - [One-time build images](scripts/build.sh)
     - [Build a boot Image](scripts/build_boot.sh)
@@ -104,13 +105,13 @@ Basic information of the image is as follows:
 >Five openEuler versions are currently supported for RK3399, i.e., 20.03 LTS, 20.03 LTS SP1, 20.03 LTS SP2, 20.03 LTS SP3, 21.09 and 22.03 LTS.
 >Only one openEuler versions are currently supported for RK3588, i.e., 22.03 LTS.
 >When building an image with Xfce/UKUI/DDE desktop environment, you need to pay attention to three issues:
->1. For building an image with Xfce desktop environment, note that only openEuler 20.03 LTS SP2、20.03 LTS SP3 ,21.09 and 22.03 LTS are currently supported.
+>1. For building an image with Xfce desktop environment, note that only openEuler 20.03 LTS SP2、20.03 LTS SP3, 21.09 and 22.03 LTS are currently supported.
 >2. For building an image with UKUI/DDE desktop environment, note that only openEuler 20.03 LTS SP1、20.03 LTS SP2、20.03 LTS SP3, 21.09 and 22.03 LTS are currently supported.
 >3. Need to set the parameter `-s/--spec`. Please refer to the description of this parameter for details. The corresponding -r/-repo parameter needs to be set at the same time.
 
 ### Prepare the Environment
 - OS: openEuler or CentOS 8
-- Hardware: AArch64 hardware, Such as the RaspberryPi or RK3399 SoCs
+- Hardware: AArch64 hardware, Such as the RaspberryPi or RK3399/RK3588 development boards
 
 Refer to [Building an openEuler image](documents/openEuler镜像的构建.md) for details.
 
@@ -172,7 +173,7 @@ The meaning of each parameter:
 
 6. -d, --device-tree DTB_NAME
 
-    The device name in the kernel device-tree whitch is a little different from the board name. It corresponds to the `DTB_NAME.dts` file under the [kernel/arch/arm64/boot/dts/rockchip](https://gitee.com/openeuler/kernel/tree/master/arch/arm64/boot/dts/rockchip) folder. The default is `rk3399_firefly`.
+    The device name in the kernel device-tree whitch is a little different from the board name. It corresponds to the `DTB_NAME.dts` file under the [kernel/arch/arm64/boot/dts/rockchip](https://gitee.com/openeuler/kernel/tree/master/arch/arm64/boot/dts/rockchip) folder. The default is `rk3399-firefly`.
 
 7.  -s, --spec SPEC
 
@@ -189,9 +190,9 @@ The meaning of each parameter:
 
     Displays help information.
 
-Applicable RK3399 SoCs:
+Applicable RK3399 development boards:
 
-The development board that have been tested are as follows, and the other types of RK3399 SoCs are to be tested.
+The development board that have been tested are as follows, and the other types of RK3399 development board are to be tested.
 
 1. Firefly-RK3399
 
@@ -217,9 +218,9 @@ The development board that have been tested are as follows, and the other types 
 
         `sudo bash build.sh -n openEuler-22.03-LTS-RockPi-4A-aarch64-alpha1 -k https://gitee.com/openeuler/kernel.git -b openEuler-22.03-LTS -c rock-pi-4-rk3399_defconfig -r https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-22.03-LTS/generic.repo -d rk3399-rock-pi-4a -s headless`
 
-Applicable RK3588 SoCs:
+Applicable RK3588 development board:
 
-The development board that have been tested are as follows, and the other types of RK3399 SoCs are to be tested.
+The development board that have been tested are as follows, and the other types of RK3588 development board are to be tested.
 
 1. Firefly ROC-RK3588S-PC
 
@@ -249,5 +250,3 @@ After decompressing the bootable image for the SD card, please refer to [Install
 ### Install an Image on an EMMC
 
 Refer to [Install openEuler to the EMMC](documents/刷写EMMC镜像.md) for details about how to write images for the EMMC to an EMMC.
-
-    - The release package of openEuler-20.03-LTS: `http://repo.openeuler.org/openEuler-20.03-LTS/everything/aarch64/Packages/openEuler-release-20.03LTS-33.oe1.aarch64.rpm`

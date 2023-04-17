@@ -2,7 +2,7 @@
 
 __usage="
 Usage: build_u-boot [OPTIONS]
-Build rk3399 u-boot image.
+Build Rockchip u-boot image.
 The target files idbloader.img and u-boot.itb will be generated in the build/u-boot folder of the directory where the build_u-boot.sh script is located.
 
 Options: 
