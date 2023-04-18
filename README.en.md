@@ -22,7 +22,7 @@ This repository provides scripts for building openEuler image for Rockchip devel
     - [Install an Image on an EMMC](documents/刷写EMMC镜像.md)
     - [Build images sequentially](documents/顺序构建.md)
     - [Compile the kernel of Firefly-RK3399 based on the Firefly SDK](documents/基于Firefly-SDK编译Firefly-RK3399的内核镜像.md)
-    - [Packaging ITX-RK3588J Integrated Burn Write Image](documents/打包ITX-RK3588J一体化烧写镜像。md)
+    - [Packaging ITX-RK3588J Integrated Burn Write Image](documents/打包ITX-RK3588J一体化烧写镜像.md)
 - [scripts](./scripts/): Used to build openEuler Rockchip images
     - [One-time build images](scripts/build.sh)
     - [Build a boot Image](scripts/build_boot.sh)
