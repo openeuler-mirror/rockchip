@@ -50,7 +50,7 @@ Basic information of the image is as follows:
 <td class="cellrowborder" valign="top" width="10%"><p>288 MiB</p></td>
 <td class="cellrowborder" valign="top" width="10%"><p>4.19.90</p></td>
 <td class="cellrowborder" valign="top" width="10%"><a href="https://gitee.com/src-openeuler/openEuler-repos/blob/openEuler-20.03-LTS/generic.repo">openEuler 20.03 LTS repository</a></td>
-<td class="cellrowborder" valign="top" width="10%"><p>A compressed image for the SD card</p></td>
+<td class="cellrowborder" valign="top" width="10%"><p>A compressed RAW original image</p></td>
 </tr>
 <tbody><tr>
 <td class="cellrowborder" valign="top" width="10%"><a href="https://eulixos.com/repo/others/openeuler-rk3399/openEuler-20.03-LTS-rk3399-firefly-aarch64-alpha1.tar.gz">openEuler 20.03 LTS Firefly-RK3399</a></td>
@@ -68,7 +68,7 @@ Basic information of the image is as follows:
 <td class="cellrowborder" valign="top" width="10%"><p>295 MiB</p></td>
 <td class="cellrowborder" valign="top" width="10%"><p>4.19.90</p></td>
 <td class="cellrowborder" valign="top" width="10%"><a href="https://gitee.com/src-openeuler/openEuler-repos/blob/openEuler-20.03-LTS/generic.repo">openEuler 20.03 LTS repository</a></td>
-<td class="cellrowborder" valign="top" width="10%"><p>A compressed image for the SD card</p></td>
+<td class="cellrowborder" valign="top" width="10%"><p>A compressed RAW original image</p></td>
 </tr>
 <tbody><tr>
 <td class="cellrowborder" valign="top" width="10%"><a href="https://eulixos.com/repo/others/openeuler-rk3399/openEuler-21.09-Firefly-RK3399-aarch64-alpha1.img.xz">openEuler 21.09 Firefly-RK3399</a></td>
@@ -77,7 +77,7 @@ Basic information of the image is as follows:
 <td class="cellrowborder" valign="top" width="10%"><p>420 MiB</p></td>
 <td class="cellrowborder" valign="top" width="10%"><p>5.10.0</p></td>
 <td class="cellrowborder" valign="top" width="10%"><a href="https://gitee.com/src-openeuler/openEuler-repos/blob/openEuler-21.09/generic.repo">openEuler 21.09 repository</a></td>
-<td class="cellrowborder" valign="top" width="10%"><p>A compressed image for the SD card</p></td>
+<td class="cellrowborder" valign="top" width="10%"><p>A compressed RAW original image</p></td>
 </tr>
 <tbody><tr>
 <td class="cellrowborder" valign="top" width="10%"><a href="https://eulixos.com/repo/others/openeuler-rk3399/openEuler-21.09-Firefly-RK3399-aarch64-alpha1.tar.gz">openEuler 21.09 Firefly-RK3399</a></td>
@@ -95,7 +95,7 @@ Basic information of the image is as follows:
 <td class="cellrowborder" valign="top" width="10%"><p>717 MiB</p></td>
 <td class="cellrowborder" valign="top" width="10%"><p>5.10.0</p></td>
 <td class="cellrowborder" valign="top" width="10%"><a href="https://gitee.com/src-openeuler/openEuler-repos/blob/openEuler-21.09/generic.repo">openEuler 21.09 repository</a></td>
-<td class="cellrowborder" valign="top" width="10%"><p>A compressed image for the SD card</p></td>
+<td class="cellrowborder" valign="top" width="10%"><p>A compressed RAW original image</p></td>
 </tr>
 </tbody></table>
 
@@ -126,13 +126,14 @@ Run the following command to build images:
 After the script is executed, the following files will be generated in the build/YYYY-MM-DD folder of the directory where the script is located:
 
 - A compressed image for the EMMC: openEuler-VERSION-BOARD-RELEASE.tar.gz
-- A compressed image for the SD card：openEuler-VERSION-BOARD-ARCH-RELEASE.img.xz
+- A compressed RAW original image：openEuler-VERSION-BOARD-ARCH-RELEASE.img.xz
 
->What is the difference between a compressed image for the EMMC and a compressed image for the SD card?
+>What is the difference between a compressed image for the EMMC and a compressed RAW original image?
 
->1. A compressed image for the EMMC: It is suitable for development boards with EMMC storage media such as Firefly-RK3399. It needs to be flashed with Rockchip special tool. The flashing process is introduced in [Install an Image on an EMMC](#install-an-image-on-an-emmc).
->2. A compressed image for the SD card: It is suitable for development boards with SD card slots. The flashing process is introduced in [Install an Image on an SD Card](#install-an-image-on-an-sd-card).
+>1. A compressed image for the EMMC: It requires the use of RKDevTool or rkdeveloptool to flash it into development boards such as Firefly-RK3399, which come with EMMC storage media. 
+>2. A compressed RAW original image: Usually refers to a complete disk image file that contains data from all disk sectors. It can be written to various storage media such as SD cards, EMMC, and others. 
 >3. A development board with EMMC can also use an SD card to boot the image. But the storage medium selected for booting varies, If the EMMC boot priority is greater than the SD card, the system in the EMMC will be booted first. In this case, if you want to use the system in the SD card, you need to clear the EMMC first.
+4. The EMMC flashing process is described in [Install an Image on an EMMC](#install-an-image-on-an-emmc), while the SD card flashing process is described in [Install an Image on an SD Card](#install-an-image-on-an-sd-card).
 
 The meaning of each parameter:
 
@@ -243,10 +244,10 @@ The development boards that have been tested are as follows, and the other types
 
 ### Install an Image on an SD Card
 
-After decompressing the bootable image for the SD card, please refer to [Install openEuler on RaspberryPi](https://gitee.com/openeuler/raspberrypi/blob/master/documents/%E5%88%B7%E5%86%99%E9%95%9C%E5%83%8F.md) for details of writing an image on an SD card. You should use images provided in this project.
+After decompressing the RAW original image, please refer to [Install openEuler on RaspberryPi](https://gitee.com/openeuler/raspberrypi/blob/master/documents/%E5%88%B7%E5%86%99%E9%95%9C%E5%83%8F.md) for details of writing an image on an SD card. You should use images provided in this project.
 
 >Note: Because Firefly-RK3399 is different from other Rockchip development boards, the system on EMMC will be booted first. The system on the EMMC needs to be cleared before using the system in the SD card to boot the Firefly-RK3399. Besides, you need to press the power button to boot after powering up the device.
 
 ### Install an Image on an EMMC
 
-Refer to [Install openEuler to the EMMC](documents/刷写EMMC镜像.md) for details about how to write images for the EMMC to an EMMC.
+Refer to [Install openEuler to the EMMC](documents/刷写EMMC镜像.md) for details about how to write compressed RAW original image to an EMMC.

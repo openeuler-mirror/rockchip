@@ -11,9 +11,11 @@
 
 ## 准备打包环境
 
-1.  在 aarch64 主机上成功完成[顺序构建](documents/顺序构建.md)中的：“编译 u-boot”、“构建 boot 镜像”、“构建 rootfs 镜像”这三步,将项目最顶层目录 `rockchip` 复制到以下环境主机中。
+1.  在 aarch64 主机上成功完成[顺序构建](documents/顺序构建.md)中的：“构建 boot 镜像”、“构建 rootfs 镜像”这两步。
 
-1.  打包环境系统要求。
+2.  在以下环境主机中，克隆本项目，将 aarch64 主机完成以上步骤的 `build` 目录下 `boot.img` 和 `rootfs.img` 复制到对应目录中。
+
+3.  打包环境系统要求。
     - 操作系统：openEuler 22.03 LTS
     - 架构：x86_64
 

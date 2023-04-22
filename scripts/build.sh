@@ -40,6 +40,7 @@ default_param() {
     repo_file="https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-20.03-LTS/generic.repo"
     kernel_url="https://gitee.com/openeuler/rockchip-kernel.git"
     workdir=$(pwd)/build
+    board_type=rk3399
     name=${branch}-${dtb_name}-aarch64-alpha1
 }
 
@@ -156,4 +157,9 @@ if [[ $(cat $workdir/.done | grep rootfs) != "rootfs" ]];then
     bash build_rootfs.sh
 fi
 
-bash gen_image.sh -n $name
+if [[ "x$dtb_name" == "xrk3588s-roc-pc" || "x$dtb_name" == "xrk3588-firefly-itx-3588j" || "x$dtb_name" == "xrk3588-rock-5b"]]; then
+    board_type=rk3588
+else
+    board_type=rk3399
+fi
+bash gen_image.sh -n $name -t $board_type

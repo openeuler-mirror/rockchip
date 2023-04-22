@@ -64,6 +64,9 @@ make_img(){
         echo "Error:No found package-file!"
         exit 1
     fi
+    
+    chmod +x ${workdir}/afptool
+    chmod +x ${workdir}/rkImageMaker
     ${workdir}/afptool -pack ${workdir}/ ${workdir}/Image/update.img || pause
     ${workdir}/rkImageMaker -RK3588 ${workdir}/Image/MiniLoaderAll.bin ${workdir}/Image/update.img ${workdir}/update.img -os_type:androidos || pause
 

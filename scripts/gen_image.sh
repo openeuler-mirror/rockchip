@@ -7,6 +7,7 @@ The target compressed bootable images will be generated in the build/YYYY-MM-DD 
 
 Options: 
   -n, --name IMAGE_NAME         The Rockchip image name to be built.
+  -t, --type BOARD_TYPE         Board Soc type.
   -h, --help                    Show command help.
 "
 
@@ -20,6 +21,7 @@ default_param() {
     workdir=$(pwd)/build
     outputdir=${workdir}/$(date +'%Y-%m-%d')
     name=openEuler-Firefly-RK3399-aarch64-alpha1
+    board_type=rk3399
     rootfs_dir=${workdir}/rootfs
     boot_dir=${workdir}/boot
     uboot_dir=${workdir}/u-boot
@@ -43,6 +45,10 @@ parseargs()
             shift
         elif [ "x$1" == "x-n" -o "x$1" == "x--name" ]; then
             name=`echo $2`
+            shift
+            shift
+        elif [ "x$1" == "x-t" -o "x$1" == "x--type" ]; then
+            board_type=`echo $2`
             shift
             shift
         else
@@ -231,39 +237,36 @@ outputd(){
         LOG "xz openEuler image success."
     fi
 
-    LOG "tar openEuler image begin..."
-    cp $workdir/../bin/rk3399_loader.bin $workdir
-    cp $workdir/../bin/rk3399_parameter.gpt $workdir
-    cp $workdir/../bin/rk3588_loader.bin $workdir
-    cp $workdir/../bin/rk3588_parameter.gpt $workdir
-    cp $workdir/u-boot/idbloader.img $workdir
-    cp $workdir/u-boot/u-boot.itb $workdir
-    cd $workdir
-    tar -zcvf ${outputdir}/${name}.tar.gz \
-    rk3399_loader.bin \
-    rk3399_parameter.gpt \
-    rk3588_loader.bin \
-    rk3588_parameter.gpt \
-    idbloader.img \
-    u-boot.itb \
-    boot.img \
-    rootfs.img
-    if [ ! -f ${outputdir}/${name}.tar.gz ]; then
-        ERROR "tar openEuler image failed!"
-        exit 2
-    else
-        LOG "tar openEuler image success."
-    fi
-    rm $workdir/rk3399_loader.bin
-    rm $workdir/rk3399_parameter.gpt
-    rm $workdir/rk3588_loader.bin
-    rm $workdir/rk3588_parameter.gpt
-    rm $workdir/idbloader.img
-    rm $workdir/u-boot.itb
+    if [ "x$board_type" == "xrk3399" ]; then
+        LOG "tar openEuler image begin..."
+        cp $workdir/../bin/rk3399_loader.bin $workdir
+        cp $workdir/../bin/rk3399_parameter.gpt $workdir
+        cp $workdir/u-boot/idbloader.img $workdir
+        cp $workdir/u-boot/u-boot.itb $workdir
+        cd $workdir
+        tar -zcvf ${outputdir}/${name}.tar.gz \
+        rk3399_loader.bin \
+        rk3399_parameter.gpt \
+        idbloader.img \
+        u-boot.itb \
+        boot.img \
+        rootfs.img
+        if [ ! -f ${outputdir}/${name}.tar.gz ]; then
+            ERROR "tar openEuler image failed!"
+            exit 2
+        else
+            LOG "tar openEuler image success."
+        fi
+        rm $workdir/rk3399_loader.bin
+        rm $workdir/rk3399_parameter.gpt
+        rm $workdir/idbloader.img
+        rm $workdir/u-boot.itb
 
+        cd $outputdir
+        sha256sum ${name}.tar.gz >> ${name}.tar.gz.sha256sum
+    fi
     cd $outputdir
     sha256sum ${name}.img.xz >> ${name}.img.xz.sha256sum
-    sha256sum ${name}.tar.gz >> ${name}.tar.gz.sha256sum
 
     LOG "The target images are generated in the ${outputdir}."
 }

@@ -50,7 +50,7 @@
 <td class="cellrowborder" valign="top" width="10%"><p>288 MiB</p></td>
 <td class="cellrowborder" valign="top" width="10%"><p>4.19.90</p></td>
 <td class="cellrowborder" valign="top" width="10%"><a href="https://gitee.com/src-openeuler/openEuler-repos/blob/openEuler-20.03-LTS/generic.repo">openEuler 20.03 LTS 源仓库</a></td>
-<td class="cellrowborder" valign="top" width="10%"><p>压缩后的 SD 卡启动镜像</p></td>
+<td class="cellrowborder" valign="top" width="10%"><p>压缩后的 RAW 原始镜像</p></td>
 </tr>
 <tbody><tr>
 <td class="cellrowborder" valign="top" width="10%"><a href="https://eulixos.com/repo/others/openeuler-rk3399/openEuler-20.03-LTS-rk3399-firefly-aarch64-alpha1.tar.gz">openEuler 20.03 LTS Firefly-RK3399</a></td>
@@ -68,7 +68,7 @@
 <td class="cellrowborder" valign="top" width="10%"><p>295 MiB</p></td>
 <td class="cellrowborder" valign="top" width="10%"><p>4.19.90</p></td>
 <td class="cellrowborder" valign="top" width="10%"><a href="https://gitee.com/src-openeuler/openEuler-repos/blob/openEuler-20.03-LTS/generic.repo">openEuler 20.03 LTS repository</a></td>
-<td class="cellrowborder" valign="top" width="10%"><p>压缩后的 SD 卡启动镜像</p></td>
+<td class="cellrowborder" valign="top" width="10%"><p>压缩后的 RAW 原始镜像</p></td>
 </tr>
 <tbody><tr>
 <td class="cellrowborder" valign="top" width="10%"><a href="https://eulixos.com/repo/others/openeuler-rk3399/openEuler-21.09-Firefly-RK3399-aarch64-alpha1.img.xz">openEuler 21.09 Firefly-RK3399</a></td>
@@ -77,7 +77,7 @@
 <td class="cellrowborder" valign="top" width="10%"><p>420 MiB</p></td>
 <td class="cellrowborder" valign="top" width="10%"><p>5.10.0</p></td>
 <td class="cellrowborder" valign="top" width="10%"><a href="https://gitee.com/src-openeuler/openEuler-repos/blob/openEuler-21.09/generic.repo">openEuler 21.09 源仓库</a></td>
-<td class="cellrowborder" valign="top" width="10%"><p>压缩后的 SD 卡启动镜像</p></td>
+<td class="cellrowborder" valign="top" width="10%"><p>压缩后的 RAW 原始镜像</p></td>
 </tr>
 <tbody><tr>
 <td class="cellrowborder" valign="top" width="10%"><a href="https://eulixos.com/repo/others/openeuler-rk3399/openEuler-21.09-Firefly-RK3399-aarch64-alpha1.tar.gz">openEuler 21.09 Firefly-RK3399</a></td>
@@ -95,7 +95,7 @@
 <td class="cellrowborder" valign="top" width="10%"><p>717 MiB</p></td>
 <td class="cellrowborder" valign="top" width="10%"><p>5.10.0</p></td>
 <td class="cellrowborder" valign="top" width="10%"><a href="https://gitee.com/src-openeuler/openEuler-repos/blob/openEuler-21.09/generic.repo">openEuler 21.09 源仓库</a></td>
-<td class="cellrowborder" valign="top" width="10%"><p>压缩后的 SD 卡启动镜像</p></td>
+<td class="cellrowborder" valign="top" width="10%"><p>压缩后的 RAW 原始镜像</p></td>
 </tr>
 </tbody></table>
 
@@ -126,13 +126,14 @@
 脚本执行完成后，会在脚本所在目录的 build/YYYY-MM-DD 文件夹下生成以下文件：
 
 - 打包后的 EMMC 刷写文件：openEuler-VERSION-BOARD-RELEASE.tar.gz。
-- 压缩后的 SD 卡启动镜像：openEuler-VERSION-BOARD-ARCH-RELEASE.img.xz。
+- 压缩后的 RAW 原始镜像：openEuler-VERSION-BOARD-ARCH-RELEASE.img.xz。
 
->打包后的 EMMC 刷写文件和压缩后的 openEuler SD 卡启动文件有什么区别？
+>打包后的 EMMC 刷写文件和压缩后的 RAW 原始镜像文件有什么区别？
 
->1. 打包后的 EMMC 刷写文件：适用于例如 Firefly-RK3399 这一类自带 EMMC 储存介质的开发板，需要使用 Rockchip 专用工具进行刷入，刷写过程在 [刷写到 EMMC](#刷写到-emmc) 中介绍。
->2. 压缩后的 SD 卡启动文件：适用于带 SD 卡槽的开发板，刷写过程在 [刷写到 SD 卡](#刷写到-sd-卡) 中介绍。
+>1. 打包后的 EMMC 刷写文件：指需要使用 RKDevTool 或者 rkdeveloptool 来刷入到例如 Firefly-RK3399 这一类自带 EMMC 储存介质的开发板中。
+>2. 压缩后的 RAW 原始镜像文件：通常指的是一个完整的磁盘镜像文件，其中包含了所有磁盘扇区的数据。可以刷写到例如 SD 卡、EMMC 等多种储存介质中。
 >3. 带 EMMC 的开发板也可以使用 SD 卡启动镜像，启动选择的储存介质各不相同，如果 EMMC 启动优先级大于 SD 卡，则优先启动 EMMC 内的系统，在这种情况下若想使用 SD 卡内的系统需要先清空 EMMC。
+>4. EMMC 刷写过程在 [刷写到 EMMC](#刷写到-emmc) 中介绍；SD 卡刷写过程在 [刷写到 SD 卡](#刷写到-sd-卡) 中介绍。
 
 各个参数意义：
 
@@ -245,10 +246,10 @@
 
 ### 刷写到 SD 卡
 
-将 SD 卡启动镜像解压后写入 SD 卡，请参考[树莓派镜像烧录](https://gitee.com/openeuler/raspberrypi/blob/master/documents/%E5%88%B7%E5%86%99%E9%95%9C%E5%83%8F.md)，过程中所用到的镜像应为本项目提供适用于 Rockchip 开发板的镜像。
+将压缩后的 RAW 原始镜像解压后写入 SD 卡，请参考[树莓派镜像烧录](https://gitee.com/openeuler/raspberrypi/blob/master/documents/%E5%88%B7%E5%86%99%E9%95%9C%E5%83%8F.md)，过程中所用到的镜像应为本项目提供适用于 Rockchip 开发板的镜像。
 
 >注意：由于 Firefly-RK3399 与其他 RK3399 开发板不同，会优先启动 EMMC 上的系统，在 Firefly-RK3399 上使用 SD 卡启动镜像之前需要清除 EMMC 上的系统，上电后需要按下电源键来启动。
 
 ### 刷写到 EMMC
 
-将 EMMC 刷写文件刷写入 EMMC，详见[刷写EMMC镜像](documents/刷写EMMC镜像.md)。
+将 openEuler 安装到 EMMC，详见[刷写EMMC镜像](documents/刷写EMMC镜像.md)。

@@ -204,7 +204,7 @@ mk_boot() {
     fi
     LOG "gen extlinux config done."
 
-    dd if=/dev/zero of=$workdir/boot.img bs=1M count=112 status=progress
+    dd if=/dev/zero of=$workdir/boot.img bs=1M count=240 status=progress
     mkfs.vfat -n boot $workdir/boot.img
     if [ -d $workdir/boot_emmc ];then rm -rf $workdir/boot_emmc; fi
     mkdir $workdir/boot_emmc
