@@ -157,7 +157,7 @@ if [[ $(cat $workdir/.done | grep rootfs) != "rootfs" ]];then
     bash build_rootfs.sh
 fi
 
-if [[ "x$dtb_name" == "xrk3588s-roc-pc" || "x$dtb_name" == "xrk3588-firefly-itx-3588j" || "x$dtb_name" == "xrk3588-rock-5b"]]; then
+if [[ "x$dtb_name" == "xrk3588s-roc-pc" || "x$dtb_name" == "xrk3588-firefly-itx-3588j" || "x$dtb_name" == "xrk3588-rock-5b" ]]; then
     board_type=rk3588
 else
     board_type=rk3399
