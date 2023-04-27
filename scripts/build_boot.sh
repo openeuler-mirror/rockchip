@@ -195,13 +195,9 @@ mk_boot() {
     kernel /${kernel_name}
     initrd /initrd.img
     fdt /${dtb_name}
-    append  earlyprintk console=ttyS2,1500000 rw root=/dev/mmcblk0p2 rootfstype=ext4 init=/sbin/init rootwait" \
+    append  earlyprintk console=ttyS2,1500000 rw root=UUID=614e0000-0000-4b53-8000-1d28000054a9 rootfstype=ext4 init=/sbin/init rootwait" \
     > ${boot_dir}/extlinux/extlinux.conf
 
-    if [ "x$dtb_name" == "xrk3399-firefly" ]; then
-        LOG "set rootfs for firefly-rk3399"
-        sed -i "s|mmcblk0p2|mmcblk2p2|g" ${boot_dir}/extlinux/extlinux.conf
-    fi
     LOG "gen extlinux config done."
 
     dd if=/dev/zero of=$workdir/boot.img bs=1M count=240 status=progress
