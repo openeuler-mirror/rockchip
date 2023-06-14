@@ -2,11 +2,11 @@
 
 __usage="
 Usage: build_u-boot [OPTIONS]
-Build rk3399 u-boot image.
+Build Rockchip u-boot image.
 The target files idbloader.img and u-boot.itb will be generated in the build/u-boot folder of the directory where the build_u-boot.sh script is located.
 
 Options: 
-  -c, --config BOARD_CONFIG     Required! The name of target board which should be a space separated list, which defaults to firefly-rk3399_defconfig.
+  -c, --config BOARD_CONFIG     Required! The name of target board which should be a space separated list, which defaults to firefly-rk3399_defconfig, set none to use prebuild u-boot image.
   -h, --help                    Show command help.
 "
 
@@ -22,6 +22,7 @@ default_param() {
     u_boot_url="https://gitlab.arm.com/systemready/firmware-build/u-boot.git"
     rk3399_bl31_url="https://github.com/rockchip-linux/rkbin/raw/master/bin/rk33/rk3399_bl31_v1.35.elf"
     log_dir=$workdir/log
+    nonfree_bin_dir=${workdir}/../bin
 }
 
 local_param(){
@@ -108,6 +109,25 @@ build_u-boot() {
 
 }
 
+use_prebuild_u-boot() {
+    if [ -d $workdir/u-boot ]; then
+        rm -rf $workdir/u-boot
+    fi
+    mkdir $workdir/u-boot
+    if [ -f $workdir/.param ]; then
+        dtb_name=$(cat $workdir/.param | grep dtb_name)
+        dtb_name=${dtb_name:9}
+        if [[ "x$dtb_name" == "xrk3588s-roc-pc" || "x$dtb_name" == "xrk3588-firefly-itx-3588j" ]]; then
+            cp $nonfree_bin_dir/u-boot/firefly-rk3588/* $workdir/u-boot
+        elif [[ "x$dtb_name" == "xrk3588-rock-5b" ]]; then
+            cp $nonfree_bin_dir/u-boot/radxa-rock5b/* $workdir/u-boot
+        else
+           echo "target u-boot can not found!"
+           exit 2
+        fi
+    fi
+}
+
 set -e
 u_boot_ver="v2020.10"
 default_param
@@ -123,6 +143,12 @@ if [ ! -f $workdir/.done ];then
 fi
 sed -i 's/u-boot//g' $workdir/.done
 LOG "build u-boot..."
-build_u-boot
+
+if [ "x$config" == "xnone" ]; then
+    use_prebuild_u-boot
+else
+    build_u-boot
+fi
+
 LOG "The u-boot.itb and idbloader.img are generated in the ${workdir}/u-boot."
 echo "u-boot" >> $workdir/.done

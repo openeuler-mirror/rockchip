@@ -1,4 +1,5 @@
 dnf
+yum
 alsa-utils
 haveged
 wpa_supplicant
@@ -19,4 +20,5 @@ gdisk
 ntp
 dde
 bc
+systemd-timesyncd
 openEuler-repos

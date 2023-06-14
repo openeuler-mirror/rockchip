@@ -1,7 +1,3 @@
-<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
-
-<!-- code_chunk_output -->
-
 - [描述](#描述)
 - [准备编译环境](#准备编译环境)
 - [基于主线 u-boot 编译启动文件](#基于主线-u-boot-编译启动文件)
@@ -38,8 +34,6 @@
     - [同步到盘](#同步到盘)
     - [卸载](#卸载)
     - [卸载镜像文件虚拟的块设备](#卸载镜像文件虚拟的块设备)
-
-<!-- /code_chunk_output -->
 
 # 描述
 

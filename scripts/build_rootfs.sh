@@ -2,7 +2,7 @@
 
 __usage="
 Usage: build_rootfs [OPTIONS]
-Build rk3399 openEuler-root image.
+Build Rockchip openEuler-root image.
 Run in root user.
 The target rootfs.img will be generated in the build folder of the directory where the build_rootfs.sh script is located.
 
@@ -267,28 +267,27 @@ build_rootfs() {
     mount -t proc /proc ${rootfs_dir}/proc
     mount -t sysfs /sys ${rootfs_dir}/sys
 
-    cp $nonfree_bin_dir/../bin/expand-rootfs.sh ${rootfs_dir}/etc/rc.d/init.d/expand-rootfs.sh
-    chmod +x ${rootfs_dir}/etc/rc.d/init.d/expand-rootfs.sh
-    LOG "Set auto expand rootfs done."
+    cp $nonfree_bin_dir/../bin/extend-root.sh ${rootfs_dir}/etc/rc.d/init.d/extend-root.sh
+    chmod +x ${rootfs_dir}/etc/rc.d/init.d/extend-root.sh
+
+    set +e
+    sed -i -e '/^#NTP=/cNTP=0.cn.pool.ntp.org' ${rootfs_dir}/etc/systemd/timesyncd.conf
+    sed -i -e 's/#FallbackNTP=/FallbackNTP=1.asia.pool.ntp.org 2.asia.pool.ntp.org /g' ${rootfs_dir}/etc/systemd/timesyncd.conf
+    set -e
 
     cat << EOF | chroot ${rootfs_dir}  /bin/bash
     echo 'openeuler' | passwd --stdin root
     echo openEuler > /etc/hostname
     ln -s /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
-    chkconfig --add expand-rootfs.sh
-    chkconfig expand-rootfs.sh on
+    chkconfig --add extend-root.sh
+    chkconfig extend-root.sh on
 EOF
 
-    sed -i 's/#NTP=/NTP=0.cn.pool.ntp.org/g' ${rootfs_dir}/etc/systemd/timesyncd.conf
-    sed -i 's/#FallbackNTP=/FallbackNTP=1.asia.pool.ntp.org 2.asia.pool.ntp.org/g' ${rootfs_dir}/etc/systemd/timesyncd.conf
+    LOG "Set NTP and auto expand rootfs done."
 
     echo "LABEL=rootfs  / ext4    defaults,noatime 0 0" > ${rootfs_dir}/etc/fstab
     echo "LABEL=boot  /boot vfat    defaults,noatime 0 0" >> ${rootfs_dir}/etc/fstab
-    LOG "Set NTP and fstab done."
-
-    if [ -d ${rootfs_dir}/boot/grub2 ]; then
-        rm -rf ${rootfs_dir}/boot/grub2
-    fi
+    LOG "Set fstab done."
 
     if [ -f $workdir/.param ]; then
         dtb_name=$(cat $workdir/.param | grep dtb_name)
@@ -304,6 +303,7 @@ EOF
                 cp   $nonfree_bin_dir/wireless/enable_bt    ${rootfs_dir}/usr/bin/
                 chmod +x  ${rootfs_dir}/usr/bin/enable_bt  ${rootfs_dir}/etc/profile.d/rcS.sh
                 LOG "install firefly-rk3399 wireless firmware done."
+                ln -s ${rootfs_dir}/system/etc/firmware ${rootfs_dir}/etc/firmware
             fi
             mkdir -p ${rootfs_dir}/usr/lib/firmware/brcm
             cp $nonfree_bin_dir/brcmfmac4356-sdio.firefly,firefly-rk3399.txt ${rootfs_dir}/usr/lib/firmware/brcm

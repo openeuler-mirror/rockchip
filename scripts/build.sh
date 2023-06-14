@@ -2,11 +2,11 @@
 
 __usage="
 Usage: build [OPTIONS]
-Build rk3399 bootable images.
+Build Rockchip bootable images.
 The target bootable compressed images will be generated in the build/YYYY-MM-DD folder of the directory where the build script is located.
 
 Options: 
-  -n, --name IMAGE_NAME            The RK3399 image name to be built.
+  -n, --name IMAGE_NAME            The Rockchip image name to be built.
   -k, --kernel KERNEL_URL          The URL of kernel source's repository, which defaults to https://gitee.com/openeuler/rockchip-kernel.git.
   -b, --branch KERNEL_BRANCH       The branch name of kernel source's repository, which defaults to openEuler-20.03-LTS.
   -c, --config BOARD_CONFIG        Required! The name of target board which should be a space separated list, which defaults to firefly-rk3399_defconfig.
@@ -40,6 +40,7 @@ default_param() {
     repo_file="https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-20.03-LTS/generic.repo"
     kernel_url="https://gitee.com/openeuler/rockchip-kernel.git"
     workdir=$(pwd)/build
+    board_type=rk3399
     name=${branch}-${dtb_name}-aarch64-alpha1
 }
 
@@ -60,7 +61,7 @@ spec_param=$spec_param" > $workdir/.param
 
 deppkg_install() {
     dnf makecache
-    dnf install git wget make gcc bison dtc m4 flex bc openssl-devel tar dosfstools rsync parted dnf-plugins-core tar kpartx diffutils -y
+    dnf install git wget make gcc bison dtc m4 flex bc openssl-devel tar dosfstools rsync parted dnf-plugins-core tar kpartx diffutils dracut -y
 }
 
 parseargs()
@@ -144,19 +145,21 @@ else
     touch $workdir/.done
 fi
 
-while [[ $(cat $workdir/.done | grep u-boot) != "u-boot" ]]
-do
+if [[ $(cat $workdir/.done | grep u-boot) != "u-boot" ]];then
     bash build_u-boot.sh
-done
+fi
 
-while [[ $(cat $workdir/.done | grep bootimg) != "bootimg" ]]
-do
+if [[ $(cat $workdir/.done | grep bootimg) != "bootimg" ]];then
     bash build_boot.sh
-done
+fi
 
-while [[ $(cat $workdir/.done | grep rootfs) != "rootfs" ]]
-do
+if [[ $(cat $workdir/.done | grep rootfs) != "rootfs" ]];then
     bash build_rootfs.sh
-done
+fi
 
-bash gen_image.sh -n $name
+if [[ "x$dtb_name" == "xrk3588s-roc-pc" || "x$dtb_name" == "xrk3588-firefly-itx-3588j" || "x$dtb_name" == "xrk3588-rock-5b" ]]; then
+    board_type=rk3588
+else
+    board_type=rk3399
+fi
+bash gen_image.sh -n $name -t $board_type
