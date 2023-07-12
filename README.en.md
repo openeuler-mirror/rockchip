@@ -97,6 +97,24 @@ Basic information of the image is as follows:
 <td class="cellrowborder" valign="top" width="10%"><a href="https://gitee.com/src-openeuler/openEuler-repos/blob/openEuler-21.09/generic.repo">openEuler 21.09 repository</a></td>
 <td class="cellrowborder" valign="top" width="10%"><p>A compressed RAW original image</p></td>
 </tr>
+<tbody><tr>
+<td class="cellrowborder" valign="top" width="10%"><a href="https://eulixos.com/repo/others/openeuler-rk3588/openEuler-22.03-LTS-ITX-3588J-aarch64-alpha1.img.xz">openEuler 22.03 Firefly ITX-3588J</a></td>
+<td class="cellrowborder" valign="top" width="10%"><ul><li>root (openeuler)</li></ul></td>
+<td class="cellrowborder" valign="top" width="10%"><p>2023/7/11</p></td>
+<td class="cellrowborder" valign="top" width="10%"><p>494 MiB</p></td>
+<td class="cellrowborder" valign="top" width="10%"><p>5.10.0</p></td>
+<td class="cellrowborder" valign="top" width="10%"><a href="https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-22.03-LTS/generic.repo">openEuler 22.03 repository</a></td>
+<td class="cellrowborder" valign="top" width="10%"><p>A compressed RAW original image</p></td>
+</tr>
+<tbody><tr>
+<td class="cellrowborder" valign="top" width="10%"><a href="https://eulixos.com/repo/others/openeuler-rk3588/openEuler-22.03-LTS-rk3588-xfce.img.xz">openEuler 22.03 Firefly ITX-3588J + XFCE</a></td>
+<td class="cellrowborder" valign="top" width="10%"><ul><li>root (openeuler)</li></ul></td>
+<td class="cellrowborder" valign="top" width="10%"><p>2023/7/11</p></td>
+<td class="cellrowborder" valign="top" width="10%"><p>1.9 GiB</p></td>
+<td class="cellrowborder" valign="top" width="10%"><p>5.10.0</p></td>
+<td class="cellrowborder" valign="top" width="10%"><a href="https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-22.03-LTS/generic.repo">openEuler 22.03 repository</a></td>
+<td class="cellrowborder" valign="top" width="10%"><p>A compressed RAW original image</p></td>
+</tr>
 </tbody></table>
 
 ## How to Build Images
@@ -223,7 +241,15 @@ Applicable RK3588 development board:
 
 The development boards that have been tested are as follows, and the other types of RK3588 development boards are to be tested.
 
-1. Firefly ROC-RK3588S-PC
+1. Firefly ITX-3588J 
+
+    The tested versions are as follows:
+
+    - openEuler-22.03-LTS, run the following command:
+
+        `sudo bash build.sh -n openEuler-22.03-RK3588-Firefly-ITX-3588J-aarch64-alpha1 -k https://gitee.com/openeuler/rockchip-kernel.git -b openEuler-22.03-LTS-RK3588 -c none -r https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-22.03-LTS/generic.repo -d rk3588-firefly-itx-3588j -s headless`
+
+2. Firefly ROC-RK3588S-PC
 
     The tested versions are as follows:
 
@@ -231,7 +257,7 @@ The development boards that have been tested are as follows, and the other types
 
         `sudo bash build.sh -n openEuler-22.03-LTS-Station-M3-aarch64-alpha1 -k https://gitee.com/openeuler/rockchip-kernel.git -b openEuler-22.03-LTS-RK3588 -c none -r https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-22.03-LTS/generic.repo -d rk3588s-roc-pc -s headless`
 
-2. Radxa Rock-5B
+3. Radxa Rock-5B
 
     The tested versions are as follows:
 

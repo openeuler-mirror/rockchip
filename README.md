@@ -97,6 +97,24 @@
 <td class="cellrowborder" valign="top" width="10%"><a href="https://gitee.com/src-openeuler/openEuler-repos/blob/openEuler-21.09/generic.repo">openEuler 21.09 源仓库</a></td>
 <td class="cellrowborder" valign="top" width="10%"><p>压缩后的 RAW 原始镜像</p></td>
 </tr>
+<tbody><tr>
+<td class="cellrowborder" valign="top" width="10%"><a href="https://eulixos.com/repo/others/openeuler-rk3588/openEuler-22.03-LTS-ITX-3588J-aarch64-alpha1.img.xz">openEuler 22.03 Firefly ITX-3588J</a></td>
+<td class="cellrowborder" valign="top" width="10%"><ul><li>root (openeuler)</li></ul></td>
+<td class="cellrowborder" valign="top" width="10%"><p>2023/7/11</p></td>
+<td class="cellrowborder" valign="top" width="10%"><p>494 MiB</p></td>
+<td class="cellrowborder" valign="top" width="10%"><p>5.10.0</p></td>
+<td class="cellrowborder" valign="top" width="10%"><a href="https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-22.03-LTS/generic.repo">openEuler 22.03 源仓库</a></td>
+<td class="cellrowborder" valign="top" width="10%"><p>压缩后的 RAW 原始镜像</p></td>
+</tr>
+<tbody><tr>
+<td class="cellrowborder" valign="top" width="10%"><a href="https://eulixos.com/repo/others/openeuler-rk3588/openEuler-22.03-LTS-rk3588-xfce.img.xz">openEuler 22.03 Firefly ITX-3588J + XFCE 桌面</a></td>
+<td class="cellrowborder" valign="top" width="10%"><ul><li>root (openeuler)</li></ul></td>
+<td class="cellrowborder" valign="top" width="10%"><p>2023/7/11</p></td>
+<td class="cellrowborder" valign="top" width="10%"><p>1.9 GiB</p></td>
+<td class="cellrowborder" valign="top" width="10%"><p>5.10.0</p></td>
+<td class="cellrowborder" valign="top" width="10%"><a href="https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-22.03-LTS/generic.repo">openEuler 22.03 源仓库</a></td>
+<td class="cellrowborder" valign="top" width="10%"><p>压缩后的 RAW 原始镜像</p></td>
+</tr>
 </tbody></table>
 
 ## 镜像构建
@@ -219,9 +237,17 @@
 
 适用的 RK3588 开发板:
 
-已经测试的开发板如下，其他类型 RK3588 开发板适用情况待测试。
+已经测试的开发板如下，其他类型 RK3588 开发板适用情况待测试。、
 
-1. Firefly ROC-RK3588S-PC
+1. Firefly ITX-3588J 
+
+    已测试的版本如下：
+
+    - openEuler-22.03-LTS，构建命令如下:
+
+        `sudo bash build.sh -n openEuler-22.03-RK3588-Firefly-ITX-3588J-aarch64-alpha1 -k https://gitee.com/openeuler/rockchip-kernel.git -b openEuler-22.03-LTS-RK3588 -c none -r https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-22.03-LTS/generic.repo -d rk3588-firefly-itx-3588j -s headless`
+
+2. Firefly ROC-RK3588S-PC
 
     已测试的版本如下：
 
@@ -229,7 +255,7 @@
 
         `sudo bash build.sh -n openEuler-22.03-LTS-Station-M3-aarch64-alpha1 -k https://gitee.com/openeuler/rockchip-kernel.git -b openEuler-22.03-LTS-RK3588 -c none -r https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-22.03-LTS/generic.repo -d rk3588s-roc-pc -s headless`
 
-2. Radxa Rock-5B
+3. Radxa Rock-5B
 
     已测试的版本如下：
 
