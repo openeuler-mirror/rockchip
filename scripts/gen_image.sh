@@ -191,11 +191,7 @@ make_img(){
     line=$(blkid | grep $rootp)
     uuid=${line#*UUID=\"}
     uuid=${uuid%%\"*}
-    if [ "x$dtb_name" == "xrk3399-firefly" ]; then
-        sed -i "s|614e0000-0000-4b53-8000-1d28000054a9|UUID=${uuid}|g" ${boot_mnt}/extlinux/extlinux.conf
-    else
-        sed -i "s|614e0000-0000-4b53-8000-1d28000054a9|UUID=${uuid}|g" ${boot_mnt}/extlinux/extlinux.conf
-    fi
+    sed -i "s|UUID=614e0000-0000-4b53-8000-1d28000054a9|UUID=${uuid}|g" ${boot_mnt}/extlinux/extlinux.conf
 
     rsync -avHAXq ${rootfs_dir}/* ${root_mnt}
     sync
