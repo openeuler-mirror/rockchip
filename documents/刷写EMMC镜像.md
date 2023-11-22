@@ -109,7 +109,7 @@
     reboot
     ```
 
-    使用 Type-C data cable 连接好开发板和主机，使用 `lsblk` 命令看到以下信息即为成功进入 Maskrom Mode
+    使用 Type-C data cable 连接好开发板和主机，使用 `lsusb` 命令看到以下信息即为成功进入 Maskrom Mode
 
     RK3399 显示如下
     ![rk3399-maskrommode](images/rk3399-maskrommode.png)
