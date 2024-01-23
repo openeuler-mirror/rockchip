@@ -20,7 +20,7 @@ default_param() {
     config="firefly-rk3399_defconfig"
     workdir=$(pwd)/build
     u_boot_url="https://gitlab.arm.com/systemready/firmware-build/u-boot.git"
-    rk3399_bl31_url="https://github.com/rockchip-linux/rkbin/raw/master/bin/rk33/rk3399_bl31_v1.35.elf"
+    rk3399_bl31_url="https://github.com/rockchip-linux/rkbin/raw/master/bin/rk33/rk3399_bl31_v1.36.elf"
     log_dir=$workdir/log
     nonfree_bin_dir=${workdir}/../bin
 }
