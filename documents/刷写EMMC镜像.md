@@ -1,9 +1,9 @@
 - [描述](#描述)
 - [使用 Windows 刷写](#使用-windows-刷写)
-  - [RK3399 刷写过程](#rk3399-刷写过程)
-  - [RK3588 刷写过程](#rk3588-刷写过程)
+  - [使用打包后的 EMMC 刷写文件](#使用打包后的-emmc-刷写文件)
+  - [使用压缩后的 RAW 原始镜像](#使用压缩后的-raw-原始镜像)
 - [使用 Linux 刷写](#使用-linux-刷写)
-- [使用 SD 镜像启动后进入系统刷写](#使用-SD-镜像启动后进入系统刷写)
+- [使用 SD 镜像启动后进入系统刷写](#使用-sd-镜像启动后进入系统刷写)
 
 # 描述
 
@@ -11,13 +11,15 @@
 
 # 使用 Windows 刷写
 
-## RK3399 刷写过程
+## 使用打包后的 EMMC 刷写文件
 
-1.  生成的刷写文件压缩包为 build 下的 openEuler-VERSION-BOARD-RELEASE.tar.gz，将其解压。
+1.  本方法仅适用于 RK3399。
 
-2.  下载 [RKDevTool 工具](http://www.t-firefly.com/doc/download/page/id/3.html#other_374)。
+2.  生成的刷写文件压缩包为 build 下的 openEuler-VERSION-BOARD-RELEASE.tar.gz，将其解压。
 
-3.  进入 Loader 模式
+3.  下载 [RKDevTool 工具](http://www.t-firefly.com/doc/download/page/id/3.html#other_374)。
+
+4.  进入 Loader 模式
 
     1.  使用 Type-C data cable 连接好开发板和主机。
 
@@ -28,40 +30,53 @@
 
         ![loader](images/loader.png)
 
-4.  切换至下载镜像页，勾选需要烧录的分区，可以多选。
+5.  切换至下载镜像页，勾选需要烧录的分区，可以多选。
 
-5.  确保映像文件的路径和刷入地址正确，点击路径右边的空白表格单元格选择对应的文件。
+6.  确保映像文件的路径和刷入地址正确，点击路径右边的空白表格单元格选择对应的文件。
 
     ![emmcaddress](images/rk3399-emmcaddress.png)
 
-6.  点击执行按钮开始升级，升级结束后开发板会自动重启。
+7.  点击执行按钮开始升级，升级结束后开发板会自动重启。
 
-## RK3588 刷写过程
+## 使用压缩后的 RAW 原始镜像
 
-1.  刷写所需要的文件：
+1.  本方法适用于 Rk3399/RK3588。
+
+2.  刷写所需要的文件：
     
     1.  生成的刷写文件压缩包为 build 下或项目主页发布的的压缩后的 RAW 原始镜像（需要解压）：openEuler-VERSION-BOARD-RELEASE.img.xz。
 
-    2.  项目主页 scripts/bin 目录下提供的 [rk3588_loader.bin](../scripts/bin/rk3588_loader.bin)。
+    2.  项目主页 scripts/bin 目录下提供的：
+        - 如果是 RK3399，使用 [rk3399_loader.bin](../scripts/bin/rk3399_loader.bin)
+        - 如果是 RK3588，使用 [rk3588_loader.bin](../scripts/bin/rk3588_loader.bin)
 
-2.  下载版本不小于 2.92 的 [RKDevTool 工具](https://dl.radxa.com/tools/windows/windows_RKDevTool_Release_v2.92.zip)。
+3.  下载版本不小于 2.92 的 [RKDevTool 工具](https://dl.radxa.com/tools/windows/windows_RKDevTool_Release_v2.92.zip)。
 
-3.  进入 Maskrom 模式
+4.  进入 Maskrom 模式
 
     1.  使用 Type-C data cable 连接好开发板和主机。
 
     2.  使开发板进入 Maskrom 模式。
-        - 按住开发板上的 Maskrom 键并保持
-        - 插上电源线
-        - 在 RKDevTool 显示“发现一个 MASKROM 设备后”，松开 Maskrom 键
+        1.  如果开发板有 Maskrom 按键。
+            - 按住开发板上的 Maskrom 键并保持；
+            - 插上电源线；
+            - 在 RKDevTool 显示“发现一个 MASKROM 设备后”，松开 Maskrom 键。
+        2.  如果开发板没有 Maskrom 按键（例如 Firefly-RK3399）。
+            - 开发板开机，登录到开发板后，清除 EMMC 上的引导程序，此时开发板会自动进入 maskrom 模式。
+              ```
+              dd if=/dev/zero of=/dev/mmcblk0 bs=1M count=8
+              reboot
+              ```
 
-4.  切换至下载镜像页，勾选需要烧录的分区，可以多选。
+5.  切换至下载镜像页，勾选需要烧录的分区，可以多选。
 
-5.  按照图片顺序进行操作：
+6.  按照图片顺序进行操作：
 
     1.  两者地址都为 `0x00000000`，确保刷入地址正确。
 
-    2.  点击路径右边的空白表格单元格选择 rk3588_loader.bin。
+    2.  点击路径右边的空白表格单元格选择：
+        - 如果是 RK3399，选择 rk3399_loader.bin
+        - 如果是 RK3588，选择 rk3588_loader.bin
 
     3.  点击路径右边的空白表格单元格选择 openEuler-VERSION-BOARD-RELEASE.img。
 
@@ -71,11 +86,11 @@
 
     6.  点击执行，开始刷写。
 
-    ![emmcaddress](images/rk3588-emmcaddress.png)
+    ![emmcaddress](images/emmcaddress.png)
 
-6.  刷写成功界面如下，刷写结束后开发板会自动重启。
+7.  刷写成功界面如下，刷写结束后开发板会自动重启。
 
-    ![completely](images/rk3588-completely.png)
+    ![completely](images/completely.png)
 
 # 使用 Linux 刷写
 
