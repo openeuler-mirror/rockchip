@@ -308,6 +308,7 @@ EOF
             mkdir -p ${rootfs_dir}/usr/lib/firmware/brcm
             cp $nonfree_bin_dir/brcmfmac4356-sdio.bin ${rootfs_dir}/usr/lib/firmware/brcm
             cp $nonfree_bin_dir/brcmfmac4356-sdio.firefly,firefly-rk3399.txt ${rootfs_dir}/usr/lib/firmware/brcm
+            cp $nonfree_bin_dir/BCM4356A2.hcd ${rootfs_dir}/usr/lib/firmware/brcm
         elif [ "x$dtb_name" == "xrk3588-firefly-itx-3588j" ]; then
             cd $workdir
             mkdir -p ${rootfs_dir}/etc/modules-load.d/

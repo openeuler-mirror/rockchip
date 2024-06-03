@@ -129,8 +129,8 @@ Basic information of the image is as follows:
 ## How to Build Images
 
 >![](documents/public_sys-resources/icon-notice.gif) **NOTICE:**  
->Five openEuler versions are currently supported for RK3399, i.e., 20.03 LTS, 20.03 LTS SP1, 20.03 LTS SP2, 20.03 LTS SP3, 21.09, 22.03 LTS and 22.03 LTS SP3.
->Only one openEuler versions are currently supported for RK3588, i.e., 22.03 LTS.
+>Five openEuler versions are currently supported for RK3399, i.e., 20.03 LTS, 20.03 LTS SP1, 20.03 LTS SP2, 20.03 LTS SP3, 22.03 LTS SP2 and 22.03 LTS SP3.
+>Only one openEuler versions are currently supported for RK3588, i.e., 22.03 LTS, 22.03 LTS SP2 and 22.03 LTS SP3.
 >When building an image with Xfce/UKUI/DDE desktop environment, you need to pay attention to three issues:
 >1. For building an image with Xfce desktop environment, note that only openEuler 20.03 LTS SP2、20.03 LTS SP3, 21.09, 22.03 LTS and 22.03 LTS SP3 are currently supported.
 >2. For building an image with UKUI/DDE desktop environment, note that only openEuler 20.03 LTS SP1、20.03 LTS SP2、20.03 LTS SP3, 21.09, 22.03 LTS and 22.03 LTS SP3 are currently supported.
@@ -230,9 +230,9 @@ The development boards that have been tested are as follows, and the other types
 
         `sudo bash build.sh -n openEuler-20.03-LTS-Firefly-RK3399-aarch64-alpha1 -k https://gitee.com/openeuler/rockchip-kernel.git -b openEuler-20.03-LTS -c firefly-rk3399_defconfig -r https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-20.03-LTS/generic.repo -d rk3399-firefly -s headless`
 
-    - openEuler-22.03-LTS, run the following command:
+    - openEuler-22.03-LTS-SP3, run the following command:
 
-        `sudo bash build.sh -n openEuler-22.03-LTS-Firefly-RK3399-aarch64-alpha1 -k https://gitee.com/openeuler/kernel.git -b openEuler-22.03-LTS -c firefly-rk3399_defconfig -r https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-22.03-LTS/generic.repo -d rk3399-firefly -s headless`
+        `sudo bash build.sh -n openEuler-22.03-LTS-SP3-Firefly-RK3399-aarch64-alpha1 -k https://gitee.com/openeuler/rockchip-kernel.git -b openEuler-22.03-LTS-SP3 -c firefly-rk3399_defconfig -r https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-22.03-LTS-SP3/generic.repo -d rk3399-firefly -s headless`
 
 2. RockPi-4A
 
