@@ -130,10 +130,11 @@ Basic information of the image is as follows:
 
 >![](documents/public_sys-resources/icon-notice.gif) **NOTICE:**  
 >Five openEuler versions are currently supported for RK3399, i.e., 20.03 LTS, 20.03 LTS SP1, 20.03 LTS SP2, 20.03 LTS SP3, 22.03 LTS SP2 and 22.03 LTS SP3.
+>Only one openEuler versions are currently supported for RK3566, i.e., 24.03 LTS.
 >Only one openEuler versions are currently supported for RK3588, i.e., 22.03 LTS, 22.03 LTS SP2 and 22.03 LTS SP3.
 >When building an image with Xfce/UKUI/DDE desktop environment, you need to pay attention to three issues:
->1. For building an image with Xfce desktop environment, note that only openEuler 20.03 LTS SP2、20.03 LTS SP3, 21.09, 22.03 LTS and 22.03 LTS SP3 are currently supported.
->2. For building an image with UKUI/DDE desktop environment, note that only openEuler 20.03 LTS SP1、20.03 LTS SP2、20.03 LTS SP3, 21.09, 22.03 LTS and 22.03 LTS SP3 are currently supported.
+>1. For building an image with Xfce desktop environment, note that only openEuler 20.03 LTS SP2、20.03 LTS SP3, 21.09, 22.03 LTS, 22.03 LTS SP3 and 24.03 LTS are currently supported.
+>2. For building an image with UKUI/DDE desktop environment, note that only openEuler 20.03 LTS SP1、20.03 LTS SP2、20.03 LTS SP3, 21.09, 22.03 LTS, 22.03 LTS SP3 and 24.03 LTS are currently supported.
 >3. Need to set the parameter `-s/--spec`. Please refer to the description of this parameter for details. The corresponding -r/-repo parameter needs to be set at the same time.
 
 ### Prepare the Environment
@@ -273,6 +274,14 @@ The development boards that have been tested are as follows, and the other types
     - openEuler-22.03-LTS, run the following command:
 
         `sudo bash build.sh -n openEuler-22.03-LTS-Rock5B-aarch64-alpha1 -k https://gitee.com/openeuler/rockchip-kernel.git -b openEuler-22.03-LTS-RK3588 -c none -r https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-22.03-LTS/generic.repo -d rk3588-rock-5b -s headless`
+        
+4. Firefly ROC-RK3566-PC
+
+    The tested versions are as follows:
+
+    - openEuler-24.03-LTS, run the following command:
+
+        `sudo bash build.sh -n openEuler-24.03-LTS-Station-M2-aarch64-alpha1 -k https://gitee.com/openeuler/rockchip-kernel.git -b openEuler-24.03-LTS -c none -r https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-24.03-LTS/generic.repo -d rk3566-roc-pc -s headless`
 
 
 ## How to Use an Image

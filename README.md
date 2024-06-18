@@ -130,10 +130,11 @@
 
 >![](documents/public_sys-resources/icon-notice.gif) **须知：**  
 >RK3399 当前支持 openEuler 版本：20.03 LTS、20.03 LTS SP1、20.03 LTS SP2、20.03 LTS SP3、22.03 LTS SP2 和 22.03 LTS SP3。
+>RK3566 当前支持 openEuler 版本：24.03 LTS。
 >RK3588 当前支持 openEuler 版本：22.03 LTS、22.03 LTS SP2 和 22.03 LTS SP3。
 >如果构建包含 Xfce/UKUI/DDE 桌面环境的镜像，需要注意三点：
->1. 构建包含 Xfce 桌面环境的镜像，当前只支持 20.03 LTS SP2、20.03 LTS SP3、21.09、22.03 LTS、22.03 LTS SP3 版本。
->2. 构建包含 UKUI 或 DDE 桌面环境的镜像，当前只支持 20.03 LTS SP1、20.03 LTS SP2、20.03 LTS SP3、21.09、22.03 LTS、22.03 LTS SP3 版本。
+>1. 构建包含 Xfce 桌面环境的镜像，当前只支持 20.03 LTS SP2、20.03 LTS SP3、21.09、22.03 LTS、22.03 LTS SP3、24.03 LTS 版本。
+>2. 构建包含 UKUI 或 DDE 桌面环境的镜像，当前只支持 20.03 LTS SP1、20.03 LTS SP2、20.03 LTS SP3、21.09、22.03 LTS、22.03 LTS SP3、24.03 LTS 版本。
 >3. 根据需要设置 -s/--spec，其具体意义见该参数的介绍部分。同时需要设置对应 -r/--repo 参数。
 
 ### 准备环境
@@ -271,6 +272,14 @@
     - openEuler-22.03-LTS，构建命令如下:
 
         `sudo bash build.sh -n openEuler-22.03-LTS-Rock5B-aarch64-alpha1 -k https://gitee.com/openeuler/rockchip-kernel.git -b openEuler-22.03-LTS-RK3588 -c none -r https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-22.03-LTS/generic.repo -d rk3588-rock-5b -s headless`
+        
+4. Firefly ROC-RK3566-PC
+
+    已测试的版本如下：
+
+    - openEuler-24.03-LTS，构建命令如下:
+
+        `sudo bash build.sh -n openEuler-24.03-LTS-Station-M2-aarch64-alpha1 -k https://gitee.com/openeuler/rockchip-kernel.git -b openEuler-24.03-LTS -c none -r https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-24.03-LTS/generic.repo -d rk3566-roc-pc -s headless`
 
 
 ### 顺序构建
