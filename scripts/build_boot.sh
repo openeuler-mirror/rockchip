@@ -131,25 +131,26 @@ clone_and_check_kernel_source() {
     fi
 }
 
-build_kernel() {
-    cd $workdir
-    if [ "x$dtb_name" == "xrk3399-firefly" ];then
-        cp $workdir/../configs/rk3399-firefly_5.10.0_defconfig kernel/arch/arm64/configs
-        cd kernel
-        make ARCH=arm64 rk3399-firefly_5.10.0_defconfig
-    else
-        cp $workdir/../configs/rockchip64_defconfig kernel/arch/arm64/configs
-        cd kernel
-        make ARCH=arm64 rockchip64_defconfig
-    fi
+build_6.6-kernel() {
+    cp $workdir/../configs/rockchip64-6.6_defconfig kernel/arch/arm64/configs
+    cd $workdir/kernel
+    make ARCH=arm64 rockchip64-6.6_defconfig
     LOG "make kernel begin..."
     make ARCH=arm64 -j$(nproc)
 }
 
-build_rockchip-kernel() {
-    cp $workdir/../configs/rockchip64_4.19.90_defconfig kernel/arch/arm64/configs
+build_5.10-kernel() {
+    cp $workdir/../configs/rockchip64-5.10_defconfig kernel/arch/arm64/configs
     cd $workdir/kernel
-    make ARCH=arm64 rockchip64_4.19.90_defconfig
+    make ARCH=arm64 rockchip64-5.10_defconfig
+    LOG "make kernel begin..."
+    make ARCH=arm64 -j$(nproc)
+}
+
+build_4.19-kernel() {
+    cp $workdir/../configs/rockchip64-4.19_defconfig kernel/arch/arm64/configs
+    cd $workdir/kernel
+    make ARCH=arm64 rockchip64_4.19_defconfig
     LOG "make kernel begin..."
     make ARCH=arm64 -j$(nproc)
 }
@@ -239,12 +240,16 @@ clone_and_check_kernel_source
 if [[ -f $workdir/kernel/arch/arm64/boot/dts/rockchip/${dtb_name}.dtb && -f $workdir/kernel/arch/arm64/boot/Image ]];then
     LOG "kernel is the latest"
 else
-    if [ "x$branch" == "xopenEuler-20.03-LTS" ];then
-        build_rockchip-kernel
-    elif [ "x$branch" == "xopenEuler-22.03-LTS-RK3588" ]; then
+    if [ "${branch:0:15}" == "openEuler-20.03-LTS" ];then # include: openEuler-20.03-LTS*
+        build_4.19-kernel
+    elif [ "${branch:0:15}" == "openEuler-22.03-LTS" ]; then # include: openEuler-22.03-LTS*
+        build_5.10-kernel
+    elif [ "${branch:0:15}" == "openEuler-24.03-LTS" ]; then # include: openEuler-24.03-LTS*
+        build_6.6-kernel
+    elif [ "${branch}" == "openEuler-22.03-LTS-RK3588" ]; then
         build_rk3588-kernel
     else
-        build_kernel
+        echo "Unsupported version."
     fi
 fi
 if [[ -f $workdir/boot.img && $(cat $workdir/.done | grep bootimg) == "bootimg" ]];then

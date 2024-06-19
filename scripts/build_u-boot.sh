@@ -121,6 +121,8 @@ use_prebuild_u-boot() {
             cp $nonfree_bin_dir/u-boot/firefly-rk3588/* $workdir/u-boot
         elif [[ "x$dtb_name" == "xrk3588-rock-5b" ]]; then
             cp $nonfree_bin_dir/u-boot/radxa-rock5b/* $workdir/u-boot
+        elif [[ "x$dtb_name" == "xrk3566-roc-pc" ]]; then
+            cp $nonfree_bin_dir/u-boot/firefly-rk3566/* $workdir/u-boot
         else
            echo "target u-boot can not found!"
            exit 2
