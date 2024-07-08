@@ -217,9 +217,9 @@
 
     显示帮助信息。
 
-适用的 RK3399 开发板:
+适用的 Rockchip 开发板:
 
-已经测试的开发板如下，其他类型 RK3399 开发板适用情况待测试。
+已经测试的开发板如下，其他类型 Rockchip 开发板适用情况待测试。
 
 1. Firefly-RK3399
 
@@ -276,6 +276,14 @@
 4. Firefly ROC-RK3566-PC
 
     已测试的版本如下：
+    
+    - openEuler-22.03-LTS-SP2，构建命令如下:
+
+        `sudo bash build.sh -n openEuler-22.03-LTS-SP2-Station-M2-aarch64-alpha1 -k https://gitee.com/openeuler/rockchip-kernel.git -b openEuler-22.03-LTS-SP2 -c none -r https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-22.03-LTS-SP2/generic.repo -d rk3566-roc-pc -s headless`
+        
+    - openEuler-22.03-LTS-SP3，构建命令如下:
+
+        `sudo bash build.sh -n openEuler-22.03-LTS-SP3-Station-M2-aarch64-alpha1 -k https://gitee.com/openeuler/rockchip-kernel.git -b openEuler-22.03-LTS-SP3 -c none -r https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-22.03-LTS-SP3/generic.repo -d rk3566-roc-pc -s headless`
 
     - openEuler-24.03-LTS，构建命令如下:
 
