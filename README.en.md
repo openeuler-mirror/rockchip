@@ -219,9 +219,9 @@ The meaning of each parameter:
 
     Displays help information.
 
-Applicable RK3399 development boards:
+Applicable Rockchip development boards:
 
-The development boards that have been tested are as follows, and the other types of RK3399 development boards are to be tested.
+The development boards that have been tested are as follows, and the other types of Rockchip development boards are to be tested.
 
 1. Firefly-RK3399
 
@@ -278,6 +278,14 @@ The development boards that have been tested are as follows, and the other types
 4. Firefly ROC-RK3566-PC
 
     The tested versions are as follows:
+    
+    - openEuler-22.03-LTS-SP2, run the following command:
+
+        `sudo bash build.sh -n openEuler-22.03-LTS-SP2-Station-M2-aarch64-alpha1 -k https://gitee.com/openeuler/rockchip-kernel.git -b openEuler-22.03-LTS-SP2 -c none -r https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-22.03-LTS-SP2/generic.repo -d rk3566-roc-pc -s headless`
+        
+    - openEuler-22.03-LTS-SP3, run the following command:
+
+        `sudo bash build.sh -n openEuler-22.03-LTS-SP3-Station-M2-aarch64-alpha1 -k https://gitee.com/openeuler/rockchip-kernel.git -b openEuler-22.03-LTS-SP3 -c none -r https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-22.03-LTS-SP3/generic.repo -d rk3566-roc-pc -s headless`
 
     - openEuler-24.03-LTS, run the following command:
 
