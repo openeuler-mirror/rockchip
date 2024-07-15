@@ -288,6 +288,18 @@
     - openEuler-24.03-LTS，构建命令如下:
 
         `sudo bash build.sh -n openEuler-24.03-LTS-Station-M2-aarch64-alpha1 -k https://gitee.com/openeuler/rockchip-kernel.git -b openEuler-24.03-LTS -c none -r https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-24.03-LTS/generic.repo -d rk3566-roc-pc -s headless`
+        
+5. Firefly ROC-RK3568-PC-SE
+
+    已测试的版本如下：
+    
+    - openEuler-22.03-LTS-SP2，构建命令如下:
+
+        `sudo bash build.sh -n openEuler-22.03-LTS-SP2-ROC-RK3568-PC-SE-aarch64-alpha1 -k https://gitee.com/openeuler/rockchip-kernel.git -b openEuler-22.03-LTS-SP2 -c none -r https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-22.03-LTS-SP2/generic.repo -d rk3568-roc-pc-se -s headless`
+        
+    - openEuler-22.03-LTS-SP3，构建命令如下:
+
+        `sudo bash build.sh -n openEuler-22.03-LTS-SP3-ROC-RK3568-PC-SE-aarch64-alpha1 -k https://gitee.com/openeuler/rockchip-kernel.git -b openEuler-22.03-LTS-SP3 -c none -r https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-22.03-LTS-SP3/generic.repo -d rk3568-roc-pc-se -s headless`
 
 
 ### 顺序构建
