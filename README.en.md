@@ -204,7 +204,11 @@ The meaning of each parameter:
 
     The device name in the kernel device-tree whitch is a little different from the board name. It corresponds to the `DTB_NAME.dts` file under the [kernel/arch/arm64/boot/dts/rockchip](https://gitee.com/openeuler/kernel/tree/master/arch/arm64/boot/dts/rockchip) folder. The default is `rk3399-firefly`.
 
-7.  -s, --spec SPEC
+7. -d, --device-tree DTB_NAME
+
+    The platform used by the development board, currently supported platforms include: rockchip, phytium. with the default being `rockchip`.
+    
+8.  -s, --spec SPEC
 
     Specify the image version:
     - `headless`, image without desktop environments.
@@ -215,13 +219,13 @@ The meaning of each parameter:
 
     The default is `headless`.
 
-8.  -h, --help
+9.  -h, --help
 
     Displays help information.
 
-Applicable Rockchip development boards:
+Applicable RK3399 development boards:
 
-The development boards that have been tested are as follows, and the other types of Rockchip development boards are to be tested.
+The development boards that have been tested are as follows, and the other types of RK3399 development boards are to be tested.
 
 1. Firefly-RK3399
 
@@ -229,11 +233,11 @@ The development boards that have been tested are as follows, and the other types
 
     - openEuler-20.03-LTS, run the following command:
 
-        `sudo bash build.sh -n openEuler-20.03-LTS-Firefly-RK3399-aarch64-alpha1 -k https://gitee.com/openeuler/rockchip-kernel.git -b openEuler-20.03-LTS -c firefly-rk3399_defconfig -r https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-20.03-LTS/generic.repo -d rk3399-firefly -s headless`
+        `sudo bash build.sh -n openEuler-20.03-LTS-Firefly-RK3399-aarch64-alpha1 -k https://gitee.com/openeuler/rockchip-kernel.git -b openEuler-20.03-LTS -c firefly-rk3399_defconfig -r https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-20.03-LTS/generic.repo -d rk3399-firefly -p rockchip -s headless`
 
     - openEuler-22.03-LTS-SP3, run the following command:
 
-        `sudo bash build.sh -n openEuler-22.03-LTS-SP3-Firefly-RK3399-aarch64-alpha1 -k https://gitee.com/openeuler/rockchip-kernel.git -b openEuler-22.03-LTS-SP3 -c firefly-rk3399_defconfig -r https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-22.03-LTS-SP3/generic.repo -d rk3399-firefly -s headless`
+        `sudo bash build.sh -n openEuler-22.03-LTS-SP3-Firefly-RK3399-aarch64-alpha1 -k https://gitee.com/openeuler/rockchip-kernel.git -b openEuler-22.03-LTS-SP3 -c firefly-rk3399_defconfig -r https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-22.03-LTS-SP3/generic.repo -d rk3399-firefly -p rockchip -s headless`
 
 2. RockPi-4A
 
@@ -241,11 +245,11 @@ The development boards that have been tested are as follows, and the other types
 
     - openEuler-20.03-LTS, run the following command:
 
-        `sudo bash build.sh -n openEuler-20.03-LTS-RockPi-4A-aarch64-alpha1 -k https://gitee.com/openeuler/rockchip-kernel.git -b openEuler-20.03-LTS -c rock-pi-4-rk3399_defconfig -r https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-20.03-LTS/generic.repo -d rk3399-rock-pi-4a -s headless`
+        `sudo bash build.sh -n openEuler-20.03-LTS-RockPi-4A-aarch64-alpha1 -k https://gitee.com/openeuler/rockchip-kernel.git -b openEuler-20.03-LTS -c rock-pi-4-rk3399_defconfig -r https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-20.03-LTS/generic.repo -d rk3399-rock-pi-4a -p rockchip -s headless`
 
     - openEuler-22.03-LTS, run the following command:
 
-        `sudo bash build.sh -n openEuler-22.03-LTS-RockPi-4A-aarch64-alpha1 -k https://gitee.com/openeuler/kernel.git -b openEuler-22.03-LTS -c rock-pi-4-rk3399_defconfig -r https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-22.03-LTS/generic.repo -d rk3399-rock-pi-4a -s headless`
+        `sudo bash build.sh -n openEuler-22.03-LTS-RockPi-4A-aarch64-alpha1 -k https://gitee.com/openeuler/kernel.git -b openEuler-22.03-LTS -c rock-pi-4-rk3399_defconfig -r https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-22.03-LTS/generic.repo -d rk3399-rock-pi-4a -p rockchip -s headless`
 
 Applicable RK3588 development board:
 
@@ -257,7 +261,7 @@ The development boards that have been tested are as follows, and the other types
 
     - openEuler-22.03-LTS, run the following command:
 
-        `sudo bash build.sh -n openEuler-22.03-RK3588-Firefly-ITX-3588J-aarch64-alpha1 -k https://gitee.com/openeuler/rockchip-kernel.git -b openEuler-22.03-LTS-RK3588 -c none -r https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-22.03-LTS/generic.repo -d rk3588-firefly-itx-3588j -s headless`
+        `sudo bash build.sh -n openEuler-22.03-RK3588-Firefly-ITX-3588J-aarch64-alpha1 -k https://gitee.com/openeuler/rockchip-kernel.git -b openEuler-22.03-LTS-RK3588 -c none -r https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-22.03-LTS/generic.repo -d rk3588-firefly-itx-3588j -p rockchip -s headless`
 
 2. Firefly ROC-RK3588S-PC
 
@@ -265,7 +269,7 @@ The development boards that have been tested are as follows, and the other types
 
     - openEuler-22.03-LTS, run the following command:
 
-        `sudo bash build.sh -n openEuler-22.03-LTS-Station-M3-aarch64-alpha1 -k https://gitee.com/openeuler/rockchip-kernel.git -b openEuler-22.03-LTS-RK3588 -c none -r https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-22.03-LTS/generic.repo -d rk3588s-roc-pc -s headless`
+        `sudo bash build.sh -n openEuler-22.03-LTS-Station-M3-aarch64-alpha1 -k https://gitee.com/openeuler/rockchip-kernel.git -b openEuler-22.03-LTS-RK3588 -c none -r https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-22.03-LTS/generic.repo -d rk3588s-roc-pc -p rockchip -s headless`
 
 3. Radxa Rock-5B
 
@@ -273,35 +277,55 @@ The development boards that have been tested are as follows, and the other types
 
     - openEuler-22.03-LTS, run the following command:
 
-        `sudo bash build.sh -n openEuler-22.03-LTS-Rock5B-aarch64-alpha1 -k https://gitee.com/openeuler/rockchip-kernel.git -b openEuler-22.03-LTS-RK3588 -c none -r https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-22.03-LTS/generic.repo -d rk3588-rock-5b -s headless`
-        
-4. Firefly ROC-RK3566-PC
+        `sudo bash build.sh -n openEuler-22.03-LTS-Rock5B-aarch64-alpha1 -k https://gitee.com/openeuler/rockchip-kernel.git -b openEuler-22.03-LTS-RK3588 -c none -r https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-22.03-LTS/generic.repo -d rk3588-rock-5b -p rockchip -s headless`
+
+Applicable RK356X development boards:
+
+The development boards that have been tested are as follows, and the other types of RK356X development boards are to be tested.
+
+1. Firefly ROC-RK3566-PC
 
     The tested versions are as follows:
     
     - openEuler-22.03-LTS-SP2, run the following command:
 
-        `sudo bash build.sh -n openEuler-22.03-LTS-SP2-Station-M2-aarch64-alpha1 -k https://gitee.com/openeuler/rockchip-kernel.git -b openEuler-22.03-LTS-SP2 -c none -r https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-22.03-LTS-SP2/generic.repo -d rk3566-roc-pc -s headless`
+        `sudo bash build.sh -n openEuler-22.03-LTS-SP2-Station-M2-aarch64-alpha1 -k https://gitee.com/openeuler/rockchip-kernel.git -b openEuler-22.03-LTS-SP2 -c none -r https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-22.03-LTS-SP2/generic.repo -d rk3566-roc-pc -p rockchip -s headless`
         
     - openEuler-22.03-LTS-SP3, run the following command:
 
-        `sudo bash build.sh -n openEuler-22.03-LTS-SP3-Station-M2-aarch64-alpha1 -k https://gitee.com/openeuler/rockchip-kernel.git -b openEuler-22.03-LTS-SP3 -c none -r https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-22.03-LTS-SP3/generic.repo -d rk3566-roc-pc -s headless`
+        `sudo bash build.sh -n openEuler-22.03-LTS-SP3-Station-M2-aarch64-alpha1 -k https://gitee.com/openeuler/rockchip-kernel.git -b openEuler-22.03-LTS-SP3 -c none -r https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-22.03-LTS-SP3/generic.repo -d rk3566-roc-pc -p rockchip -s headless`
 
     - openEuler-24.03-LTS, run the following command:
 
-        `sudo bash build.sh -n openEuler-24.03-LTS-Station-M2-aarch64-alpha1 -k https://gitee.com/openeuler/rockchip-kernel.git -b openEuler-24.03-LTS -c none -r https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-24.03-LTS/generic.repo -d rk3566-roc-pc -s headless`
+        `sudo bash build.sh -n openEuler-24.03-LTS-Station-M2-aarch64-alpha1 -k https://gitee.com/openeuler/rockchip-kernel.git -b openEuler-24.03-LTS -c none -r https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-24.03-LTS/generic.repo -d rk3566-roc-pc -p rockchip -s headless`
         
-5. Firefly ROC-RK3568-PC-SE
+2. Firefly ROC-RK3568-PC-SE
 
     The tested versions are as follows:
     
     - openEuler-22.03-LTS-SP2, run the following command:
 
-        `sudo bash build.sh -n openEuler-22.03-LTS-SP2-ROC-RK3568-PC-SE-aarch64-alpha1 -k https://gitee.com/openeuler/rockchip-kernel.git -b openEuler-22.03-LTS-SP2 -c none -r https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-22.03-LTS-SP2/generic.repo -d rk3568-roc-pc-se -s headless`
+        `sudo bash build.sh -n openEuler-22.03-LTS-SP2-ROC-RK3568-PC-SE-aarch64-alpha1 -k https://gitee.com/openeuler/rockchip-kernel.git -b openEuler-22.03-LTS-SP2 -c none -r https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-22.03-LTS-SP2/generic.repo -d rk3568-roc-pc-se -p rockchip -s headless`
         
     - openEuler-22.03-LTS-SP3, run the following command:
 
-        `sudo bash build.sh -n openEuler-22.03-LTS-SP3-ROC-RK3568-PC-SE-aarch64-alpha1 -k https://gitee.com/openeuler/rockchip-kernel.git -b openEuler-22.03-LTS-SP3 -c none -r https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-22.03-LTS-SP3/generic.repo -d rk3568-roc-pc-se -s headless`
+        `sudo bash build.sh -n openEuler-22.03-LTS-SP3-ROC-RK3568-PC-SE-aarch64-alpha1 -k https://gitee.com/openeuler/rockchip-kernel.git -b openEuler-22.03-LTS-SP3 -c none -r https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-22.03-LTS-SP3/generic.repo -d rk3568-roc-pc-se -p rockchip -s headless`
+        
+Applicable Phytium development board:
+
+The development boards that have been tested are as follows, and the other types of Phytium development boards are to be tested.
+        
+1. Phytium Pi 4GB
+
+    The tested versions are as follows:
+    
+    - openEuler-22.03-LTS, run the following command:
+
+        `sudo bash build.sh -n openEuler-22.03-LTS-PhytiumPi-aarch64-alpha1 -k https://gitee.com/openeuler/phytium-kernel.git -b openEuler-22.03-LTS-Phytium -c none -r https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-22.03-LTS/generic.repo -d phytiumpi_firefly -p phytium -s headless`
+        
+    - openEuler-24.03-LTS, run the following command:
+
+        `sudo bash build.sh -n openEuler-24.03-LTS-PhytiumPi-aarch64-alpha1 -k https://gitee.com/openeuler/phytium-kernel.git -b openEuler-24.03-LTS-Phytium -c none -r https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-24.03-LTS/generic.repo -d phytiumpi_firefly -p phytium -s headless`
 
 
 ## How to Use an Image

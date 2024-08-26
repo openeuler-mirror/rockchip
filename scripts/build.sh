@@ -10,6 +10,7 @@ Options:
   -k, --kernel KERNEL_URL          The URL of kernel source's repository, which defaults to https://gitee.com/openeuler/rockchip-kernel.git.
   -b, --branch KERNEL_BRANCH       The branch name of kernel source's repository, which defaults to openEuler-20.03-LTS.
   -c, --config BOARD_CONFIG        Required! The name of target board which should be a space separated list, which defaults to firefly-rk3399_defconfig.
+  -p, --platform PLATFORM          Required! The platform of target board, which defaults to rockchip.
   -r, --repo REPO_INFO             The URL/path of target repo file or list of repo's baseurls which should be a space separated list.
   -d, --device-tree DTB_NAME       Required! The device tree name of target board, which defaults to rk3399-firefly.
   -s, --spec SPEC                  The image's specification: headless, xfce, ukui, dde or the file path of rpmlist. The default is headless.
@@ -31,11 +32,14 @@ used_param() {
     echo ""
     echo "KERNEL_BRANCH        : $branch"
     echo ""
+    echo "PLATFORM             : $platform"
+    echo ""
 }
 
 default_param() {
     config=firefly-rk3399_defconfig
     dtb_name=rk3399-firefly
+    platform=rockchip
     branch=openEuler-20.03-LTS
     repo_file="https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-20.03-LTS/generic.repo"
     kernel_url="https://gitee.com/openeuler/rockchip-kernel.git"
@@ -53,6 +57,7 @@ save_param() {
     fi
     echo "config=$config
 dtb_name=$dtb_name
+platform=$platform
 branch=$branch
 repo_file=$repo_file
 kernel_url=$kernel_url
@@ -61,7 +66,7 @@ spec_param=$spec_param" > $workdir/.param
 
 deppkg_install() {
     dnf makecache
-    dnf install git wget make gcc bison dtc m4 flex bc openssl-devel tar dosfstools rsync parted dnf-plugins-core tar kpartx diffutils dracut -y
+    dnf install git wget make gcc bison dtc m4 flex bc openssl-devel tar dosfstools rsync parted dnf-plugins-core tar kpartx diffutils dracut uboot-tools -y
 }
 
 parseargs()
@@ -82,6 +87,10 @@ parseargs()
             shift
         elif [ "x$1" == "x-k" -o "x$1" == "x--kernel" ]; then
             kernel_url=`echo $2`
+            shift
+            shift
+        elif [ "x$1" == "x-p" -o "x$1" == "x--platform" ]; then
+            platform=`echo $2`
             shift
             shift
         elif [ "x$1" == "x-b" -o "x$1" == "x--branch" ]; then
@@ -162,4 +171,4 @@ if [[ "x$dtb_name" == "xrk3588s-roc-pc" || "x$dtb_name" == "xrk3588-firefly-itx-
 else
     board_type=rk3399
 fi
-bash gen_image.sh -n $name -t $board_type
+bash gen_image.sh -n $name -t $board_type -p $platform
