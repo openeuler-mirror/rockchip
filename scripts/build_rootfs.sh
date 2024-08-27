@@ -318,6 +318,11 @@ EOF
             cp $nonfree_bin_dir/linux-firmware/ap6255/brcmfmac43455-sdio.bin ${rootfs_dir}/usr/lib/firmware/brcm/brcmfmac43455-sdio.firefly,rk3566-roc-pc.bin
             cp $nonfree_bin_dir/linux-firmware/ap6255/brcmfmac43455-sdio.txt ${rootfs_dir}/usr/lib/firmware/brcm/brcmfmac43455-sdio.firefly,rk3566-roc-pc.txt
             cp $nonfree_bin_dir/linux-firmware/ap6255/BCM4345C0.hcd ${rootfs_dir}/usr/lib/firmware/brcm
+        elif [ "x$dtb_name" == "xrk3568-roc-pc-se" ];then
+            mkdir -p ${rootfs_dir}/usr/lib/firmware/brcm
+            cp $nonfree_bin_dir/linux-firmware/ap6275s/brcmfmac43752-sdio.bin ${rootfs_dir}/usr/lib/firmware/brcm/brcmfmac43752-sdio.firefly,rk3568-roc-pc-se.bin
+            cp $nonfree_bin_dir/linux-firmware/ap6275s/brcmfmac43752-sdio.txt ${rootfs_dir}/usr/lib/firmware/brcm/brcmfmac43752-sdio.firefly,rk3568-roc-pc-se.txt
+            cp $nonfree_bin_dir/linux-firmware/ap6275s/BCM4362A2.hcd ${rootfs_dir}/usr/lib/firmware/brcm
         fi
     fi
     UMOUNT_ALL
