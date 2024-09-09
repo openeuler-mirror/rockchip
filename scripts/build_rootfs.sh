@@ -329,6 +329,7 @@ EOF
 	        cp $nonfree_bin_dir/linux-firmware/rtl8821c/rtk_hciattach ${rootfs_dir}/usr/bin/rtk_hciattach
 	        cp $nonfree_bin_dir/linux-firmware/rtl8821c/rtl8821c_config ${rootfs_dir}/lib/firmware/rtlbt/rtl8821c_config
 	        cp $nonfree_bin_dir/linux-firmware/rtl8821c/rtl8821c_fw ${rootfs_dir}/lib/firmware/rtlbt/rtl8821c_fw
+            chmod +x ${rootfs_dir}/usr/bin/rtk_hciattach
         fi
     fi
     UMOUNT_ALL
