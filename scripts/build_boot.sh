@@ -242,12 +242,12 @@ if [[ -f $workdir/kernel/arch/arm64/boot/dts/rockchip/${dtb_name}.dtb && -f $wor
 else
     if [ "${branch:0:19}" == "openEuler-20.03-LTS" ];then # include: openEuler-20.03-LTS*
         build_4.19-kernel
+    elif [ "${branch}" == "openEuler-22.03-LTS-RK3588" ]; then
+        build_rk3588-kernel
     elif [ "${branch:0:19}" == "openEuler-22.03-LTS" ]; then # include: openEuler-22.03-LTS*
         build_5.10-kernel
     elif [ "${branch:0:19}" == "openEuler-24.03-LTS" ]; then # include: openEuler-24.03-LTS*
         build_6.6-kernel
-    elif [ "${branch}" == "openEuler-22.03-LTS-RK3588" ]; then
-        build_rk3588-kernel
     else
         echo "Unsupported version."
     fi
