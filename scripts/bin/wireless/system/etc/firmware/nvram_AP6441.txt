@@ -52,7 +52,7 @@ pa1b1=-671
 pa1b2=-212
 tssifloor5gm=77
 
-#PA paramasdeters for high band
+#PA parameters for high band
 #pa1hib0=5320 default
 pa1hib0=5620
 #pa1hib1=-963
