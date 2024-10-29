@@ -125,6 +125,10 @@ use_prebuild_u-boot() {
             cp $nonfree_bin_dir/u-boot/firefly-rk3566/* $workdir/u-boot
         elif [[ "x$dtb_name" == "xrk3568-roc-pc-se" ]]; then
             cp $nonfree_bin_dir/u-boot/firefly-rk3568/* $workdir/u-boot
+        elif [[ "x$dtb_name" == "xphytiumpi_firefly" ]]; then
+            cp $nonfree_bin_dir/u-boot/phytiumpi/fip-all-sd-boot.bin $workdir/u-boot
+            mkenvimage -s 0x1000 -o $workdir/u-boot/env.bin $nonfree_bin_dir/u-boot/phytiumpi/env.txt
+            dd if=$workdir/u-boot/env.bin of=$workdir/u-boot/fip-all-sd-boot.bin bs=1k seek=1472 conv=notrunc
         else
            echo "target u-boot can not found!"
            exit 2
@@ -154,5 +158,5 @@ else
     build_u-boot
 fi
 
-LOG "The u-boot.itb and idbloader.img are generated in the ${workdir}/u-boot."
+LOG "The bootloader files are generated in the ${workdir}/u-boot."
 echo "u-boot" >> $workdir/.done

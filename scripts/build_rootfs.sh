@@ -323,6 +323,13 @@ EOF
             cp $nonfree_bin_dir/linux-firmware/ap6275s/brcmfmac43752-sdio.bin ${rootfs_dir}/usr/lib/firmware/brcm/brcmfmac43752-sdio.firefly,rk3568-roc-pc-se.bin
             cp $nonfree_bin_dir/linux-firmware/ap6275s/brcmfmac43752-sdio.txt ${rootfs_dir}/usr/lib/firmware/brcm/brcmfmac43752-sdio.firefly,rk3568-roc-pc-se.txt
             cp $nonfree_bin_dir/linux-firmware/ap6275s/BCM4362A2.hcd ${rootfs_dir}/usr/lib/firmware/brcm
+        elif [[ "x$dtb_name" == "xphytiumpi_firefly" ]]; then
+            mkdir -p ${rootfs_dir}/lib/firmware/rtlbt/
+            cp $nonfree_bin_dir/linux-firmware/rtl8821c/systemd-hciattach.service ${rootfs_dir}/etc/systemd/system/systemd-hciattach.service
+	        cp $nonfree_bin_dir/linux-firmware/rtl8821c/rtk_hciattach ${rootfs_dir}/usr/bin/rtk_hciattach
+	        cp $nonfree_bin_dir/linux-firmware/rtl8821c/rtl8821c_config ${rootfs_dir}/lib/firmware/rtlbt/rtl8821c_config
+	        cp $nonfree_bin_dir/linux-firmware/rtl8821c/rtl8821c_fw ${rootfs_dir}/lib/firmware/rtlbt/rtl8821c_fw
+            chmod +x ${rootfs_dir}/usr/bin/rtk_hciattach
         fi
     fi
     UMOUNT_ALL

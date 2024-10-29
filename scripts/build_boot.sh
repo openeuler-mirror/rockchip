@@ -9,6 +9,7 @@ Options:
   -b, --branch KERNEL_BRANCH            The branch name of kernel source's repository, which defaults to openEuler-20.03-LTS.
   -k, --kernel KERNEL_URL               Required! The URL of kernel source's repository.
   -d, --device-tree DTB_NAME            Required! The device tree name of target board, which defaults to rk3399-firefly.
+  -p, --platform PLATFORM               Required! The platform of target board, which defaults to rockchip.
   -h, --help                            Show command help.
 "
 
@@ -22,6 +23,7 @@ default_param() {
     workdir=$(pwd)/build
     branch=openEuler-20.03-LTS
     dtb_name=rk3399-firefly
+    platform=rockchip
     kernel_url="https://gitee.com/openeuler/rockchip-kernel.git"
     boot_dir=$workdir/boot
     log_dir=$workdir/log
@@ -34,6 +36,9 @@ local_param(){
 
         dtb_name=$(cat $workdir/.param | grep dtb_name)
         dtb_name=${dtb_name:9}
+        
+        platform=$(cat $workdir/.param | grep platform)
+        platform=${platform:9}
 
         kernel_url=$(cat $workdir/.param | grep kernel_url)
         kernel_url=${kernel_url:11}
@@ -62,6 +67,10 @@ parseargs()
             shift
         elif [ "x$1" == "x-k" -o "x$1" == "x--kernel" ]; then
             kernel_url=`echo $2`
+            shift
+            shift
+        elif [ "x$1" == "x-p" -o "x$1" == "x--platform" ]; then
+            platform=`echo $2`
             shift
             shift
         else
@@ -104,6 +113,9 @@ clone_and_check_kernel_source() {
 
             last_dtb_name=$(cat $workdir/.param_last | grep dtb_name)
             last_dtb_name=${last_dtb_name:9}
+            
+            last_platform_name=$(cat $workdir/.param_last | grep platform)
+            last_platform_name=${last_dtb_name:9}
 
             last_kernel_url=$(cat $workdir/.param_last | grep kernel_url)
             last_kernel_url=${last_kernel_url:11}
@@ -131,7 +143,7 @@ clone_and_check_kernel_source() {
     fi
 }
 
-build_6.6-kernel() {
+build_rockchip-6.6-kernel() {
     cp $workdir/../configs/rockchip64-6.6_defconfig kernel/arch/arm64/configs
     cd $workdir/kernel
     make ARCH=arm64 rockchip64-6.6_defconfig
@@ -139,7 +151,7 @@ build_6.6-kernel() {
     make ARCH=arm64 -j$(nproc)
 }
 
-build_5.10-kernel() {
+build_rockchip-5.10-kernel() {
     cp $workdir/../configs/rockchip64-5.10_defconfig kernel/arch/arm64/configs
     cd $workdir/kernel
     make ARCH=arm64 rockchip64-5.10_defconfig
@@ -147,10 +159,24 @@ build_5.10-kernel() {
     make ARCH=arm64 -j$(nproc)
 }
 
-build_4.19-kernel() {
+build_rockchip-4.19-kernel() {
     cp $workdir/../configs/rockchip64-4.19_defconfig kernel/arch/arm64/configs
     cd $workdir/kernel
     make ARCH=arm64 rockchip64_4.19_defconfig
+    LOG "make kernel begin..."
+    make ARCH=arm64 -j$(nproc)
+}
+
+build_phytium-5.10-kernel() {
+    cd $workdir/kernel
+    make ARCH=arm64 phytium_defconfig
+    LOG "make kernel begin..."
+    make ARCH=arm64 -j$(nproc)
+}
+
+build_phytium-6.6-kernel() {
+    cd $workdir/kernel
+    make ARCH=arm64 phytium_defconfig
     LOG "make kernel begin..."
     make ARCH=arm64 -j$(nproc)
 }
@@ -177,7 +203,7 @@ install_kernel() {
     make ARCH=arm64 install INSTALL_PATH=${boot_dir}
     make ARCH=arm64 modules_install INSTALL_MOD_PATH=$workdir/kernel/kernel-modules
     LOG "device tree name is ${dtb_name}.dtb"
-    cp arch/arm64/boot/dts/rockchip/${dtb_name}.dtb ${boot_dir}
+    cp arch/arm64/boot/dts/${platform}/${dtb_name}.dtb ${boot_dir}
     LOG "prepare kernel done."
 }
 
@@ -192,11 +218,19 @@ mk_boot() {
     kernel_name=$(ls $boot_dir | grep vmlinu)
     dtb_name=$(ls $boot_dir | grep dtb)
     LOG "gen extlinux config for $dtb_name"
+    if [ "${platform}" == "rockchip" ];then
+        bootargs=${rockchip_bootargs}
+    elif [ "${platform}" == "phytium" ];then
+        bootargs=${phytium_bootargs}
+    else
+        echo "Unsupported platform"
+        exit 2
+    fi
     echo "label openEuler
     kernel /${kernel_name}
     initrd /initrd.img
     fdt /${dtb_name}
-    append  earlyprintk console=ttyS2,1500000 rw root=UUID=614e0000-0000-4b53-8000-1d28000054a9 rootfstype=ext4 init=/sbin/init rootwait" \
+    append  ${bootargs}" \
     > ${boot_dir}/extlinux/extlinux.conf
 
     LOG "gen extlinux config done."
@@ -226,6 +260,9 @@ local_param
 parseargs "$@" || help $?
 set -e
 
+rockchip_bootargs="earlyprintk console=ttyS2,1500000 rw root=UUID=614e0000-0000-4b53-8000-1d28000054a9 rootfstype=ext4 init=/sbin/init rootwait"
+phytium_bootargs="console=ttyAMA1,115200 earlycon=pl011,0x2800d000 rw root=UUID=614e0000-0000-4b53-8000-1d28000054a9 rootfstype=ext4 rootwait cma=256m"
+
 if [ ! -d $workdir ]; then
     mkdir $workdir
 fi
@@ -237,19 +274,32 @@ sed -i 's/bootimg//g' $workdir/.done
 LOG "build boot..."
 clone_and_check_kernel_source
 
-if [[ -f $workdir/kernel/arch/arm64/boot/dts/rockchip/${dtb_name}.dtb && -f $workdir/kernel/arch/arm64/boot/Image ]];then
+if [[ -f $workdir/kernel/arch/arm64/boot/dts/${platform}/${dtb_name}.dtb && -f $workdir/kernel/arch/arm64/boot/Image ]];then
     LOG "kernel is the latest"
 else
-    if [ "${branch:0:19}" == "openEuler-20.03-LTS" ];then # include: openEuler-20.03-LTS*
-        build_4.19-kernel
-    elif [ "${branch}" == "openEuler-22.03-LTS-RK3588" ]; then
-        build_rk3588-kernel
-    elif [ "${branch:0:19}" == "openEuler-22.03-LTS" ]; then # include: openEuler-22.03-LTS*
-        build_5.10-kernel
-    elif [ "${branch:0:19}" == "openEuler-24.03-LTS" ]; then # include: openEuler-24.03-LTS*
-        build_6.6-kernel
+    if [ "${platform}" == "rockchip" ];then
+        if [ "${branch:0:19}" == "openEuler-20.03-LTS" ];then # include: openEuler-20.03-LTS*
+            build_rockchip-4.19-kernel
+        elif [ "${branch}" == "openEuler-22.03-LTS-RK3588" ]; then
+            build_rk3588-kernel
+        elif [ "${branch:0:19}" == "openEuler-22.03-LTS" ]; then # include: openEuler-22.03-LTS*
+            build_rockchip-5.10-kernel
+        elif [ "${branch:0:19}" == "openEuler-24.03-LTS" ]; then # include: openEuler-24.03-LTS*
+            build_rockchip-6.6-kernel
+        else
+            echo "Unsupported version."
+        fi
+    elif [ "${platform}" == "phytium" ];then
+        if [ "${branch:0:19}" == "openEuler-22.03-LTS" ]; then # include: openEuler-22.03-LTS*
+            build_phytium-5.10-kernel
+        elif [ "${branch:0:19}" == "openEuler-24.03-LTS" ]; then # include: openEuler-24.03-LTS*
+            build_phytium-6.6-kernel
+        else
+            echo "Unsupported version."
+        fi
     else
-        echo "Unsupported version."
+        echo "Unsupported platform"
+        exit 2
     fi
 fi
 if [[ -f $workdir/boot.img && $(cat $workdir/.done | grep bootimg) == "bootimg" ]];then

@@ -8,6 +8,7 @@ The target compressed bootable images will be generated in the build/YYYY-MM-DD 
 Options: 
   -n, --name IMAGE_NAME         The Rockchip image name to be built.
   -t, --type BOARD_TYPE         Board Soc type.
+  -p, --platform PLATFORM       Required! The platform of target board, which defaults to rockchip.
   -h, --help                    Show command help.
 "
 
@@ -22,6 +23,7 @@ default_param() {
     outputdir=${workdir}/$(date +'%Y-%m-%d')
     name=openEuler-Firefly-RK3399-aarch64-alpha1
     board_type=rk3399
+    platform=rockchip
     rootfs_dir=${workdir}/rootfs
     boot_dir=${workdir}/boot
     uboot_dir=${workdir}/u-boot
@@ -49,6 +51,10 @@ parseargs()
             shift
         elif [ "x$1" == "x-t" -o "x$1" == "x--type" ]; then
             board_type=`echo $2`
+            shift
+            shift
+        elif [ "x$1" == "x-p" -o "x$1" == "x--platform" ]; then
+            platform=`echo $2`
             shift
             shift
         else
@@ -164,22 +170,6 @@ make_img(){
     mount -t vfat -o uid=root,gid=root,umask=0000 ${bootp} ${boot_mnt}
     mount -t ext4 ${rootp} ${root_mnt}
 
-    if [ ! -f ${uboot_dir}/idbloader.img ]; then
-        ERROR "u-boot idbloader file can not be found!"
-        exit 2
-    else
-        dd if=${uboot_dir}/idbloader.img of=/dev/${loopX} seek=64
-    fi
-    
-    if [ ! -f ${uboot_dir}/u-boot.itb ]; then
-        ERROR "u-boot.itb file can not be found!"
-        exit 2
-    else
-        dd if=${uboot_dir}/u-boot.itb of=/dev/${loopX} seek=16384
-    fi
-    
-    LOG "install u-boot done."
-
     if [ -d ${rootfs_dir} ];then rm -rf ${rootfs_dir}; fi
     mkdir ${rootfs_dir}
     mount $workdir/rootfs.img ${rootfs_dir}
@@ -206,6 +196,39 @@ make_img(){
     umount $bootp
     umount ${rootfs_dir}
     umount ${boot_dir}
+    
+    if [ "${platform}" == "rockchip" ];then
+        echo "Installing Rockchip U-Boot..."
+
+        if [ -f ${uboot_dir}/idbloader.img ]; then
+            dd if=${uboot_dir}/idbloader.img of=/dev/${loopX} seek=64
+        else
+            ERROR "u-boot idbloader file can not be found!"
+            exit 2
+        fi
+    
+        if [ -f ${uboot_dir}/u-boot.itb ]; then
+            dd if=${uboot_dir}/u-boot.itb of=/dev/${loopX} seek=16384
+        else
+            ERROR "u-boot.itb file can not be found!"
+            exit 2
+        fi
+        
+    elif [ "${platform}" == "phytium" ];then
+        echo "Installing Phytium U-Boot..."
+        if [ -f ${uboot_dir}/fip-all-sd-boot.bin ]; then
+            sfdisk --dump /dev/${loopX} > ${uboot_dir}/part.txt
+            dd if=${uboot_dir}/fip-all-sd-boot.bin of=/dev/${loopX}
+            sfdisk --no-reread /dev/${loopX} < ${uboot_dir}/part.txt
+        else
+            ERROR "phytium fip-all-sd-boot file can not be found!"
+            exit 2
+        fi
+    else
+        echo "Unsupported platform"
+    fi
+    
+    LOG "install u-boot done."
 
     LOSETUP_D_IMG
     losetup -D
@@ -233,7 +256,7 @@ outputd(){
         LOG "xz openEuler image success."
     fi
 
-    if [ "x$board_type" == "xrk3399" ]; then
+    if [[ "x$board_type" == "xrk3399" && "x$platform" == "xrockchip" ]]; then
         LOG "tar openEuler image begin..."
         cp $workdir/../bin/rk3399_loader.bin $workdir
         cp $workdir/../bin/rk3399_parameter.gpt $workdir

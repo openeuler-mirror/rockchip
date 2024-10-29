@@ -202,7 +202,11 @@
 
     内核设备树中的设备名称，和开发板名称有一点区别，对应 [kernel/arch/arm64/boot/dts/rockchip](https://gitee.com/openeuler/kernel/tree/master/arch/arm64/boot/dts/rockchip) 下的 `DTB_NAME.dts` 文件，默认为 `rk3399-firefly`。
 
-7.  -s, --spec SPEC
+7. -p, --platform PLATFORM
+
+    开发板所使用的平台，目前支持的平台有：rockchip、phytium，默认为 `rockchip`。
+
+8.  -s, --spec SPEC
 
     构建的镜像版本：
     - `headless`，无图形界面版的镜像。
@@ -213,11 +217,11 @@
 
     默认使用 `headless` 选项。
 
-8.  -h, --help
+9.  -h, --help
 
     显示帮助信息。
 
-适用的 Rockchip 开发板:
+适用的 RK3399 开发板:
 
 已经测试的开发板如下，其他类型 Rockchip 开发板适用情况待测试。
 
@@ -227,11 +231,11 @@
 
     - openEuler-20.03-LTS，构建命令如下:
 
-        `sudo bash build.sh -n openEuler-20.03-LTS-Firefly-RK3399-aarch64-alpha1 -k https://gitee.com/openeuler/rockchip-kernel.git -b openEuler-20.03-LTS -c firefly-rk3399_defconfig -r https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-20.03-LTS/generic.repo -d rk3399-firefly -s headless`
+        `sudo bash build.sh -n openEuler-20.03-LTS-Firefly-RK3399-aarch64-alpha1 -k https://gitee.com/openeuler/rockchip-kernel.git -b openEuler-20.03-LTS -c firefly-rk3399_defconfig -r https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-20.03-LTS/generic.repo -d rk3399-firefly -p rockchip -s headless`
 
     - openEuler-22.03-LTS-SP3，构建命令如下：
 
-        `sudo bash build.sh -n openEuler-22.03-LTS-SP3-Firefly-RK3399-aarch64-alpha1 -k https://gitee.com/openeuler/rockchip-kernel.git -b openEuler-22.03-LTS-SP3 -c firefly-rk3399_defconfig -r https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-22.03-LTS-SP3/generic.repo -d rk3399-firefly -s headless`
+        `sudo bash build.sh -n openEuler-22.03-LTS-SP3-Firefly-RK3399-aarch64-alpha1 -k https://gitee.com/openeuler/rockchip-kernel.git -b openEuler-22.03-LTS-SP3 -c firefly-rk3399_defconfig -r https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-22.03-LTS-SP3/generic.repo -d rk3399-firefly -p rockchip -s headless`
 
 2. RockPi-4A
 
@@ -239,15 +243,15 @@
 
     - openEuler-20.03-LTS，构建命令如下:
 
-        `sudo bash build.sh -n openEuler-20.03-LTS-RockPi-4A-aarch64-alpha1 -k https://gitee.com/openeuler/rockchip-kernel.git -b openEuler-20.03-LTS -c rock-pi-4-rk3399_defconfig -r https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-20.03-LTS/generic.repo -d rk3399-rock-pi-4a -s headless`
+        `sudo bash build.sh -n openEuler-20.03-LTS-RockPi-4A-aarch64-alpha1 -k https://gitee.com/openeuler/rockchip-kernel.git -b openEuler-20.03-LTS -c rock-pi-4-rk3399_defconfig -r https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-20.03-LTS/generic.repo -d rk3399-rock-pi-4a -p rockchip -s headless`
 
     - openEuler-22.03-LTS，构建命令如下：
 
-        `sudo bash build.sh -n openEuler-22.03-LTS-RockPi-4A-aarch64-alpha1 -k https://gitee.com/openeuler/kernel.git -b openEuler-22.03-LTS -c rock-pi-4-rk3399_defconfig -r https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-22.03-LTS/generic.repo -d rk3399-rock-pi-4a -s headless`
+        `sudo bash build.sh -n openEuler-22.03-LTS-RockPi-4A-aarch64-alpha1 -k https://gitee.com/openeuler/kernel.git -b openEuler-22.03-LTS -c rock-pi-4-rk3399_defconfig -r https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-22.03-LTS/generic.repo -d rk3399-rock-pi-4a -p rockchip -s headless`
 
 适用的 RK3588 开发板:
 
-已经测试的开发板如下，其他类型 RK3588 开发板适用情况待测试。、
+已经测试的开发板如下，其他类型 RK3588 开发板适用情况待测试。
 
 1. Firefly ITX-3588J 
 
@@ -255,7 +259,7 @@
 
     - openEuler-22.03-LTS，构建命令如下:
 
-        `sudo bash build.sh -n openEuler-22.03-RK3588-Firefly-ITX-3588J-aarch64-alpha1 -k https://gitee.com/openeuler/rockchip-kernel.git -b openEuler-22.03-LTS-RK3588 -c none -r https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-22.03-LTS/generic.repo -d rk3588-firefly-itx-3588j -s headless`
+        `sudo bash build.sh -n openEuler-22.03-RK3588-Firefly-ITX-3588J-aarch64-alpha1 -k https://gitee.com/openeuler/rockchip-kernel.git -b openEuler-22.03-LTS-RK3588 -c none -r https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-22.03-LTS/generic.repo -d rk3588-firefly-itx-3588j -p rockchip -s headless`
 
 2. Firefly ROC-RK3588S-PC
 
@@ -263,7 +267,7 @@
 
     - openEuler-22.03-LTS，构建命令如下:
 
-        `sudo bash build.sh -n openEuler-22.03-LTS-Station-M3-aarch64-alpha1 -k https://gitee.com/openeuler/rockchip-kernel.git -b openEuler-22.03-LTS-RK3588 -c none -r https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-22.03-LTS/generic.repo -d rk3588s-roc-pc -s headless`
+        `sudo bash build.sh -n openEuler-22.03-LTS-Station-M3-aarch64-alpha1 -k https://gitee.com/openeuler/rockchip-kernel.git -b openEuler-22.03-LTS-RK3588 -c none -r https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-22.03-LTS/generic.repo -d rk3588s-roc-pc -p rockchip -s headless`
 
 3. Radxa Rock-5B
 
@@ -271,35 +275,55 @@
 
     - openEuler-22.03-LTS，构建命令如下:
 
-        `sudo bash build.sh -n openEuler-22.03-LTS-Rock5B-aarch64-alpha1 -k https://gitee.com/openeuler/rockchip-kernel.git -b openEuler-22.03-LTS-RK3588 -c none -r https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-22.03-LTS/generic.repo -d rk3588-rock-5b -s headless`
-        
-4. Firefly ROC-RK3566-PC
+        `sudo bash build.sh -n openEuler-22.03-LTS-Rock5B-aarch64-alpha1 -k https://gitee.com/openeuler/rockchip-kernel.git -b openEuler-22.03-LTS-RK3588 -c none -r https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-22.03-LTS/generic.repo -d rk3588-rock-5b -p rockchip -s headless`
+
+适用的 RK356X 开发板:
+
+已经测试的开发板如下，其他类型 RK356X 开发板适用情况待测试。
+
+1. Firefly ROC-RK3566-PC
 
     已测试的版本如下：
     
     - openEuler-22.03-LTS-SP2，构建命令如下:
 
-        `sudo bash build.sh -n openEuler-22.03-LTS-SP2-Station-M2-aarch64-alpha1 -k https://gitee.com/openeuler/rockchip-kernel.git -b openEuler-22.03-LTS-SP2 -c none -r https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-22.03-LTS-SP2/generic.repo -d rk3566-roc-pc -s headless`
+        `sudo bash build.sh -n openEuler-22.03-LTS-SP2-Station-M2-aarch64-alpha1 -k https://gitee.com/openeuler/rockchip-kernel.git -b openEuler-22.03-LTS-SP2 -c none -r https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-22.03-LTS-SP2/generic.repo -d rk3566-roc-pc -p rockchip -s headless`
         
     - openEuler-22.03-LTS-SP3，构建命令如下:
 
-        `sudo bash build.sh -n openEuler-22.03-LTS-SP3-Station-M2-aarch64-alpha1 -k https://gitee.com/openeuler/rockchip-kernel.git -b openEuler-22.03-LTS-SP3 -c none -r https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-22.03-LTS-SP3/generic.repo -d rk3566-roc-pc -s headless`
+        `sudo bash build.sh -n openEuler-22.03-LTS-SP3-Station-M2-aarch64-alpha1 -k https://gitee.com/openeuler/rockchip-kernel.git -b openEuler-22.03-LTS-SP3 -c none -r https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-22.03-LTS-SP3/generic.repo -d rk3566-roc-pc -p rockchip -s headless`
 
     - openEuler-24.03-LTS，构建命令如下:
 
-        `sudo bash build.sh -n openEuler-24.03-LTS-Station-M2-aarch64-alpha1 -k https://gitee.com/openeuler/rockchip-kernel.git -b openEuler-24.03-LTS -c none -r https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-24.03-LTS/generic.repo -d rk3566-roc-pc -s headless`
+        `sudo bash build.sh -n openEuler-24.03-LTS-Station-M2-aarch64-alpha1 -k https://gitee.com/openeuler/rockchip-kernel.git -b openEuler-24.03-LTS -c none -r https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-24.03-LTS/generic.repo -d rk3566-roc-pc -p rockchip -s headless`
         
-5. Firefly ROC-RK3568-PC-SE
+2. Firefly ROC-RK3568-PC-SE
 
     已测试的版本如下：
     
     - openEuler-22.03-LTS-SP2，构建命令如下:
 
-        `sudo bash build.sh -n openEuler-22.03-LTS-SP2-ROC-RK3568-PC-SE-aarch64-alpha1 -k https://gitee.com/openeuler/rockchip-kernel.git -b openEuler-22.03-LTS-SP2 -c none -r https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-22.03-LTS-SP2/generic.repo -d rk3568-roc-pc-se -s headless`
+        `sudo bash build.sh -n openEuler-22.03-LTS-SP2-ROC-RK3568-PC-SE-aarch64-alpha1 -k https://gitee.com/openeuler/rockchip-kernel.git -b openEuler-22.03-LTS-SP2 -c none -r https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-22.03-LTS-SP2/generic.repo -d rk3568-roc-pc-se -p rockchip -s headless`
         
     - openEuler-22.03-LTS-SP3，构建命令如下:
 
-        `sudo bash build.sh -n openEuler-22.03-LTS-SP3-ROC-RK3568-PC-SE-aarch64-alpha1 -k https://gitee.com/openeuler/rockchip-kernel.git -b openEuler-22.03-LTS-SP3 -c none -r https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-22.03-LTS-SP3/generic.repo -d rk3568-roc-pc-se -s headless`
+        `sudo bash build.sh -n openEuler-22.03-LTS-SP3-ROC-RK3568-PC-SE-aarch64-alpha1 -k https://gitee.com/openeuler/rockchip-kernel.git -b openEuler-22.03-LTS-SP3 -c none -r https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-22.03-LTS-SP3/generic.repo -d rk3568-roc-pc-se -p rockchip -s headless`
+
+适用的 Phytium 开发板:
+
+已经测试的开发板如下，其他类型 Phytium 开发板适用情况待测试。
+
+1.  Phytium Pi 4GB
+
+    已测试的版本如下：
+
+    - openEuler-22.03-LTS-SP3，构建命令如下:
+
+        `sudo bash build.sh -n openEuler-22.03-LTS-PhytiumPi-4GB-aarch64-alpha1 -k https://gitee.com/openeuler/phytium-kernel.git -b openEuler-22.03-LTS-Phytium -c none -r https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-22.03-LTS/generic.repo -d phytiumpi_firefly -p phytium -s headless`
+
+    - openEuler-24.03-LTS，构建命令如下:
+
+        `sudo bash build.sh -n openEuler-24.03-LTS-PhytiumPi-4GB-aarch64-alpha1 -k https://gitee.com/openeuler/phytium-kernel.git -b openEuler-24.03-LTS-Phytium -c none -r https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-24.03-LTS/generic.repo -d phytiumpi_firefly -p phytium -s headless`
 
 
 ### 顺序构建
