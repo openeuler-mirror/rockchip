@@ -14,6 +14,7 @@ This repository provides scripts for building openEuler image for Rockchip devel
     - [Install an Image on an SD Card](#install-an-image-on-an-sd-card)
     - [Install an Image on an EMMC](#install-an-image-on-an-emmc)
     - [Install an Image on an EMMC](#install-an-image-on-an-emmc)
+  - [Issue Summary](#issue-summary)
 
 ## File Description
 
@@ -23,6 +24,8 @@ This repository provides scripts for building openEuler image for Rockchip devel
     - [Build images sequentially](documents/顺序构建.md)
     - [Compile the kernel of Firefly-RK3399 based on the Firefly SDK](documents/基于Firefly-SDK编译Firefly-RK3399的内核镜像.md)
     - [Packaging ITX-RK3588J Integrated Burn Write Image](documents/打包ITX-RK3588J一体化烧写镜像.md)
+    - [Set up SELinux](documents/设置SELinux.md)
+    - [Build an image using Docker](documents/使用Docker构建镜像.md)
 - [scripts](./scripts/): Used to build openEuler Rockchip images
     - [One-time build images](scripts/build.sh)
     - [Build a boot Image](scripts/build_boot.sh)
@@ -339,3 +342,31 @@ After decompressing the RAW original image, please refer to [Install openEuler o
 ### Install an Image on an EMMC
 
 Refer to [Install openEuler to the EMMC](documents/刷写EMMC镜像.md) for details about how to write compressed RAW original image to an EMMC.
+
+## Issue Summary
+
+1. Login Incorrect Message with Custom Built openEuler Image:
+
+   This issue typically has the following characteristics:
+
+   - After entering root/openeuler, you see "Login incorrect":
+
+   ```
+   openEuler 22.03 LTS
+   Kernel 5.10.0 on an aarch64
+
+   openEuler login: root
+   Password:
+
+   Login incorrect
+   ```
+
+   - Unable to change the password when chrooted to the root directory:
+
+   `passwd: Authentication token manipulation error`
+
+   Here are some solutions for this type of issue. If you have more methods, feel free to provide feedback:
+
+   - [Build an Image Using Docker (Recommended)](documents/使用Docker构建镜像.md)
+   
+   - [Set Up SELinux](documents/设置SELinux.md)

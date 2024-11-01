@@ -14,6 +14,7 @@
   - [刷写镜像](#刷写镜像)
     - [刷写到 SD 卡](#刷写到-sd-卡)
     - [刷写到 EMMC](#刷写到-emmc)
+  - [问题汇总](#问题汇总)
 
 ## 文件说明
 
@@ -23,6 +24,8 @@
     - [顺序构建](documents/顺序构建.md)
     - [基于Firefly-SDK编译Firefly-RK3399的内核镜像](documents/基于Firefly-SDK编译Firefly-RK3399的内核镜像.md)
     - [打包 ITX-RK3588J 一体化烧写镜像](documents/打包ITX-RK3588J一体化烧写镜像.md)
+    - [设置 SELinux](documents/设置SELinux.md)
+    - [使用 Docker 构建镜像](documents/使用Docker构建镜像.md)
 - [scripts](./scripts/): 构建 openEuler Rockchip镜像的脚本
     - [一次构建脚本](scripts/build.sh)
     - [boot 镜像构建脚本](scripts/build_boot.sh)
@@ -341,3 +344,32 @@
 ### 刷写到 EMMC
 
 将 openEuler 安装到 EMMC，详见[刷写EMMC镜像](documents/刷写EMMC镜像.md)。
+
+
+## 问题汇总
+
+1.  自构建 openEuler 镜像登录时提示 Login incorrect：
+    
+    该问题通常有以下几种特征：
+
+    - 根据提示输入 root / openeuler 后提示 Login incorrect
+    
+    ```
+    openEuler 22.03 LTS
+    Kernel 5.10.0 on an aarch64
+
+    openEuler login:root
+    Password:
+
+    Login incorrect
+    ```
+
+    - chroot 到根目录无法修改密码
+
+    `passwd:Authentication token manipulation error`
+
+    遇到这一类问题有以下解决方法，如果有更多方法，欢迎反馈：
+
+    - [使用 Docker 构建镜像（推荐）](documents/使用Docker构建镜像.md)
+    
+    - [设置 SELinux](documents/设置SELinux.md)
