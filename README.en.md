@@ -205,7 +205,7 @@ The meaning of each parameter:
 
 6. -d, --device-tree DTB_NAME
 
-    The device name in the kernel device-tree whitch is a little different from the board name. It corresponds to the `DTB_NAME.dts` file under the [kernel/arch/arm64/boot/dts/rockchip](https://gitee.com/openeuler/kernel/tree/master/arch/arm64/boot/dts/rockchip) folder. The default is `rk3399-firefly`.
+    The device name in the kernel device-tree which is a little different from the board name. It corresponds to the `DTB_NAME.dts` file under the [kernel/arch/arm64/boot/dts/rockchip](https://gitee.com/openeuler/kernel/tree/master/arch/arm64/boot/dts/rockchip) folder. The default is `rk3399-firefly`.
 
 7. -d, --device-tree DTB_NAME
 
