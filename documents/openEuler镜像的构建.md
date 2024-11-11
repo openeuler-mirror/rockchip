@@ -1,7 +1,8 @@
 - [描述](#描述)
 - [准备编译环境](#准备编译环境)
-- [基于主线 u-boot 编译启动文件](#基于主线-u-boot-编译启动文件)
-  - [编译 u-boot](#编译-u-boot)
+- [编译 u-boot 启动文件](#编译-u-boot-启动文件)
+  - [编译 RK3399 u-boot](#编译-rk3399-u-boot)
+  - [编译 RK356x/RK3588 u-boot](#编译-rk356xrk3588-u-boot)
 - [基于 openEuler 内核编译内核镜像](#基于-openeuler-内核编译内核镜像)
   - [编译内核代码](#编译内核代码)
 - [构建 boot 镜像](#构建-boot-镜像)
@@ -59,9 +60,9 @@
     cd $WORKDIR
     ```
 
-# 基于主线 u-boot 编译启动文件
+# 编译 u-boot 启动文件
 
-## 编译 u-boot
+## 编译 RK3399 u-boot
 
 1. 下载源码
 
@@ -95,6 +96,191 @@
     cd $WORKDIR
     ```
 
+## 编译 RK356x/RK3588 u-boot
+
+1. 下载源码
+
+    - 如果是 RK3566/RK3568 开发板，执行以下命令来下载 u-boot 源码，以 `Firefly ROC-RK3566-PC` 和 `Firefly ROC-RK3568-PC-SE` 为例，使用 Firefly 的 u-boot 源码：
+
+      ```
+      cd $WORKDIR
+      git clone --branch rk356x/firefly-5.10 --depth=1 https://gitlab.com/firefly-linux/u-boot.git
+      ```
+
+    - 如果是 RK3588 开发板，执行以下命令来下载 u-boot 源码，以 `Firefly ROC-RK3588S-PC` 为例，使用 Firefly 的 u-boot 源码：
+
+      ```
+      cd $WORKDIR
+      git clone --branch rk3588/firefly --depth=1 https://gitlab.com/firefly-linux/u-boot.git
+      ```
+
+2. 下载 rkbin
+
+    ```
+    cd $WORKDIR
+    git clone --depth=1 https://github.com/rockchip-linux/u-boot.git -o 7c35e21a8529b3758d1f051d1a5dc62aae934b2b --recursive --depth=1
+    ```
+
+3. 编译 u-boot
+
+    - 如果是 RK3566/RK3568 开发板，执行以下命令来编译 u-boot 源码，以 `Firefly ROC-RK3566-PC` 和 `Firefly ROC-RK3568-PC-SE` 为例，使用 Firefly 的 u-boot 源码：
+
+      ```
+      make ARCH=arm rk3568_defconfig
+      make ARCH=arm -j$(nproc)
+      ```
+
+      注意：这里 Firefly 的 u-boot 源码中的 `rk3568_defconfig` u-boot 配置文件中指定的 `rk3568-evb.dts` 仅保证可用于 Firefly 的 RK3566/RK3568 设备：
+
+      https://gitlab.com/firefly-linux/u-boot/-/blob/rk356x/firefly-5.10/configs/rk3568_defconfig?ref_type=heads#L21
+
+    - 如果是 RK3588 开发板，执行以下命令来编译 u-boot 源码，以 `Firefly ROC-RK3588S-PC` 为例，使用 Firefly 的 u-boot 源码：
+
+      ```
+      make ARCH=arm rk3588_defconfig
+      make ARCH=arm -j$(nproc)
+      ```
+
+      注意：这里 Firefly 的 u-boot 源码中的 `rk3588_defconfig` u-boot 配置文件中指定的 `rk3588-evb.dts` 仅保证可用于 Firefly 的 RK3588 设备：
+
+      https://gitlab.com/firefly-linux/u-boot/-/blob/rk3588/firefly/configs/rk3588_defconfig?ref_type=heads#L23
+
+4.  生成 idbloader.img
+
+    - RK3566
+
+      ```
+      tools/mkimage -n rk356x -T rksd -d ../rkbin/bin/rk35/rk3566_ddr_1056MHz_v1.23.bin:spl/u-boot-spl.bin idbloader.img
+      ```
+
+    - RK3568
+
+      ```
+      tools/mkimage -n rk356x -T rksd -d ../rkbin/bin/rk35/rk3568_ddr_1560MHz_v1.23.bin:spl/u-boot-spl.bin idbloader.img
+      ```
+
+    - RK3588
+
+      ```
+      tools/mkimage -n rk3588 -T rksd -d ../rkbin/bin/rk35/rk3588_ddr_lp4_2112MHz_lp5_2400MHz_v1.18.bin:spl/u-boot-spl.bin idbloader.img
+      ```
+
+    输出如下：
+
+    ```
+    Image Type:   Rockchip RK35 boot image
+    Init Data Size: 75776 bytes
+    Boot Data Size: 256000 bytes
+    ```
+
+5.  生成 u-boot.itb
+
+    - RK3566/RK3568
+
+    ```
+    cp ../rkbin/bin/rk35/rk3568_bl31_v1.44.elf bl31.elf
+    arch/arm/mach-rockchip/make_fit_atf.sh u-boot.dtb > uboot.its
+
+    cp ../rkbin/bin/rk35/rk3568_bl32_v2.14.bin tee.bin
+    tools/mkimage -f uboot.its -E u-boot.itb
+    ```
+
+    - RK3588
+
+    ```
+    cp ../rkbin/bin/rk35/rk3588_bl31_v1.47.elf bl31.elf
+    arch/arm/mach-rockchip/make_fit_atf.sh u-boot.dtb > uboot.its
+
+    cp ../rkbin/bin/rk35/rk3588_bl32_v1.17.bin tee.bin
+    tools/mkimage -f uboot.its -E u-boot.itb
+    ```
+
+    输出如下：
+
+    ```
+    FIT description: FIT Image with ATF/OP-TEE/U-Boot/MCU
+    Created:         Fri Nov  8 09:14:41 2024
+     Image 0 (uboot)
+      Description:  U-Boot
+      Created:      Fri Nov  8 09:14:41 2024
+      Type:         Standalone Program
+      Compression:  uncompressed
+      Data Size:    1357176 Bytes = 1325.37 KiB = 1.29 MiB
+      Architecture: AArch64
+      Load Address: 0x00200000
+      Entry Point:  unavailable
+      Hash algo:    sha256
+      Hash value:   67813f7c0d6c6f429254565954b83d91fd00fdd36735c18833b2f892a74d7a2f
+     Image 1 (atf-1)
+      Description:  ARM Trusted Firmware
+      Created:      Fri Nov  8 09:14:41 2024
+      Type:         Firmware
+      Compression:  uncompressed
+      Data Size:    204860 Bytes = 200.06 KiB = 0.20 MiB
+      Architecture: AArch64
+      Load Address: 0x00040000
+      Hash algo:    sha256
+      Hash value:   6a4a192c104cc98c4b7e63ad0c6728b27b1af0a95fb9555b19faf55f8cf5871c
+     Image 2 (atf-2)
+      Description:  ARM Trusted Firmware
+      Created:      Fri Nov  8 09:14:41 2024
+      Type:         Firmware
+      Compression:  uncompressed
+      Data Size:    36864 Bytes = 36.00 KiB = 0.04 MiB
+      Architecture: AArch64
+      Load Address: 0xff100000
+      Hash algo:    sha256
+      Hash value:   70505bb764db81a665c8bba4953d804ed9eab580d5428888a4436121eff11c50
+     Image 3 (atf-3)
+      Description:  ARM Trusted Firmware
+      Created:      Fri Nov  8 09:14:41 2024
+      Type:         Firmware
+      Compression:  uncompressed
+      Data Size:    24576 Bytes = 24.00 KiB = 0.02 MiB
+      Architecture: AArch64
+      Load Address: 0x000f0000
+      Hash algo:    sha256
+      Hash value:   569ee96047e8ff069a6f89d1f62a530133c3e0afc74da4958519da2b51ec57d6
+     Image 4 (optee)
+      Description:  OP-TEE
+      Created:      Fri Nov  8 09:14:41 2024
+      Type:         Firmware
+      Compression:  uncompressed
+      Data Size:    465312 Bytes = 454.41 KiB = 0.44 MiB
+      Architecture: AArch64
+      Load Address: 0x08400000
+      Hash algo:    sha256
+      Hash value:   66e4b7a4cd05b86d45085ccc6f676d596c581d7e5c981c916c874abd0ebfad54
+     Image 5 (fdt)
+      Description:  U-Boot dtb
+      Created:      Fri Nov  8 09:14:41 2024
+      Type:         Flat Device Tree
+      Compression:  uncompressed
+      Data Size:    8867 Bytes = 8.66 KiB = 0.01 MiB
+      Architecture: AArch64
+      Hash algo:    sha256
+      Hash value:   a434b1c4fe1fe989156b3b53572daa76e0342fbcf2503fd4807ad30f8da2ce71
+     Default Configuration: 'conf'
+     Configuration 0 (conf)
+      Description:  rk3588-evb
+      Kernel:       unavailable
+      Firmware:     atf-1
+      FDT:          fdt
+      Loadables:    uboot
+                    atf-2
+                    atf-3
+                    optee
+    ```
+
+6.  收集编译结果
+
+    将生成的 idbloader.img 和 u-boot.itb 文件复制到工作目录。
+
+    ```
+    cp idbloader.img $WORKDIR
+    cp idbloader.img $WORKDIR
+    cd $WORKDIR
+    ```
 
 # 基于 openEuler 内核编译内核镜像
 
