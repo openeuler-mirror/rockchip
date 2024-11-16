@@ -1,3 +1,5 @@
+# DEPRECATED. Please refer to [SBC-sig](https://gitee.com/openeuler/SBC-sig)
+
 # Rockchip
 
 English | [简体中文](./README.md)

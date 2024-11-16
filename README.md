@@ -1,3 +1,5 @@
+# 本仓库已废弃，请移步：[SBC-sig](https://gitee.com/openeuler/SBC-sig)
+
 # Rockchip
 
 [English](./README.en.md) | 简体中文
