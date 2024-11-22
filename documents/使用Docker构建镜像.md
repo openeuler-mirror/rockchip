@@ -128,7 +128,7 @@ dnf install git -y
 
 脚本执行完成后，会在 Docker 容器中脚本所在目录的 build/YYYY-MM-DD 文件夹下生成 openEuler 镜像文件。
 
-假设构建框架 rockchip 文件夹的在 Docker 容器里的绝对路径为：/root/rockchip，使用以下命令来拷贝 openEuler 镜像文件到构建主机：
+假设构建框架 rockchip 的文件夹在 Docker 容器里的绝对路径为：/root/rockchip，使用以下命令来拷贝 openEuler 镜像文件到构建主机：
 
 ```
 docker cp openEuler-2203-aarch64:/root/rockchip/build/YYYY-MM-DD/openEuler-VERSION-BOARD-ARCH-RELEASE.img.xz /root

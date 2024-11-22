@@ -50,7 +50,7 @@
 
     ```
     dnf makecache
-    dnf install git wget make gcc bison dtc m4 flex bc openssl-devel tar dosfstools rsync parted dnf-plugins-core tar
+    dnf install git wget make gcc bison dtc m4 flex bc openssl-devel tar dosfstools rsync parted dnf-plugins-core
     ```
 
 3.  创建工作目录
